@@ -12,7 +12,7 @@ The Arduino software for this project is in the [`sensor_logger.ino`](https://gi
 - [Adafruit Feather M0 Bluefruit LE](https://amzn.to/2ryuGN1)
 - [Adalogger FeatherWing - RTC + SD](https://amzn.to/2EsIelH)
 - [3.7V 500maH LiPo Battery](https://amzn.to/2UASH3g)
-- [3D-printed mount](https://grabcad.com/library/3-axis-acceleration-sensor-mount-1)
+- [3D-printed mount](https://www.thingiverse.com/thing:3343163)
 
 
 ## Instructions
