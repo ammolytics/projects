@@ -1,4 +1,10 @@
-// Basic demo for accelerometer readings from Adafruit LIS3DH
+/**
+ * Created by Ammolytics
+ * License: MIT
+ * Version: 1.0.0
+ * URL: https://github.com/ammolytics/projects/
+ * Inexpensive firearm accelerometer based on the Adafruit LIS3DH breakout board.
+ */
 
 #include <Wire.h>
 #include <SPI.h>
