@@ -4,15 +4,15 @@ This project was first featured in an article which investigated the effects [Re
 
 ## Software
 
-The Arduino software for this project is in the [`sensor_logger.ino`](https://github.com/ammolytics/projects/blob/master/accelerometer/sensor_logger.ino) file. It's based on the [example code](https://github.com/adafruit/Adafruit_LIS3DH) from Adafruit for the [LIS3DH sensor](https://amzn.to/2PASGsD).
+The Arduino software for this project is in the [`sensor_logger.ino`](https://github.com/ammolytics/projects/blob/master/accelerometer/sensor_logger.ino) file. It's based on the [example code](https://github.com/adafruit/Adafruit_LIS3DH) from Adafruit for the [LIS3DH sensor](https://amzn.to/2CqVRi0).
 
 
 ## Hardware
 
-- [Adafruit LIS3DH Triple-Axis Accelerometer](https://amzn.to/2PASGsD)
-- [Adafruit Feather M0 Bluefruit LE](https://amzn.to/2ryuGN1)
-- [Adalogger FeatherWing - RTC + SD](https://amzn.to/2EsIelH)
-- [3.7V 500maH LiPo Battery](https://amzn.to/2UASH3g)
+- [Adafruit LIS3DH Triple-Axis Accelerometer](https://amzn.to/2CqVRi0)
+- [Adafruit Feather M0 Bluefruit LE](https://amzn.to/2DhGHNH)
+- [Adalogger FeatherWing - RTC + SD](https://amzn.to/2T2kdFU)
+- [3.7V 500maH LiPo Battery](https://amzn.to/2RR6wfC)
 - [3D-printed mount](https://www.thingiverse.com/thing:3343163)
 
 
