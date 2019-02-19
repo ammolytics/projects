@@ -34,3 +34,24 @@ After assembling the hardware, you'll need to install the software in this repo 
 // Note: Comment out before running in real-world.
 #define DEBUG
 ```
+
+## Data Output
+
+When the unit is powered up, it will create a new file based on the date/time in this format:
+
+    YYYYMMDDHHmm.csv
+
+While it's running, it stores a few seconds of acceleration data in memory before writing to disk. The write opertation can take around `10ms`, which is too slow to do constantly. It does write often enough that you should not lose much data at all when powering down.
+
+Acceleration values are in [`G`s](https://en.wikipedia.org/wiki/G-force#Unit_and_measurement), which can easily be converted to metric or imperial units.
+
+Here's an example of the resulting data set. 
+
+| timestamp (s) | start (µs) | delta (µs) | accel x (G) | accel y (G) | accel z (G) |
+| -- | -- | -- | -- | -- | -- |
+| 1547749706 | 123593 | 223 | 0.75 | 1.19 | -0.19 |
+| 1547749706 | 125917 | 251 | 0.80 | 1.19 | -0.22 |
+| 1547749706 | 126979 | 252 | 0.85 | 1.11 | -0.21 |
+| 1547749706 | 128040 | 252 | 0.85 | 1.09 | -0.26 |
+| 1547749706 | 129097 | 251 | 0.94 | 1.05 | -0.22 |
+| 1547749706 | 130158 | 252 | 0.97 | 1.02 | -0.20 |
