@@ -169,17 +169,17 @@ void loop() {
   dataFile.print(stop_us - start_us);
   dataFile.print(',');
   
-  DEBUG_PRINT(lis.x);
+  DEBUG_PRINT(lis.x_g);
   DEBUG_PRINT(',');
-  DEBUG_PRINT(lis.y);
+  DEBUG_PRINT(lis.y_g);
   DEBUG_PRINT(',');
-  DEBUG_PRINT(lis.z);
+  DEBUG_PRINT(lis.z_g);
   // Write acceleration to file.
-  dataFile.print(lis.x);
+  dataFile.print(lis.x_g);
   dataFile.print(',');
-  dataFile.print(lis.y);
+  dataFile.print(lis.y_g);
   dataFile.print(',');
-  dataFile.print(lis.z);
+  dataFile.print(lis.z_g);
 
   DEBUG_PRINTLN();
   // Write newline.
