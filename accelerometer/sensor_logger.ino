@@ -57,9 +57,6 @@ unsigned long counter = 0;
 // I2C
 Adafruit_LIS3DH lis = Adafruit_LIS3DH();
 
-// global event
-sensors_event_t event;
-
 // set up variables using the SD utility library functions:
 // File system object.
 SdFat sd;
@@ -108,6 +105,7 @@ void setup() {
   }
   DEBUG_PRINTLN("Card initialized.");
   
+  // Set filename based on timestamp.
   sprintf_P(filename, PSTR("%4d%02d%02d%02d%02d.csv"), now.year(), now.month(), now.day(), now.hour(), now.minute());
   DEBUG_PRINT("Filename: ");
   DEBUG_PRINTLN(filename);
@@ -116,8 +114,9 @@ void setup() {
      DEBUG_PRINTLN("Could not open file...");
      while (1);
   }
-  DEBUG_PRINTLN("timestamp (s), start (µs), delta (µs), accel x (m/s²), accel y (m/s²), accel z (m/s²)");
-  dataFile.println("timestamp (s), start (µs), delta (µs), accel x (m/s²), accel y (m/s²), accel z (m/s²)");
+  DEBUG_PRINTLN("timestamp (s), start (µs), delta (µs), accel x (G), accel y (G), accel z (G)");
+  // Write header row to file.
+  dataFile.println("timestamp (s), start (µs), delta (µs), accel x (G), accel y (G), accel z (G)");
   dataFile.flush();
   
   // Check to see if the file exists:
@@ -142,32 +141,21 @@ void setup() {
   lis.setDataRate(LIS3DH_DATARATE_LOWPOWER_5KHZ);
   DEBUG_PRINTLN("LIS3DH initialized.");
 
-
   DEBUG_PRINTLN("Ready!");
-
-  /**
-  DateTime now = rtc.now();
-  sprintf_P(DateTimeString, PSTR("%4d-%02d-%02d %d:%02d:%02d"),
-      now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
-  sprintf_P(filename, PSTR("%4d%02d%02d.csv"), now.year(), now.month(), now.day());
-
-  DEBUG_PRINTLN(DateTimeString);
-  DEBUG_PRINTLN(filename);
-  */
 }
-
 
 
 // Main Loop
 void loop() {
+  // Read from the accelerometer sensor and measure how long the op takes.
   start_us = micros();
-  lis.getEvent(&event);
+  lis.read();
   stop_us = micros();
 
   // Roughly equivalent to calling rtc.now().unixtime(), without 1ms latency.
   DEBUG_PRINT(begin_epoch + ((stop_us - begin_us) / 1000000));
   DEBUG_PRINT(',');
-  // repeat
+  // Write timestamp to file.
   dataFile.print(begin_epoch + ((stop_us - begin_us) / 1000000));
   dataFile.print(',');
 
@@ -175,31 +163,31 @@ void loop() {
   DEBUG_PRINT(',');
   DEBUG_PRINT(stop_us - start_us);
   DEBUG_PRINT(',');
-  // repeat
+  // Write timers to file.
   dataFile.print(start_us);
   dataFile.print(',');
   dataFile.print(stop_us - start_us);
   dataFile.print(',');
   
-  DEBUG_PRINT(event.acceleration.x);
+  DEBUG_PRINT(lis.x);
   DEBUG_PRINT(',');
-  DEBUG_PRINT(event.acceleration.y);
+  DEBUG_PRINT(lis.y);
   DEBUG_PRINT(',');
-  DEBUG_PRINT(event.acceleration.z);
-  // repeat
-  dataFile.print(event.acceleration.x);
+  DEBUG_PRINT(lis.z);
+  // Write acceleration to file.
+  dataFile.print(lis.x);
   dataFile.print(',');
-  dataFile.print(event.acceleration.y);
+  dataFile.print(lis.y);
   dataFile.print(',');
-  dataFile.print(event.acceleration.z);
-  
+  dataFile.print(lis.z);
 
   DEBUG_PRINTLN();
+  // Write newline.
   dataFile.println();
   counter++;
 
-
   /**
+   * Flush buffer, actually write to disk.
    * This can take between 9 and 26 milliseconds. Or ~10ms with SDfat.
    */
   if (counter >= 800) {
