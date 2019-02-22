@@ -47,11 +47,21 @@ Acceleration values are in [`G`s](https://en.wikipedia.org/wiki/G-force#Unit_and
 
 Here's an example of the resulting data set. 
 
-| timestamp (s) | start (µs) | delta (µs) | accel x (G) | accel y (G) | accel z (G) |
-| -- | -- | -- | -- | -- | -- |
-| 1547749706 | 123593 | 223 | 0.75 | 1.19 | -0.19 |
-| 1547749706 | 125917 | 251 | 0.80 | 1.19 | -0.22 |
-| 1547749706 | 126979 | 252 | 0.85 | 1.11 | -0.21 |
-| 1547749706 | 128040 | 252 | 0.85 | 1.09 | -0.26 |
-| 1547749706 | 129097 | 251 | 0.94 | 1.05 | -0.22 |
-| 1547749706 | 130158 | 252 | 0.97 | 1.02 | -0.20 |
+| timestamp (s) | start (µs) | accel x (G) | accel y (G) | accel z (G) |
+| -- | -- | -- | -- | -- |
+| 1547749706 | 123593 | 0.750 | 1.194 | -0.191 |
+| 1547749706 | 125917 | 0.801 | 1.191 | -0.222 |
+| 1547749706 | 126979 | 0.853 | 1.112 | -0.212 |
+| 1547749706 | 128040 | 0.852 | 1.092 | -0.263 |
+| 1547749706 | 129097 | 0.944 | 1.054 | -0.223 |
+| 1547749706 | 130158 | 0.973 | 1.021 | -0.201 |
+
+
+## Configuration
+
+There are a few variables which can be changed according to your needs.
+
+- `ACCEL_RANGE`: Can be set to 2G, 4G, 8G, 16G (default: `8G`)  
+  Greater acceleration ranges have lower sensitivity.  
+- `ACCEL_PRECISION`: Defines the number of decimal places for the acceleration output (default: `3`)
+- `SEP`: Defines the separator character for the output (default: `,`)
