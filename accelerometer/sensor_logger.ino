@@ -1,7 +1,7 @@
 /**
  * Created by Ammolytics
  * License: MIT
- * Version: 2.0.0
+ * Version: 2.1.0
  * URL: https://github.com/ammolytics/projects/
  * Inexpensive firearm accelerometer based on the Adafruit LIS3DH breakout board.
  */
@@ -19,6 +19,14 @@
 
 // I2C clock speed
 #define I2C_SPEED 1000000
+// Set range to 2G, 4G, 8G, 16G
+#define ACCEL_RANGE LIS3DH_RANGE_8_G
+// 5khz data rate
+#define ACCEL_DATARATE LIS3DH_DATARATE_LOWPOWER_5KHZ
+// Decimal precision for acceleration
+#define ACCEL_PRECISION 3
+// Separator character
+#define SEP ","
 
 // Enable debug logger.
 // Note: Comment out before running in real-world.
@@ -64,6 +72,9 @@ SdFat sd;
 SdFile dataFile;
 
 
+/**
+ * Setup procedures.
+ */
 void setup() {
   #ifdef DEBUG
     Serial.begin(115200);
@@ -94,37 +105,11 @@ void setup() {
   DateTime now = rtc.now();
   begin_epoch = now.unixtime();
 
-  /**
-   * Initialize the SD card and log file.
-   */
-  DEBUG_PRINTLN("Initializing SD card...");
-  if (!sd.begin(chipSelect, SD_SCK_MHZ(50))) {
-    DEBUG_PRINTLN("Card failed, or not present");
-    // don't do anything more:
-    while (1);
-  }
-  DEBUG_PRINTLN("Card initialized.");
-  
   // Set filename based on timestamp.
   sprintf_P(filename, PSTR("%4d%02d%02d%02d%02d.csv"), now.year(), now.month(), now.day(), now.hour(), now.minute());
   DEBUG_PRINT("Filename: ");
   DEBUG_PRINTLN(filename);
 
-  if (! dataFile.open(filename, O_CREAT | O_APPEND | O_WRITE)) {
-     DEBUG_PRINTLN("Could not open file...");
-     while (1);
-  }
-  DEBUG_PRINTLN("timestamp (s), start (µs), delta (µs), accel x (G), accel y (G), accel z (G)");
-  // Write header row to file.
-  dataFile.println("timestamp (s), start (µs), delta (µs), accel x (G), accel y (G), accel z (G)");
-  dataFile.flush();
-  
-  // Check to see if the file exists:
-  if (! sd.exists(filename)) {
-    DEBUG_PRINTLN("Log file doesn't exist.");
-    while (1);
-  }
-  
   /**
    * Initialize the accelerometer.
    */
@@ -135,67 +120,120 @@ void setup() {
   }
   // Set I2C high speedmode
   Wire.setClock(I2C_SPEED);
-  // Set range to 8G
-  lis.setRange(LIS3DH_RANGE_8_G);
-  // 5khz data rate
-  lis.setDataRate(LIS3DH_DATARATE_LOWPOWER_5KHZ);
+  lis.setRange(ACCEL_RANGE);
+  lis.setDataRate(ACCEL_DATARATE);
   DEBUG_PRINTLN("LIS3DH initialized.");
 
+
+  /**
+   * Initialize the SD card and log file.
+   */
+  DEBUG_PRINTLN("Initializing SD card...");
+  if (!sd.begin(chipSelect, SD_SCK_MHZ(50))) {
+    DEBUG_PRINTLN("Card failed, or not present");
+    // don't do anything more:
+    while (1);
+  }
+  DEBUG_PRINTLN("Card initialized.");
+
+  if (! dataFile.open(filename, O_CREAT | O_APPEND | O_WRITE)) {
+     DEBUG_PRINTLN("Could not open file...");
+     while (1);
+  }
+  // Write header row to file.
+  dataFile.println("timestamp (s), start (µs), accel x (G), accel y (G), accel z (G)");
+  dataFile.flush();
+  
+  // Check to see if the file exists:
+  if (! sd.exists(filename)) {
+    DEBUG_PRINTLN("Log file doesn't exist.");
+    while (1);
+  }
+
   DEBUG_PRINTLN("Ready!");
+  DEBUG_PRINTLN("timestamp (s), start (µs), delta (µs), accel x (G), accel y (G), accel z (G)");
 }
 
 
-// Main Loop
+/**
+ * Main Loop
+ */
 void loop() {
-  // Read from the accelerometer sensor and measure how long the op takes.
+  read_accel();
+  log_timers();
+  log_accel();
+  counter++;
+
+  if (counter >= 1000) {
+    write_sd();
+    counter = 0;
+  }
+}
+
+
+/**
+ * Read from the accelerometer sensor and measure how long the op takes.
+ */
+void read_accel() {
   start_us = micros();
   lis.read();
   stop_us = micros();
+}
 
-  // Roughly equivalent to calling rtc.now().unixtime(), without 1ms latency.
+
+/**
+ * Output the timing info.
+ */
+void log_timers() {
   DEBUG_PRINT(begin_epoch + ((stop_us - begin_us) / 1000000));
-  DEBUG_PRINT(',');
-  // Write timestamp to file.
-  dataFile.print(begin_epoch + ((stop_us - begin_us) / 1000000));
-  dataFile.print(',');
-
-  DEBUG_PRINT(start_us);
-  DEBUG_PRINT(',');
+  DEBUG_PRINT(SEP);
+  DEBUG_PRINT(stop_us);
+  DEBUG_PRINT(SEP);
+  // Include time delta in debug output.
   DEBUG_PRINT(stop_us - start_us);
-  DEBUG_PRINT(',');
-  // Write timers to file.
-  dataFile.print(start_us);
-  dataFile.print(',');
-  dataFile.print(stop_us - start_us);
-  dataFile.print(',');
-  
-  DEBUG_PRINT(lis.x_g);
-  DEBUG_PRINT(',');
-  DEBUG_PRINT(lis.y_g);
-  DEBUG_PRINT(',');
-  DEBUG_PRINT(lis.z_g);
-  // Write acceleration to file.
-  dataFile.print(lis.x_g);
-  dataFile.print(',');
-  dataFile.print(lis.y_g);
-  dataFile.print(',');
-  dataFile.print(lis.z_g);
+  DEBUG_PRINT(SEP);
 
-  DEBUG_PRINTLN();
+  // Write timestamp to file.
+  // Roughly equivalent to calling rtc.now().unixtime(), without 1ms latency.
+  dataFile.print(begin_epoch + ((stop_us - begin_us) / 1000000));
+  dataFile.print(SEP);
+  // Write timers to file.
+  dataFile.print(stop_us);
+  dataFile.print(SEP);
+}
+
+
+/**
+ * Output the acceleration info.
+ */
+void log_accel() {
+  #ifdef DEBUG
+    Serial.print(lis.x_g, ACCEL_PRECISION);
+    Serial.print(SEP);
+    Serial.print(lis.y_g, ACCEL_PRECISION);
+    Serial.print(SEP);
+    Serial.print(lis.z_g, ACCEL_PRECISION);
+    Serial.println();
+  #endif
+  // Write acceleration to file.
+  dataFile.print(lis.x_g, ACCEL_PRECISION);
+  dataFile.print(SEP);
+  dataFile.print(lis.y_g, ACCEL_PRECISION);
+  dataFile.print(SEP);
+  dataFile.print(lis.z_g, ACCEL_PRECISION);
   // Write newline.
   dataFile.println();
-  counter++;
+}
 
-  /**
-   * Flush buffer, actually write to disk.
-   * This can take between 9 and 26 milliseconds. Or ~10ms with SDfat.
-   */
-  if (counter >= 800) {
-    DEBUG_PRINTLN("Writing to SD card");
-    unsigned long pre_write = micros();
-    dataFile.flush();
-    unsigned long post_write = micros();
-    DEBUG_PRINT("Write ops took: "); DEBUG_PRINTLN(post_write - pre_write);
-    counter = 0;
-  }
+
+/**
+ * Flush buffer, actually write to disk.
+ * This can take between 9 and 26 milliseconds. Or ~10ms with SDfat.
+ */
+void write_sd() {
+  DEBUG_PRINTLN("Writing to SD card");
+  unsigned long pre_write = micros();
+  dataFile.flush();
+  DEBUG_PRINT("Write ops took: ");
+  DEBUG_PRINTLN(micros() - pre_write);
 }
