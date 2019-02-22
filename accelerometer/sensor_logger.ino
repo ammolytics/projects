@@ -187,7 +187,7 @@ void read_accel() {
 void log_timers() {
   DEBUG_PRINT(begin_epoch + ((stop_us - begin_us) / 1000000));
   DEBUG_PRINT(SEP);
-  DEBUG_PRINT(stop_us - begin_us);
+  DEBUG_PRINT(stop_us);
   DEBUG_PRINT(SEP);
   // Include time delta in debug output.
   DEBUG_PRINT(stop_us - start_us);
