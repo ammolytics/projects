@@ -1,6 +1,6 @@
 # Ammolytics Project: Inexpensive Firearm Accelerometer
 
-This project was first featured in an article which investigated the effects [Recoil has on Muzzle Velocity](https://blog.ammolytics.com/2018-12-12/experiment-recoil-vs-muzzle-velocity.html), and was [described in more detail](https://blog.ammolytics.com/2019-01-01/project-cheap-rifle-accelerometer.html) in a later article.
+This project was first featured in an article which investigated the effects [Recoil has on Muzzle Velocity](https://blog.ammolytics.com/2018-12-12/experiment-recoil-vs-muzzle-velocity.html), and was [described in more detail](https://blog.ammolytics.com/2019-01-01/project-cheap-rifle-accelerometer.html) in a later article. I also gave an update on the [progress that's been made](https://blog.ammolytics.com/2019-02-23/rifle-accelerometer-update.html) since the first release.
 
 ## Software
 
