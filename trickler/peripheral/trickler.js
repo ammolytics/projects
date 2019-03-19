@@ -37,6 +37,7 @@ const StatusMap = {
   'US': TricklerStatus.UNSTABLE,
   'OL': TricklerStatus.OVERLOAD,
   'EC': TricklerStatus.ERROR,
+  'AK': TricklerStatus.ACKNOWLEDGE,
 }
 
 const ErrorCodeMap = {
@@ -68,6 +69,9 @@ function Trickler(port) {
     switch (status) {
       case undefined:
         // Unit not ready yet.
+        break
+      case TricklerStatus.ACKNOWLEDGE:
+        console.log('Command acknowledged')
         break
       case TricklerStatus.ERROR:
         var errCode = line.substr(3, 3)
