@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Ammolytics and contributors. All rights reserved.
+ * Released under the MIT license. See LICENSE file in the project root for details.
+ */
 const util = require('util')
 const bleno = require('bleno')
 
