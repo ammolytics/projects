@@ -29,9 +29,16 @@ UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
     var data = Buffer.alloc(1)
     data.writeUInt8(this.trickler.unit, 0)
     callback(this.RESULT_SUCCESS, data)
+
+    this.trickler.on('ready', result => {
+      if (this.updateValueCallback) {
+        var data = Buffer.alloc(1)
+        data.writeUInt8(result.unit, 0)
+        this.updateValueCallback(data)
+      }
+    })
   }
 }
 
 
 module.exports = UnitCharacteristic
-

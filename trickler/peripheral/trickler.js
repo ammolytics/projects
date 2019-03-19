@@ -85,7 +85,7 @@ function Trickler(port) {
           this.unit = unit
           this.weight = rawWeight
 
-          this.emit('ready', rawWeight)
+          this.emit('ready', this)
         }
         break
     }
