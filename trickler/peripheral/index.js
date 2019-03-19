@@ -6,7 +6,7 @@ const trickler = require('./trickler')
 const TrickerService = require('./trickler-service')
 
 const port = new SerialPort('/dev/ttyUSB0', { baudRate: 19200 })
-cont PERIPHERAL_NAME = 'Trickler'
+const PERIPHERAL_NAME = 'Trickler'
 
 var service = new TricklerService(new trickler.Trickler(port))
 
