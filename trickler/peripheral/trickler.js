@@ -76,14 +76,15 @@ function Trickler(port) {
         break
       default:
         this.status = status
-        var rawValue = line.substr(3, 9).trim()
+        var rawWeight = line.substr(3, 9).trim()
         var rawUnit = line.substr(12, 3).trim()
         var unit = UnitMap[rawUnit]
         // Make sure the unit is ready first, unit is defined.
         if (typeof unit !== 'undefined') {
-          console.log(`${now}: ${rawStatus}, ${rawValue}, ${rawUnit}, ${status}, ${unit}`)
+          console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${status}, ${unit}`)
           this.unit = unit
-          this.value = rawValue
+          this.weight = rawWeight
+          callback(this.RESULT_SUCCESS)
         }
         break
     }

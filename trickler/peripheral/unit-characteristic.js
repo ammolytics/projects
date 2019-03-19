@@ -3,14 +3,14 @@ const bleno = require('bleno')
 const trickler = require('./trickler')
 
 
-function WeightCharacteristic(trickler) {
+function UnitCharacteristic(trickler) {
   bleno.Characteristic.call(this, {
-    uuid: '10000001-be5f-4b43-a49f-76f2d65c6e28',
+    uuid: '10000003-be5f-4b43-a49f-76f2d65c6e28',
     properties: ['read', 'notify'],
     descriptors: [
       new bleno.Descriptor({
         uuid: '2901',
-        value: 'Reads the current weight value of the scale'
+        value: 'Reads the current weight unit of the scale'
       })
     ]
   })
@@ -19,17 +19,19 @@ function WeightCharacteristic(trickler) {
 }
 
 
-util.inherits(WeightCharacteristic, bleno.Characteristic)
+util.inherits(UnitCharacteristic, bleno.Characteristic)
 
 
-WeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
+UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
-    var data = Buffer.from(Number(this.trickler.weight).toString())
+    var data = Buffer.alloc(1)
+    data.writeUInt8(this.trickler.unit, 0)
     callback(this.RESULT_SUCCESS, data)
   }
 }
 
 
-module.exports = WeightCharacteristic
+module.exports = UnitCharacteristic
+
