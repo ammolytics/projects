@@ -7,12 +7,11 @@ const TricklerUnits = {
   GRAMS: 1,
 }
 
-
 const TricklerStatus = {
   STABLE: 0,
   UNSTABLE: 1,
+  OVERLOAD: 2,
 }
-
 
 const TricklerWeightStatus = {
   UNDER: 0,
@@ -20,10 +19,22 @@ const TricklerWeightStatus = {
   OVER: 2,
 }
 
-
 const TricklerMotorStatus = {
   OFF: 0,
   ON: 1,
+}
+
+const UnitMap = {
+  'GN': TricklerUnits.GRAINS,
+  'g': TricklerUnits.GRAMS,
+}
+
+const StatusMap = {
+  'ST': TricklerStatus.STABLE,
+  'QT': TricklerStatus.STABLE,
+  'US': TricklerStatus.UNSTABLE,
+  'OL': TricklerStatus.OVERLOAD,
+  'OL': TricklerStatus.OVERLOAD,
 }
 
 
@@ -36,9 +47,14 @@ function Trickler(port) {
   parser.on('data', line => {
     var status = line.substr(0, 2).trim()
     var value = line.substr(3, 0).trim()
-    var unit = line.substr(13, 2).trim()
+    var unit = line.substr(12, 3).trim()
     var now = new Date(Date.now()).toISOString()
     console.log(`${now}: ${status}, ${value}, ${unit}`)
+
+    this.status = StatusMap[status]
+    this.unit = UnitMap[unit]
+    this.value = value
+    console.log(`${this.status}, ${this.unit}`)
   })
 }
 
