@@ -64,9 +64,11 @@ function Trickler(port) {
   parser.on('data', line => {
     var now = new Date(Date.now()).toISOString()
     var rawStatus = line.substr(0, 2).trim()
-    var status = StatusMap[rawStatus]
+    var values = {
+      status: StatusMap[rawStatus]
+    }
 
-    switch (status) {
+    switch (values.status) {
       case undefined:
         // Unit not ready yet.
         break
@@ -79,17 +81,14 @@ function Trickler(port) {
         console.error(`Error! code: ${errCode}, message: ${errMsg}`)
         break
       default:
-        this.status = status
         var rawWeight = line.substr(3, 9).trim()
         var rawUnit = line.substr(12, 3).trim()
-        var unit = UnitMap[rawUnit]
+        values.weight = rawWeight
+        values.unit = UnitMap[rawUnit]
         // Make sure the unit is ready first, unit is defined.
-        if (typeof unit !== 'undefined') {
-          console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${status}, ${unit}`)
-          this.unit = unit
-          this.weight = rawWeight
-
-          this.emit('ready', this)
+        if (typeof values.unit !== 'undefined') {
+          console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${values.status}, ${values.unit}`)
+          this.emit('ready', values)
         }
         break
     }
