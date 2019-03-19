@@ -67,7 +67,7 @@ function Trickler(port) {
       var errMsg = ErrorCodeMap[errCode]
       console.error(`Error! code: ${errCode}, message: ${errMsg}`)
     } else {
-      var value = line.substr(3, 0).trim()
+      var value = line.substr(3, 9).trim()
       var unit = line.substr(12, 3).trim()
       var now = new Date(Date.now()).toISOString()
       console.log(`${now}: ${status}, ${value}, ${unit}`)
