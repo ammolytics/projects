@@ -32,7 +32,7 @@ WeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
         this.updateValueCallback(data)
       }
     })
-    callback(this.RESULT_SUCCESS, data)
+    callback(this.RESULT_SUCCESS)
   }
 }
 
