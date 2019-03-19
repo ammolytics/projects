@@ -84,7 +84,8 @@ function Trickler(port) {
           console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${status}, ${unit}`)
           this.unit = unit
           this.weight = rawWeight
-          callback(this.RESULT_SUCCESS)
+
+          this.emit('ready', rawWeight)
         }
         break
     }
