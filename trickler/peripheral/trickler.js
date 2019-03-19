@@ -38,6 +38,7 @@ const StatusMap = {
   'OL': TricklerStatus.OVERLOAD,
   'EC': TricklerStatus.ERROR,
 }
+
 const ErrorCodeMap = {
   'E00': 'Communications error',
   'E01': 'Undefined command error',
@@ -57,24 +58,34 @@ const parser = new Readline()
 
 function Trickler(port) {
   events.EventEmitter.call(this)
-  // TODO: get values from scale over serial
+  // Get values from scale over serial
   port.pipe(parser)
   parser.on('data', line => {
-    var status = line.substr(0, 2).trim()
-    this.status = StatusMap[status]
-    if (this.status === TricklerStatus.ERROR) {
-      var errCode = line.substr(3, 3)
-      var errMsg = ErrorCodeMap[errCode]
-      console.error(`Error! code: ${errCode}, message: ${errMsg}`)
-    } else {
-      var value = line.substr(3, 9).trim()
-      var unit = line.substr(12, 3).trim()
-      var now = new Date(Date.now()).toISOString()
-      console.log(`${now}: ${status}, ${value}, ${unit}`)
+    var now = new Date(Date.now()).toISOString()
+    var rawStatus = line.substr(0, 2).trim()
+    var status = StatusMap[rawStatus]
 
-      this.unit = UnitMap[unit]
-      this.value = value
-      console.log(`${this.status}, ${this.unit}`)
+    switch (status) {
+      case undefined:
+        // Unit not ready yet.
+        break
+      case TricklerStatus.ERROR:
+        var errCode = line.substr(3, 3)
+        var errMsg = ErrorCodeMap[errCode]
+        console.error(`Error! code: ${errCode}, message: ${errMsg}`)
+        break
+      default:
+        this.status = status
+        var rawValue = line.substr(3, 9).trim()
+        var rawUnit = line.substr(12, 3).trim()
+        var unit = UnitMap[rawUnit]
+        // Make sure the unit is ready first, unit is defined.
+        if (typeof unit !== 'undefined') {
+          console.log(`${now}: ${rawStatus}, ${rawValue}, ${rawUnit}, ${status}, ${unit}`)
+          this.unit = unit
+          this.value = rawValue
+        }
+        break
     }
   })
 }
