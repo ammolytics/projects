@@ -11,6 +11,7 @@ const TricklerStatus = {
   STABLE: 0,
   UNSTABLE: 1,
   OVERLOAD: 2,
+  ERROR: 3,
 }
 
 const TricklerWeightStatus = {
@@ -31,10 +32,24 @@ const UnitMap = {
 
 const StatusMap = {
   'ST': TricklerStatus.STABLE,
+  // Counting mode
   'QT': TricklerStatus.STABLE,
   'US': TricklerStatus.UNSTABLE,
   'OL': TricklerStatus.OVERLOAD,
-  'OL': TricklerStatus.OVERLOAD,
+  'EC': TricklerStatus.ERROR,
+}
+const ErrorCodeMap = {
+  'E00': 'Communications error',
+  'E01': 'Undefined command error',
+  'E02': 'Not ready',
+  'E03': 'Timeout error',
+  'E04': 'Excess characters error',
+  'E06': 'Format error',
+  'E07': 'Parameter setting error',
+  'E11': 'Stability error',
+  'E17': 'Internal mass error',
+  'E20': 'Calibration weight error: The calibration weight is too heavy',
+  'E21': 'Calibration weight error: The calibration weight is too light',
 }
 
 
@@ -46,15 +61,21 @@ function Trickler(port) {
   port.pipe(parser)
   parser.on('data', line => {
     var status = line.substr(0, 2).trim()
-    var value = line.substr(3, 0).trim()
-    var unit = line.substr(12, 3).trim()
-    var now = new Date(Date.now()).toISOString()
-    console.log(`${now}: ${status}, ${value}, ${unit}`)
-
     this.status = StatusMap[status]
-    this.unit = UnitMap[unit]
-    this.value = value
-    console.log(`${this.status}, ${this.unit}`)
+    if (this.status === TricklerStatus.ERROR) {
+      var errCode = line.substr(3, 3)
+      var errMsg = ErrorCodeMap[errCode]
+      console.error(`Error! code: ${errCode}, message: ${errMsg}`)
+    } else {
+      var value = line.substr(3, 0).trim()
+      var unit = line.substr(12, 3).trim()
+      var now = new Date(Date.now()).toISOString()
+      console.log(`${now}: ${status}, ${value}, ${unit}`)
+
+      this.unit = UnitMap[unit]
+      this.value = value
+      console.log(`${this.status}, ${this.unit}`)
+    }
   })
 }
 
