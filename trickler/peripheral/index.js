@@ -3,7 +3,7 @@ const bleno = require('bleno')
 const SerialPort = require('serialport')
 
 const trickler = require('./trickler')
-const TrickerService = require('./trickler-service')
+const TricklerService = require('./trickler-service')
 
 const port = new SerialPort('/dev/ttyUSB0', { baudRate: 19200 })
 const PERIPHERAL_NAME = 'Trickler'
@@ -20,7 +20,7 @@ bleno.on('stateChange', function(state) {
     // We will also advertise the service ID in the advertising packet,
     // so it's easier to find.
     //
-    bleno.startAdvertising(name, [service.uuid], function(err) {
+    bleno.startAdvertising(PERIPHERAL_NAME, [service.uuid], function(err) {
       if (err) {
         console.log(err);
       }
