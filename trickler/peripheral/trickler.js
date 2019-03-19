@@ -1,6 +1,6 @@
 const util = require('util')
 const events = require('events')
-
+const Readline = require('@serialport/parser-readline')
 
 const TricklerUnits = {
   GRAINS: 0,
@@ -27,9 +27,19 @@ const TricklerMotorStatus = {
 }
 
 
-function Trickler() {
+const parser = new Readline()
+
+function Trickler(port) {
   events.EventEmitter.call(this)
   // TODO: get values from scale over serial
+  port.pipe(parser)
+  parser.on('data', line => {
+    var status = line.substr(0, 2).trim()
+    var value = line.substr(3, 0).trim()
+    var unit = line.substr(13, 2).trim()
+    var now = new Date(Date.now()).toISOString()
+    console.log(`${now}: ${status}, ${value}, ${unit}`)
+  })
 }
 
 

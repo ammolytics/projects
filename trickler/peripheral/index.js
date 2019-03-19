@@ -1,10 +1,14 @@
 const util = require('util')
 const bleno = require('bleno')
+const SerialPort = require('serialport')
+
 const trickler = require('./trickler')
 const TrickerService = require('./trickler-service')
 
+const port = new SerialPort('/dev/ttyUSB0', { baudRate: 19200 })
 cont PERIPHERAL_NAME = 'Trickler'
-var service = new TricklerService(new trickler.Trickler())
+
+var service = new TricklerService(new trickler.Trickler(port))
 
 //
 // Wait until the BLE radio powers on before attempting to advertise.
