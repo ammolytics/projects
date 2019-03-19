@@ -29,7 +29,7 @@ WeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
     var data = Buffer.from(Number(this.trickler.weight).toString())
     callback(this.RESULT_SUCCESS, data)
 
-    this.trickler.on('ready', result => {
+    this.trickler.on('ready', weight => {
       if (this.updateValueCallback) {
         this.updateValueCallback(Buffer.from(Number(weight).toString()))
       }
