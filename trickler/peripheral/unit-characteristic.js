@@ -37,7 +37,7 @@ UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
     this.trickler.on('ready', result => {
       if (this.updateValueCallback) {
         // Only send a notification if the value has changed.
-        if (this.trickler.unit !== result.unit) {
+        if (typeof this.trickler.unit === 'undefined' || this.trickler.unit !== result.unit) {
           var data = Buffer.alloc(1)
           data.writeUInt8(result.unit, 0)
           data.writeUInt8(this.trickler.unit, 0)
