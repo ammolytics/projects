@@ -119,21 +119,28 @@ util.inherits(Trickler, events.EventEmitter)
 
 
 Trickler.prototype.trickle = function(weight) {
-  var self = this
   console.log('Running trickler...')
   // TODO: Send commands over serial, monitor status.
 }
 
 Trickler.prototype.getModelNumber = function() {
-  var self = this
   console.log('Requesting model number...')
   this.port.write('?TN\r\n')
 }
 
 Trickler.prototype.getSerialNumber = function() {
-  var self = this
   console.log('Requesting serial number...')
   this.port.write('?SN\r\n')
+}
+
+Trickler.prototype.setUnit = function(unit) {
+  console.log('Pressing Mode button to change unit...')
+  this.port.write('U\r\n')
+}
+
+Trickler.prototype.reZero = function() {
+  console.log('Pressing ReZero button...')
+  this.port.write('R\r\n')
 }
 
 
