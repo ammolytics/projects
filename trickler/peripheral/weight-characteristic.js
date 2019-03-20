@@ -4,7 +4,6 @@
  */
 const util = require('util')
 const bleno = require('bleno')
-const trickler = require('./trickler')
 
 
 function WeightCharacteristic(trickler) {

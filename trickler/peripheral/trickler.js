@@ -59,12 +59,14 @@ const ErrorCodeMap = {
 }
 
 
-const parser = new Readline()
 
 function Trickler(port) {
   events.EventEmitter.call(this)
+  const parser = new Readline()
   // Get values from scale over serial
-  port.pipe(parser)
+  this.port = port
+  this.port.pipe(parser)
+
   parser.on('data', line => {
     var now = new Date(Date.now()).toISOString()
     var rawStatus = line.substr(0, 2).trim()
@@ -75,6 +77,7 @@ function Trickler(port) {
     switch (values.status) {
       case undefined:
         // Unit not ready yet.
+        console.log(`Unknown command: "${line}"`)
         break
       case TricklerStatus.ACKNOWLEDGE:
         console.log('Command acknowledged')
@@ -107,6 +110,18 @@ Trickler.prototype.trickle = function(weight) {
   var self = this
   console.log('Running trickler...')
   // TODO: Send commands over serial, monitor status.
+}
+
+Trickler.prototype.getModelNumber = function() {
+  var self = this
+  console.log('Requesting model number...')
+  this.port.write('?TN\r\n')
+}
+
+Trickler.prototype.getSerialNumber = function() {
+  var self = this
+  console.log('Requesting serial number...')
+  this.port.write('?SN\r\n')
 }
 
 

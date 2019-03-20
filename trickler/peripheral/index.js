@@ -7,6 +7,7 @@ const bleno = require('bleno')
 const SerialPort = require('serialport')
 
 const trickler = require('./trickler')
+const DeviceInfoService = require('./device-info-service')
 const TricklerService = require('./trickler-service')
 
 // Create mock binding if env MOCK is set.
@@ -20,8 +21,11 @@ if (process.env.MOCK) {
 
 const port = new SerialPort('/dev/ttyUSB0', { baudRate: 19200 })
 const PERIPHERAL_NAME = 'Trickler'
+const TRICKLER = new trickler.Trickler(port)
 
-var service = new TricklerService(new trickler.Trickler(port))
+var deviceInfoService = new DeviceInfoService(TRICKLER)
+var service = new TricklerService(TRICKLER)
+
 
 //
 // Wait until the BLE radio powers on before attempting to advertise.
@@ -53,6 +57,7 @@ bleno.on('advertisingStart', function(err) {
     // along with our characteristics.
     //
     bleno.setServices([
+      deviceInfoService,
       service
     ]);
   }
