@@ -16,6 +16,8 @@ const TricklerStatus = {
   UNSTABLE: 1,
   OVERLOAD: 2,
   ERROR: 3,
+  MODEL_NUMBER: 4,
+  SERIAL_NUMBER: 5,
 }
 
 const TricklerWeightStatus = {
@@ -104,7 +106,7 @@ function Trickler(port) {
         values.unit = UnitMap[rawUnit]
         // Make sure the unit is ready first, unit is defined.
         if (typeof values.unit !== 'undefined') {
-          console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${values.status}, ${values.unit}`)
+          //console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${values.status}, ${values.unit}`)
           this.emit('ready', values)
         }
         break
