@@ -57,19 +57,23 @@ UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
     callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH)
   } else {
     var unit = data.readUInt8(0)
+    console.log(`request to switch unit from ${this.trickler.unit} to ${unit}`)
     switch(unit) {
       case trickler.TricklerUnits.GRAINS:
       case trickler.TricklerUnits.GRAMS:
         if (this.trickler.unit === unit) {
           // Nothing to do.
+          console.log('Unit already set')
           callback(this.RESULT_SUCCESS)
         } else {
           this.trickler.setUnit()
           this.trickler.on('unit', result => {
             // Keep pressing Mode button until correct unit is selected.
             if (unit !== result) {
+              console.log('Unit still incorrect, trying again')
               this.trickler.setUnit()
             } else {
+              console.log('Unit changed!')
               this.trickler.unit = result
               callback(this.RESULT_SUCCESS)
             }
