@@ -5,6 +5,9 @@
 const util = require('util')
 const bleno = require('bleno')
 
+/**
+"nknown command: "SN,15641060
+*/
 
 function SerialNumberCharacteristic(trickler) {
   bleno.Characteristic.call(this, {
@@ -29,16 +32,17 @@ SerialNumberCharacteristic.prototype.onReadRequest = function(offset, callback) 
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
-    this.trickler.getSerialNumber()
-
-    /**
-    var data = Buffer.alloc(1)
-    data.writeUInt8(this.trickler.unit, 0)
-    callback(this.RESULT_SUCCESS, data)
-    */
-
-    this.trickler.on('ready', result => {
-    })
+    if (typeof this.trickler.serialNumber === 'undefined') {
+      this.trickler.getSerialNumber()
+      this.trickler.once('serialNumber', serialNumber => {
+        this.trickler.serialNumber = serialNumber
+        var data = Buffer.from(this.trickler.serialNumber)
+        callback(this.RESULT_SUCCESS, data)
+      })
+    } else {
+      var data = Buffer.from(this.trickler.serialNumber)
+      callback(this.RESULT_SUCCESS, data)
+    }
   }
 }
 

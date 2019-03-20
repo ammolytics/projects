@@ -42,6 +42,8 @@ const StatusMap = {
   'OL': TricklerStatus.OVERLOAD,
   'EC': TricklerStatus.ERROR,
   'AK': TricklerStatus.ACKNOWLEDGE,
+  'TN': TricklerStatus.MODEL_NUMBER,
+  'SN': TricklerStatus.SERIAL_NUMBER,
 }
 
 const ErrorCodeMap = {
@@ -86,6 +88,14 @@ function Trickler(port) {
         var errCode = line.substr(3, 3)
         var errMsg = ErrorCodeMap[errCode]
         console.error(`Error! code: ${errCode}, message: ${errMsg}`)
+        break
+      case TricklerStatus.MODEL_NUMBER:
+        var modelNumber = line.substr(3).trim()
+        this.emit('modelNumber', modelNumber)
+        break
+      case TricklerStatus.SERIAL_NUMBER:
+        var serialNumber = line.substr(3).trim()
+        this.emit('serialNumber', serialNumber)
         break
       default:
         var rawWeight = line.substr(3, 9).trim()

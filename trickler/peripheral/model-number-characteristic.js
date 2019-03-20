@@ -5,6 +5,12 @@
 const util = require('util')
 const bleno = require('bleno')
 
+/**
+Requesting model number...
+2019-03-20T16:14:48.177Z: ST, +00000.00, GN, 0, 0
+"nknown command: "TN,   FX-120i
+*/
+
 
 function ModelNumberCharacteristic(trickler) {
   bleno.Characteristic.call(this, {
@@ -29,16 +35,17 @@ ModelNumberCharacteristic.prototype.onReadRequest = function(offset, callback) {
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
-    this.trickler.getModelNumber()
-
-    /**
-    var data = Buffer.alloc(1)
-    data.writeUInt8(this.trickler.unit, 0)
-    callback(this.RESULT_SUCCESS, data)
-    */
-
-    this.trickler.on('ready', result => {
-    })
+    if (typeof this.trickler.modelNumber === 'undefined') {
+      this.trickler.getModelNumber()
+      this.trickler.once('modelNumber', modelNumber => {
+        this.trickler.modelNumber = modelNumber
+        var data = Buffer.from(this.trickler.modelNumber)
+        callback(this.RESULT_SUCCESS, data)
+      })
+    } else {
+      var data = Buffer.from(this.trickler.modelNumber)
+      callback(this.RESULT_SUCCESS, data)
+    }
   }
 }
 
