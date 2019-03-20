@@ -1,3 +1,4 @@
+import 'package:flutter_blue/flutter_blue.dart';
 import 'actions.dart';
 import 'model.dart';
 
@@ -26,10 +27,26 @@ String connectionStatusReducer(String state, dynamic action) {
   return state;
 }
 
+BluetoothDevice device(BluetoothDevice state, dynamic action) {
+  if (action is SetDevice) {
+    return action.device;
+  }
+  return state;
+}
+
+BluetoothService service(BluetoothService state, dynamic action) {
+  if (action is SetService) {
+    return action.service;
+  }
+  return state;
+}
+
 AppState appStateReducer(AppState state, action) {
   return AppState(
     currentMeasurement: currentMeasurementReducer(state.currentMeasurement, action),
     measurementHistory: measuermentsReducer(state.measurementHistory, action),
     connectionStatus: connectionStatusReducer(state.connectionStatus, action),
+    device: device(state.device, action),
+    service: service(state.service, action),
   );
 }

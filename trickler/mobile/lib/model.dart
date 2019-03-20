@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'globals.dart' as globals;
 import 'dart:math';
 
@@ -41,19 +42,23 @@ class AppState {
   Measurement currentMeasurement;
   List<Measurement> measurementHistory;
   String connectionStatus;
-  int counter;
+  BluetoothDevice device;
+  BluetoothService service;
 
   AppState({
     this.currentMeasurement,
     this.measurementHistory,
     this.connectionStatus,
-    this.counter
+    this.device,
+    this.service,
   });
 
   AppState.initialState()
   : currentMeasurement = Measurement(globals.grams, 0.0, 0.0, false),
     measurementHistory = <Measurement>[],
-    connectionStatus = globals.disconnected;
+    connectionStatus = globals.disconnected,
+    device = BluetoothDevice(id: DeviceIdentifier('000')),
+    service = null;
 
   getStatusColor() {
     if (this.connectionStatus == globals.disconnected) {

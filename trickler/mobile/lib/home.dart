@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'model.dart';
 import 'actions.dart';
@@ -66,15 +67,36 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _submit(Function dispatch) {
+  void _submit(List state) {
+    Function dispatch = state.length > 0 ? state[0] : () => {};
+    BluetoothDevice device = state.length > 1 ? state[1] : BluetoothDevice(id:DeviceIdentifier('000'));
+    BluetoothService service = state.length > 2 ? state[2] : null;
     if (_inputFocus.hasFocus) {
       _inputFocus.unfocus();
     }
     _capCounterValue();
     _roundCounterValue();
-
+    
+    // Update global state with new measurement
     Measurement measure = Measurement(_unit, _counter, 0.0, false);
     dispatch(SetCurrentMeasurement(measure));
+
+    print('Sending $_counter to ${device.name}');
+
+    if (
+      service?.characteristics != null &&
+      service.characteristics.length > 2 &&
+      service.characteristics[2].properties.write
+    ) {
+      // Write to trickler unit characteristic
+      device.writeCharacteristic(service.characteristics[2],
+        _unit == globals.grains ? [0] : [1]).then((value) {
+          // Check unit characteristic was changed to the right value
+          device.readCharacteristic(service.characteristics[2]).then((readChar) {
+            print("\n\n\nUpdated Unit is ${readChar.toString() == (_unit == globals.grains ? '[0]' : '[1]')} - ${readChar.toString()}\n\n\n");
+          });
+        });
+    }
   }
 
   String _getUnit() {
@@ -96,6 +118,15 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            StoreConnector<AppState, BluetoothDevice>(
+              converter: (store) => store.state.device,
+              builder: (context, device) {
+                if (device.id != DeviceIdentifier('000')) {
+                  return Text("You are connected to: ${device.name}");
+                }
+                return Text('You are not connected to a device!');
+              },
+            ),
             Padding(
               padding:EdgeInsets.symmetric(horizontal: 30),
               child: TextField(
@@ -104,6 +135,7 @@ class _HomePageState extends State<HomePage> {
                 onChanged: _updateCounter,
                 focusNode: _inputFocus,
                 textAlign: TextAlign.center,
+                textInputAction: TextInputAction.done,
                 key: Key('WeightInput'),
                 style: TextStyle(
                   fontSize: 30,
@@ -111,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  // prefix is to center the value
+                  // prefix centers the value
                   prefix: SizedBox(
                     width: 57.0,
                     height: 40.0,
@@ -143,14 +175,18 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: StoreConnector<AppState, Function>(
+      floatingActionButton: StoreConnector<AppState, List>(
         converter: (store) {
-          return (action) => store.dispatch(action);
+          return [
+            (action) => store.dispatch(action),
+            store.state.device,
+            store.state.service,
+          ];
         },
-        builder: (context, dispatch) {
+        builder: (context, state) {
           return FloatingActionButton(
             heroTag: 'SubmitBtn',
-            onPressed: () => _submit(dispatch),
+            onPressed: () => _submit(state),
             tooltip: 'Toggle Unit',
             backgroundColor: Color.fromARGB(255, 11, 145, 227),
             child: Icon(Icons.check),
