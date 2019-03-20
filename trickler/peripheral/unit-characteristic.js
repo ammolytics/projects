@@ -64,7 +64,7 @@ UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
           // Nothing to do.
           callback(this.RESULT_SUCCESS)
         } else {
-          this.tricker.setUnit()
+          this.trickler.setUnit()
           this.trickler.on('unit', result => {
             // Keep pressing Mode button until correct unit is selected.
             if (unit !== result) {
