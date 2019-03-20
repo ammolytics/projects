@@ -100,6 +100,9 @@ function Trickler(port) {
         this.emit('serialNumber', serialNumber)
         break
       default:
+        if (typeof this.status === 'undefined') {
+          this.status = values.status
+        }
         var rawWeight = line.substr(3, 9).trim()
         var rawUnit = line.substr(12, 3).trim()
         values.weight = rawWeight
@@ -107,6 +110,9 @@ function Trickler(port) {
         // Make sure the unit is ready first, unit is defined.
         if (typeof values.unit !== 'undefined') {
           //console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${values.status}, ${values.unit}`)
+          if (typeof this.unit === 'undefined') {
+            this.unit = values.unit
+          }
           this.emit('ready', values)
         }
         break
