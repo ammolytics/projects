@@ -66,7 +66,7 @@ UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
           console.log('Unit already set')
           callback(this.RESULT_SUCCESS)
         } else {
-          this.trickler.setUnit()
+          this.trickler.pressMode()
           callback(this.RESULT_SUCCESS)
         }
         break

@@ -139,7 +139,7 @@ Trickler.prototype.getSerialNumber = function() {
   this.port.write('?SN\r\n')
 }
 
-Trickler.prototype.setUnit = function(unit) {
+Trickler.prototype.pressMode = function() {
   console.log('Pressing Mode button to change unit...')
   this.port.write('U\r\n')
 }
