@@ -63,10 +63,18 @@ const ErrorCodeMap = {
 }
 
 const CommandMap = {
-  MODEL_NUMBER: '?TN\r\n',
+  ID: '?ID\r\n',
   SERIAL_NUMBER: '?SN\r\n',
-  MODE_BTN: 'U\r\n',
+  MODEL_NUMBER: '?TN\r\n',
+  TARE_WEIGHT: '?PT\r\n',
+  CAL_BTN: 'CAL\r\n',
+  OFF_BTN: 'OFF\r\n',
+  ON_BTN: 'ON\r\n',
+  ONOFF_BTN: 'P\r\n',
+  PRINT_BTN: 'PRT\r\n',
   REZERO_BTN: 'R\r\n',
+  SAMPLE_BTN: 'SMP\r\n',
+  MODE_BTN: 'U\r\n',
 }
 
 
