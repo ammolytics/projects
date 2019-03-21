@@ -6,9 +6,19 @@ class SetCurrentMeasurement {
   SetCurrentMeasurement(this.measurement);
 }
 
-class SetCurrentActualWeight {
+class SetUnit {
+  final String unit;
+  SetUnit(this.unit);
+}
+
+class SetTargetWeight {
   final double weight;
-  SetCurrentActualWeight(this.weight);
+  SetTargetWeight(this.weight);
+}
+
+class SetActualWeight {
+  final double weight;
+  SetActualWeight(this.weight);
 }
 
 class SetConnectionStatus {
@@ -24,6 +34,11 @@ class SetDevice {
 class SetService {
   final BluetoothService service;
   SetService(this.service);
+}
+
+class SetStability {
+  final int stability;
+  SetStability(this.stability);
 }
 
 class AddMeasurementToHistory {

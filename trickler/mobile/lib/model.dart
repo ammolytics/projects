@@ -8,15 +8,31 @@ class Measurement {
   double targetWeight;
   double actualWeight = 0.0;
   bool isComplete = false;
-  final time = DateTime.now();
+  final startTime = DateTime.now();
+  DateTime endTime;
 
   Measurement(this.unit, this.targetWeight, this.actualWeight, this.isComplete);
 
+  setUnit(unit) {
+    if (globals.unitsList.indexOf(unit) != -1) {
+      this.unit = unit;
+    }
+  }
+
+  setTargetWeight(weight) {
+    weight = this.capWeight(weight);
+    weight = this.roundWeight(weight);
+    this.targetWeight = weight;
+  }
+
   setActualWeight(weight) {
-    double w;
-    w = this.capWeight(weight);
-    w = this.roundWeight(weight);
-    this.actualWeight = w;
+    weight = this.capWeight(weight);
+    weight = this.roundWeight(weight);
+    this.actualWeight = weight;
+    if (this.actualWeight >= this.targetWeight) {
+      this.isComplete = true;
+      this.endTime =DateTime.now();
+    }
   }
 
   capWeight(weight) {
@@ -44,6 +60,7 @@ class AppState {
   String connectionStatus;
   BluetoothDevice device;
   BluetoothService service;
+  int stability;
 
   AppState({
     this.currentMeasurement,
@@ -51,6 +68,7 @@ class AppState {
     this.connectionStatus,
     this.device,
     this.service,
+    this.stability,
   });
 
   AppState.initialState()
@@ -58,7 +76,8 @@ class AppState {
     measurementHistory = <Measurement>[],
     connectionStatus = globals.disconnected,
     device = BluetoothDevice(id: DeviceIdentifier('000')),
-    service = null;
+    service = null,
+    stability = 4;
 
   getStatusColor() {
     if (this.connectionStatus == globals.disconnected) {
