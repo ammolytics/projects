@@ -14,6 +14,13 @@ BluetoothDevice device(BluetoothDevice state, dynamic action) {
   return state;
 }
 
+dynamic deviceConnection(dynamic state, dynamic action) {
+  if (action is SetDeviceConnection) {
+    return action.deviceConnection;
+  }
+  return state;
+}
+
 BluetoothService service(BluetoothService state, dynamic action) {
   if (action is SetService) {
     return action.service;
@@ -21,9 +28,10 @@ BluetoothService service(BluetoothService state, dynamic action) {
   return state;
 }
 
-int stability(int state, dynamic action) {
-  if (action is SetStability) {
-    return action.stability;
+List characteristics(List state, dynamic action) {
+  if (action is UpdateCharacteristic) {
+    state[action.index] = action.characteristic;
+    return state;
   }
   return state;
 }

@@ -5,16 +5,18 @@ class AppState {
   List<Measurement> measurementHistory;
   String connectionStatus;
   BluetoothDevice device;
+  dynamic deviceConnection;
   BluetoothService service;
-  int stability;
+  List characteristics;
 
   AppState({
     this.currentMeasurement,
     this.measurementHistory,
     this.connectionStatus,
     this.device,
+    this.deviceConnection,
     this.service,
-    this.stability,
+    this.characteristics,
   });
 
   AppState.initialState()
@@ -22,8 +24,9 @@ class AppState {
     measurementHistory = <Measurement>[],
     connectionStatus = globals.disconnected,
     device = BluetoothDevice(id: DeviceIdentifier('000')),
+    deviceConnection = null,
     service = null,
-    stability = 4;
+    characteristics = [[], [], []];
 
   getStatusColor() {
     if (this.connectionStatus == globals.disconnected) {

@@ -31,17 +31,23 @@ class SetDevice {
   SetDevice(this.device);
 }
 
+class SetDeviceConnection {
+  final dynamic deviceConnection;
+  SetDeviceConnection(this.deviceConnection);
+}
+
 class SetService {
   final BluetoothService service;
   SetService(this.service);
 }
 
-class SetStability {
-  final int stability;
-  SetStability(this.stability);
-}
-
 class AddMeasurementToHistory {
   final Measurement measurement;
   AddMeasurementToHistory(this.measurement);
+}
+
+class UpdateCharacteristic {
+  final int index;
+  final List characteristic;
+  UpdateCharacteristic(this.index, this.characteristic);
 }

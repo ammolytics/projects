@@ -25,12 +25,6 @@ class _DevicesPageState extends State<DevicesPage> {
   dynamic _scanSubscription;
   Map<DeviceIdentifier, ScanResult> _scanResults = Map();
 
-  dynamic _deviceConnection;
-
-  List<int> _stability = [];
-  List<int> _weight = [];
-  List<int> _unit = [];
-
   void _scanDevices() {
     try {
       bool foundPeripheral = false;
@@ -78,7 +72,7 @@ class _DevicesPageState extends State<DevicesPage> {
   void _connectToDevice(BluetoothDevice device) async {
     // Stop the scan before 5 second timeout
     _stopScan(true);
-    _deviceConnection = _flutterBlue
+    dynamic deviceConnection = _flutterBlue
       .connect(device, timeout: Duration(seconds: 4))
       .listen((s) {
         // Connect to device and listen for data
@@ -92,31 +86,29 @@ class _DevicesPageState extends State<DevicesPage> {
           _disconnect();
         }
       }, onDone: _disconnect);
+    _dispatch(SetDeviceConnection(deviceConnection));
   }
 
   void _disconnect() {
-    _deviceConnection?.cancel();
+    _state.deviceConnection?.cancel();
     print('\n\n\nDisconnecting...\n\n\n\n');
     _dispatch(SetConnectionStatus(globals.disconnected));
     _dispatch(SetDevice(BluetoothDevice(id:DeviceIdentifier('000'))));
-    setState(() {
-      _stability = [];
-      _weight = [];
-      _unit = [];
-    });
+    // Reset all characteristics in global state
+    _dispatch(UpdateCharacteristic(0, [])); // Stability
+    _dispatch(UpdateCharacteristic(1, [])); // Weight
+    _dispatch(UpdateCharacteristic(2, [])); // Unit
+    setState(() {});
   }
 
   void _getServices(BluetoothDevice device) {
-    print('\n\n\n\n DEVICE ID: ${device.id.toString()}\n\n\n');
     // Discover all advertised trickler services
     device.discoverServices().then((services) {
-      print('\n\n\nGOT ${services.length} SERVICES...\n\n\n');
       List<BluetoothCharacteristic> chars = [];
       services.forEach((service) {
         // Find the service we need for data readout
         if (service.uuid.toString() == globals.tricklerServiceId) {
           _dispatch(SetService(service));
-          print('\n\n\nCHRACTERISTICS: ${service.characteristics.length}\n\n\n');
           service.characteristics.forEach((char) {
             chars.add(char);
           });
@@ -140,20 +132,13 @@ class _DevicesPageState extends State<DevicesPage> {
         print('READ: ${char.properties.read}');
         print('WRITE: ${char.properties.write}\n\n');
         print('${charNames[i]}: ${char.value}\n\n');
-        // 
-        // Update local state to reflect characteristics
-        // TODO: Migrate to global state for data persistence
-        // 
-        setState(() {
-          if (i == 0) {
-            _stability = readChar;
-          } else if (i == 1) {
-            _weight = readChar;
-          } else if (i == 2) {
-            _unit = readChar;
-          }
-        });
-        if (i + 1 >= chars.length) {
+        // Update global state to reflect characteristics
+        _dispatch(UpdateCharacteristic(i, readChar));
+        setState(() {});
+        if (i + 1 >= 3) {
+          // Only loop through the first 3 characteristics.
+          // This prevents index out of range error if
+          // additional characteristics are available.
           return [readChar];
         }
         return List.from([readChar])..addAll(_readCharacteristics(device, chars, i + 1));
@@ -165,6 +150,20 @@ class _DevicesPageState extends State<DevicesPage> {
       print('READ: ${char.properties.read}');
       print('WRITE: ${char.properties.write}\n\n');
     }
+  }
+
+  String _getStability() {
+    return _state.characteristics[0].length > 0 ?
+      globals.stabilityList[_state.characteristics[0][0]] : '';
+  }
+  String _getWeight() {
+    // TODO: convert data to double
+    return _state.characteristics[1].toString();
+  }
+
+  String _getUnit() {
+    return _state.characteristics[2].length > 0 ?
+      globals.unitsList[_state.characteristics[2][0]] : '';
   }
 
   Widget _getDeviceInfo() {
@@ -184,7 +183,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
           Padding(
             padding:EdgeInsets.only(bottom: 8.0),
-            child: Text("Stability: ${_stability.length > 0 ? globals.stabilityList[_stability[0]] : ''}",
+            child: Text("Stability: ${_getStability()}",
               style: TextStyle(
                 fontSize: 18.0,
                 fontStyle: FontStyle.italic,
@@ -193,7 +192,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
           Padding(
             padding:EdgeInsets.only(bottom: 8.0),
-            child: Text("Weight: ${_weight.toString()}",
+            child: Text("Weight: ${_getWeight()}",
               style: TextStyle(
                 fontSize: 18.0,
                 fontStyle: FontStyle.italic,
@@ -202,7 +201,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
           Padding(
             padding:EdgeInsets.only(bottom: 8.0),
-            child: Text("Unit: ${_unit.length > 0 ? globals.unitsList[_unit[0]] : ''}",
+            child: Text("Unit: ${_getUnit()}",
               style: TextStyle(
                 fontSize: 18.0,
                 fontStyle: FontStyle.italic,
@@ -224,9 +223,9 @@ class _DevicesPageState extends State<DevicesPage> {
     BluetoothDevice device = _state.device;
     if (device.id != DeviceIdentifier('000')) {
       return FloatingActionButton(
-        heroTag: 'Dissconnect',
+        heroTag: 'Disconnect',
         onPressed: _disconnect,
-        tooltip: 'Dissconnect',
+        tooltip: 'Disconnect',
         backgroundColor: Colors.red,
         child: Icon(Icons.bluetooth_disabled),
       );

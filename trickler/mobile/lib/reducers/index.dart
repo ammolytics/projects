@@ -11,6 +11,8 @@ AppState appStateReducer(AppState state, action) {
     measurementHistory: measuermentsReducer(state.measurementHistory, action),
     connectionStatus: connectionStatusReducer(state.connectionStatus, action),
     device: device(state.device, action),
+    deviceConnection:deviceConnection(state.deviceConnection, action),
     service: service(state.service, action),
+    characteristics: characteristics(state.characteristics, action),
   );
 }
