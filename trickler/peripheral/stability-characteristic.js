@@ -32,19 +32,32 @@ StabilityCharacteristic.prototype.onReadRequest = function(offset, callback) {
     var data = Buffer.alloc(1)
     data.writeUInt8(this.trickler.status, 0)
     callback(this.RESULT_SUCCESS, data)
-
-    this.trickler.on('ready', result => {
-      if (this.updateValueCallback) {
-        // Only send a notification if the value has changed.
-        if (this.trickler.status !== result.status) {
-          var data = Buffer.alloc(1)
-          data.writeUInt8(result.status, 0)
-          data.writeUInt8(this.trickler.status, 0)
-          this.updateValueCallback(data)
-        }
-      }
-    })
   }
+}
+
+
+StabilityCharacteristic.prototype.sendStatusNotification = function(result) {
+  if (this.updateValueCallback) {
+    var data = Buffer.alloc(1)
+    data.writeUInt8(result, 0)
+    this.updateValueCallback(data)
+  }
+}
+
+
+StabilityCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  this.maxValueSize = maxValueSize
+  this.updateValueCallback = updateValueCallback
+
+  this.trickler.on('status', this.sendStatusNotification)
+}
+
+
+StabilityCharacteristic.prototype.onUnsubscribe = function() {
+  this.maxValueSize = null
+  this.updateValueCallback = null
+
+  this.trickler.removeListener('status', this.sendStatusNotification)
 }
 
 

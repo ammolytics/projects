@@ -37,13 +37,14 @@ UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
 }
 
 
-UnitCharacteristic.prototype.sendUnitNotification = function(unit) {
+UnitCharacteristic.prototype.sendUnitNotification = function(result) {
   if (this.updateValueCallback) {
     var data = Buffer.alloc(1)
     data.writeUInt8(result, 0)
     this.updateValueCallback(data)
   }
 }
+
 
 UnitCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
   this.maxValueSize = maxValueSize
