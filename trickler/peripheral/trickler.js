@@ -71,61 +71,6 @@ function Trickler(port) {
   this.port = port
   this.port.pipe(parser)
 
-  get unit() {
-    return this._unit
-  }
-
-  set unit(value) {
-    if (this._unit !== value) {
-      this._unit = value
-      this.emit('unit', value)
-    }
-  }
-
-  get status() {
-    return this._status
-  }
-
-  set status(value) {
-    if (this._status !== value) {
-      this._status = value
-      this.emit('status', value)
-    }
-  }
-
-  get weight() {
-    return this._weight
-  }
-
-  set weight(value) {
-    if (this._weight !== value) {
-      this._weight = value
-      this.emit('weight', value)
-    }
-  }
-
-  get modelNumber() {
-    return this._modelNumber
-  }
-
-  set modelNumber(value) {
-    if (this._modelNumber !== value) {
-      this._modelNumber = value
-      this.emit('modelNumber', value)
-    }
-  }
-
-  get serialNumber() {
-    return this._serialNumber
-  }
-
-  set serialNumber(value) {
-    if (this._serialNumber !== value) {
-      this._serialNumber = value
-      this.emit('serialNumber', value)
-    }
-  }
-
   parser.on('data', line => {
     var now = new Date(Date.now()).toISOString()
     var rawStatus = line.substr(0, 2).trim()
@@ -177,6 +122,73 @@ function Trickler(port) {
 
 
 util.inherits(Trickler, events.EventEmitter)
+
+Object.defineProperties(Trickler, {
+  unit: {
+    get: function() {
+      return this._unit
+    },
+
+    set: function(value) {
+      if (this._unit !== value) {
+        this._unit = value
+        this.emit('unit', value)
+      }
+    }
+  },
+
+  status: {
+    get: function() {
+      return this._status
+    },
+
+    set: function(value) {
+      if (this._status !== value) {
+        this._status = value
+        this.emit('status', value)
+      }
+    }
+  },
+
+  weight: {
+    get: function() {
+      return this._weight
+    },
+
+    set: function(value) {
+      if (this._weight !== value) {
+        this._weight = value
+        this.emit('weight', value)
+      }
+    }
+  },
+
+  modelNumber: {
+    get: function() {
+      return this._modelNumber
+    },
+
+    set: function(value) {
+      if (this._modelNumber !== value) {
+        this._modelNumber = value
+        this.emit('modelNumber', value)
+      }
+    }
+  },
+
+  serialNumber: {
+    get: function() {
+      return this._serialNumber
+    },
+
+    set: function(value) {
+      if (this._serialNumber !== value) {
+        this._serialNumber = value
+        this.emit('serialNumber', value)
+      }
+    }
+  },
+})
 
 
 Trickler.prototype.trickle = function(weight) {
