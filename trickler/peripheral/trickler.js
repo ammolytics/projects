@@ -71,6 +71,61 @@ function Trickler(port) {
   this.port = port
   this.port.pipe(parser)
 
+  get unit() {
+    return this._unit
+  }
+
+  set unit(value) {
+    if (this._unit !== value) {
+      this._unit = value
+      this.emit('unit', value)
+    }
+  }
+
+  get status() {
+    return this._status
+  }
+
+  set status(value) {
+    if (this._status !== value) {
+      this._status = value
+      this.emit('status', value)
+    }
+  }
+
+  get weight() {
+    return this._weight
+  }
+
+  set weight(value) {
+    if (this._weight !== value) {
+      this._weight = value
+      this.emit('weight', value)
+    }
+  }
+
+  get modelNumber() {
+    return this._modelNumber
+  }
+
+  set modelNumber(value) {
+    if (this._modelNumber !== value) {
+      this._modelNumber = value
+      this.emit('modelNumber', value)
+    }
+  }
+
+  get serialNumber() {
+    return this._serialNumber
+  }
+
+  set serialNumber(value) {
+    if (this._serialNumber !== value) {
+      this._serialNumber = value
+      this.emit('serialNumber', value)
+    }
+  }
+
   parser.on('data', line => {
     var now = new Date(Date.now()).toISOString()
     var rawStatus = line.substr(0, 2).trim()
@@ -81,7 +136,7 @@ function Trickler(port) {
     switch (values.status) {
       case undefined:
         // Unit not ready yet.
-        console.log(`Unknown command: "${line}"`)
+        console.log(`Unknown command: ${line}`)
         break
       case TricklerStatus.ACKNOWLEDGE:
         console.log('Command acknowledged')
@@ -92,28 +147,28 @@ function Trickler(port) {
         console.error(`Error! code: ${errCode}, message: ${errMsg}`)
         break
       case TricklerStatus.MODEL_NUMBER:
-        var modelNumber = line.substr(3).trim()
-        this.emit('modelNumber', modelNumber)
+        this.modelNumber = line.substr(3).trim()
         break
       case TricklerStatus.SERIAL_NUMBER:
-        var serialNumber = line.substr(3).trim()
-        this.emit('serialNumber', serialNumber)
+        this.serialNumber = line.substr(3).trim()
         break
       default:
-        if (typeof this.status === 'undefined') {
-          this.status = values.status
-        }
         var rawWeight = line.substr(3, 9).trim()
         var rawUnit = line.substr(12, 3).trim()
         values.weight = rawWeight
         values.unit = UnitMap[rawUnit]
+
+        this.status = values.status
+        this.unit = values.unit
+        this.weight = values.weight
+
         // Make sure the unit is ready first, unit is defined.
         if (typeof values.unit !== 'undefined') {
           //console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${values.status}, ${values.unit}`)
           if (typeof this.unit === 'undefined') {
-            this.unit = values.unit
+            //this.unit = values.unit
           }
-          this.emit('ready', values)
+          //this.emit('ready', values)
         }
         break
     }

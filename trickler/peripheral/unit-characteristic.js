@@ -33,20 +33,31 @@ UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
     var data = Buffer.alloc(1)
     data.writeUInt8(this.trickler.unit, 0)
     callback(this.RESULT_SUCCESS, data)
-
-    this.trickler.on('ready', result => {
-      if (this.updateValueCallback) {
-        // Only send a notification if the value has changed.
-        if (typeof this.trickler.unit === 'undefined' || this.trickler.unit !== result.unit) {
-          this.trickler.unit = result.unit
-          var data = Buffer.alloc(1)
-          data.writeUInt8(result.unit, 0)
-          data.writeUInt8(this.trickler.unit, 0)
-          this.updateValueCallback(data)
-        }
-      }
-    })
   }
+}
+
+
+UnitCharacteristic.prototype.sendUnitNotification = function(unit) {
+  if (this.updateValueCallback) {
+    var data = Buffer.alloc(1)
+    data.writeUInt8(result, 0)
+    this.updateValueCallback(data)
+  }
+}
+
+UnitCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  this.maxValueSize = maxValueSize
+  this.updateValueCallback = updateValueCallback
+
+  this.trickler.on('unit', this.sendUnitNotification)
+}
+
+
+UnitCharacteristic.prototype.onUnsubscribe = function() {
+  this.maxValueSize = null
+  this.updateValueCallback = null
+
+  this.trickler.removeListener('unit', this.sendUnitNotification)
 }
 
 
@@ -58,6 +69,7 @@ UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
   } else {
     var unit = data.readUInt8(0)
     console.log(`request to switch unit from ${this.trickler.unit} to ${unit}`)
+
     switch(unit) {
       case trickler.TricklerUnits.GRAINS:
       case trickler.TricklerUnits.GRAMS:
@@ -66,8 +78,10 @@ UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
           console.log('Unit already set')
           callback(this.RESULT_SUCCESS)
         } else {
+          this.trickler.once('unit', result => {
+            callback(this.RESULT_SUCCESS)
+          })
           this.trickler.pressMode()
-          callback(this.RESULT_SUCCESS)
         }
         break
       default:
