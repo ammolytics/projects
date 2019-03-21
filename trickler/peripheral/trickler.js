@@ -123,7 +123,8 @@ function Trickler(port) {
 
 util.inherits(Trickler, events.EventEmitter)
 
-Object.defineProperties(Trickler, {
+
+Object.defineProperties(Trickler.prototype, {
   unit: {
     get: function() {
       return this._unit
@@ -169,6 +170,7 @@ Object.defineProperties(Trickler, {
     },
 
     set: function(value) {
+      console.log(`setting modelNumber from ${this._modelNumber} to ${value}`)
       if (this._modelNumber !== value) {
         this._modelNumber = value
         this.emit('modelNumber', value)
@@ -182,6 +184,7 @@ Object.defineProperties(Trickler, {
     },
 
     set: function(value) {
+      console.log(`setting serialNumber from ${this._serialNumber} to ${value}`)
       if (this._serialNumber !== value) {
         this._serialNumber = value
         this.emit('serialNumber', value)
