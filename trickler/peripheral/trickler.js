@@ -62,6 +62,12 @@ const ErrorCodeMap = {
   'E21': 'Calibration weight error: The calibration weight is too light',
 }
 
+const CommandMap = {
+  MODEL_NUMBER: '?TN\r\n',
+  SERIAL_NUMBER: '?SN\r\n',
+  MODE_BTN: 'U\r\n',
+  REZERO_BTN: 'R\r\n',
+}
 
 
 function Trickler(port) {
@@ -77,6 +83,8 @@ function Trickler(port) {
     var values = {
       status: StatusMap[rawStatus]
     }
+
+    console.debug(line)
 
     switch (values.status) {
       case undefined:
@@ -201,22 +209,22 @@ Trickler.prototype.trickle = function(weight) {
 
 Trickler.prototype.getModelNumber = function() {
   console.log('Requesting model number...')
-  this.port.write('?TN\r\n')
+  this.port.write(CommandMap.MODEL_NUMBER)
 }
 
 Trickler.prototype.getSerialNumber = function() {
   console.log('Requesting serial number...')
-  this.port.write('?SN\r\n')
+  this.port.write(CommandMap.SERIAL_NUMBER)
 }
 
 Trickler.prototype.pressMode = function() {
   console.log('Pressing Mode button to change unit...')
-  this.port.write('U\r\n')
+  this.port.write(CommandMap.MODE_BTN)
 }
 
 Trickler.prototype.reZero = function() {
   console.log('Pressing ReZero button...')
-  this.port.write('R\r\n')
+  this.port.write(CommandMap.REZERO_BTN)
 }
 
 
@@ -225,3 +233,6 @@ module.exports.TricklerUnits = TricklerUnits
 module.exports.TricklerStatus = TricklerStatus
 module.exports.TricklerWeightStatus = TricklerWeightStatus
 module.exports.TricklerMotorStatus = TricklerMotorStatus
+module.exports.UnitMap = UnitMap
+module.exports.StatusMap = StatusMap
+module.exports.CommandMap = CommandMap
