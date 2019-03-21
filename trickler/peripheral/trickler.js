@@ -84,7 +84,9 @@ function Trickler(port) {
       status: StatusMap[rawStatus]
     }
 
-    console.debug(line)
+    if (process.env.DEBUG) {
+      console.debug(line)
+    }
 
     switch (values.status) {
       case undefined:
