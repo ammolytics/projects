@@ -31,17 +31,31 @@ WeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
   } else {
     var data = Buffer.from(Number(this.trickler.weight).toString())
     callback(this.RESULT_SUCCESS, data)
-
-    this.trickler.on('ready', result => {
-      if (this.updateValueCallback) {
-        // Only send a notification if the value has changed.
-        if (this.trickler.weight !== result.weight) {
-          this.trickler.weight = result.weight
-          this.updateValueCallback(Buffer.from(Number(result.weight).toString()))
-        }
-      }
-    })
   }
+}
+
+
+WeightCharacteristic.prototype.sendWeightNotification = function(result) {
+  if (this.updateValueCallback) {
+    var data = Buffer.from(Number(result).toString())
+    this.updateValueCallback(data)
+  }
+}
+
+
+WeightCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  this.maxValueSize = maxValueSize
+  this.updateValueCallback = updateValueCallback
+
+  this.trickler.on('weight', this.sendWeightNotification)
+}
+
+
+WeightCharacteristic.prototype.onUnsubscribe = function() {
+  this.maxValueSize = null
+  this.updateValueCallback = null
+
+  this.trickler.removeListener('weight', this.sendWeightNotification)
 }
 
 
