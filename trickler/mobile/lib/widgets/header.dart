@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'model.dart';
+import '../models/index.dart';
 
 class Header extends StatelessWidget {
   Header({ Key key, this.title, this.iconColor, this.onClick }) : super(key: key);

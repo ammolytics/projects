@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:scale_controller/home.dart';
+import 'package:scale_controller/pages/home.dart';
 
 void main() {
   test('Counter Value Updates', () {

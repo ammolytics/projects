@@ -1,5 +1,5 @@
-import 'model.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'models/index.dart';
 
 class SetCurrentMeasurement {
   final Measurement measurement;

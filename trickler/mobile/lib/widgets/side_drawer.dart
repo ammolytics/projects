@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'devices.dart';
-import 'history.dart';
+import '../pages/devices.dart';
+import '../pages/history.dart';
 
-import 'testBlue.dart';
+import '../testBlue.dart';
 
 class SideDrawer extends StatelessWidget {
   SideDrawer({ Key key }) : super(key: key);

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'model.dart';
+import '../models/index.dart';
 
-import 'header.dart';
+import '../widgets/header.dart';
 
 class HistoryPage extends StatefulWidget {
   HistoryPage({ Key key }) : super(key: key);

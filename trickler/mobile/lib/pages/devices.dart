@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'model.dart';
-import 'actions.dart';
-import 'globals.dart' as globals;
-import 'header.dart';
+import '../models/index.dart';
+import '../actions.dart';
+import '../globals.dart' as globals;
+import '../widgets/header.dart';
 
 class DevicesPage extends StatefulWidget {
   DevicesPage({ Key key }) : super(key: key);
