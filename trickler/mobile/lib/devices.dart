@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'model.dart';
 import 'actions.dart';
 import 'globals.dart' as globals;
@@ -16,6 +16,8 @@ class DevicesPage extends StatefulWidget {
 }
 
 class _DevicesPageState extends State<DevicesPage> {
+  AppState _state;
+  Function _dispatch;
   String _btDeviceName = 'Trickler';
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
@@ -29,10 +31,10 @@ class _DevicesPageState extends State<DevicesPage> {
   List<int> _weight = [];
   List<int> _unit = [];
 
-  void _scanDevices(Function dispatch) {
+  void _scanDevices() {
     try {
       bool foundPeripheral = false;
-      dispatch(SetConnectionStatus(globals.connecting));
+      _dispatch(SetConnectionStatus(globals.connecting));
       // Listen for BT Devices for 5 seconds
       _scanSubscription = _flutterBlue.scan(timeout: const Duration(seconds: 5)).listen((scanResult) {
         // Save all results to local state
@@ -42,15 +44,15 @@ class _DevicesPageState extends State<DevicesPage> {
         if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
           // Connect before 5 second timeout
           foundPeripheral = true;
-          _connectToDevice(scanResult.device, dispatch);
+          _connectToDevice(scanResult.device);
         }
-      }, onDone: () => _stopScan(dispatch, foundPeripheral));
+      }, onDone: () => _stopScan(foundPeripheral));
     } catch (e) {
       print(e.toString());
     }
   }
 
-  void _stopScan(Function dispatch, bool foundPeripheral) {
+  void _stopScan(bool foundPeripheral) {
     // Stop scanning...
     _scanSubscription?.cancel();
     _scanSubscription = null;
@@ -66,36 +68,37 @@ class _DevicesPageState extends State<DevicesPage> {
       _scanResults.forEach((key, value) {
         if (value.advertisementData.localName == _btDeviceName) {
           foundDevice = true;
-          _connectToDevice(value.device, dispatch);
+          _connectToDevice(value.device);
         }
       });
-      dispatch(SetConnectionStatus(globals.disconnected));
+      _dispatch(SetConnectionStatus(globals.disconnected));
     }
   }
 
-  void _connectToDevice(BluetoothDevice device, Function dispatch) async {
+  void _connectToDevice(BluetoothDevice device) async {
     // Stop the scan before 5 second timeout
-    _stopScan(dispatch, true);
+    _stopScan(true);
     _deviceConnection = _flutterBlue
       .connect(device, timeout: Duration(seconds: 4))
       .listen((s) {
         // Connect to device and listen for data
         if (s == BluetoothDeviceState.connected) {
           print('\n\n\nConnected!\n\n\n\n');
-          dispatch(SetConnectionStatus(globals.connected));
-          dispatch(SetDevice(device));
-          _getServices(device, dispatch);
+          _dispatch(SetConnectionStatus(globals.connected));
+          _dispatch(SetDevice(device));
+          setState(() {});
+          _getServices(device);
         } else if (s == BluetoothDeviceState.disconnected) {
-          _disconnect(dispatch);
+          _disconnect();
         }
-      }, onDone: () => _disconnect(dispatch));
+      }, onDone: _disconnect);
   }
 
-  void _disconnect(Function dispatch) {
+  void _disconnect() {
     _deviceConnection?.cancel();
     print('\n\n\nDisconnecting...\n\n\n\n');
-    dispatch(SetConnectionStatus(globals.disconnected));
-    dispatch(SetDevice(BluetoothDevice(id:DeviceIdentifier('000'))));
+    _dispatch(SetConnectionStatus(globals.disconnected));
+    _dispatch(SetDevice(BluetoothDevice(id:DeviceIdentifier('000'))));
     setState(() {
       _stability = [];
       _weight = [];
@@ -103,7 +106,8 @@ class _DevicesPageState extends State<DevicesPage> {
     });
   }
 
-  void _getServices(BluetoothDevice device, Function dispatch) {
+  void _getServices(BluetoothDevice device) {
+    print('\n\n\n\n DEVICE ID: ${device.id.toString()}\n\n\n');
     // Discover all advertised trickler services
     device.discoverServices().then((services) {
       print('\n\n\nGOT ${services.length} SERVICES...\n\n\n');
@@ -111,7 +115,7 @@ class _DevicesPageState extends State<DevicesPage> {
       services.forEach((service) {
         // Find the service we need for data readout
         if (service.uuid.toString() == globals.tricklerServiceId) {
-          dispatch(SetService(service));
+          _dispatch(SetService(service));
           print('\n\n\nCHRACTERISTICS: ${service.characteristics.length}\n\n\n');
           service.characteristics.forEach((char) {
             chars.add(char);
@@ -163,7 +167,8 @@ class _DevicesPageState extends State<DevicesPage> {
     }
   }
 
-  Widget _getDeviceInfo(BuildContext context, BluetoothDevice device) {
+  Widget _getDeviceInfo() {
+    BluetoothDevice device = _state.device;
     if (device.id != DeviceIdentifier('000')) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,8 +220,32 @@ class _DevicesPageState extends State<DevicesPage> {
     );
   }
 
+  _getActionButton() {
+    BluetoothDevice device = _state.device;
+    if (device.id != DeviceIdentifier('000')) {
+      return FloatingActionButton(
+        heroTag: 'Dissconnect',
+        onPressed: _disconnect,
+        tooltip: 'Dissconnect',
+        backgroundColor: Colors.red,
+        child: Icon(Icons.bluetooth_disabled),
+      );
+    }
+    return FloatingActionButton(
+      heroTag: 'ScanBTDevices',
+      onPressed: _scanDevices,
+      tooltip: 'Scan for Devices',
+      backgroundColor: Colors.green,
+      child: Icon(Icons.bluetooth_searching),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      _state = StoreProvider.of<AppState>(context).state;
+      _dispatch = (action) => StoreProvider.of<AppState>(context).dispatch(action);
+    });
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
@@ -229,41 +258,11 @@ class _DevicesPageState extends State<DevicesPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            StoreConnector<AppState, BluetoothDevice>(
-              converter: (store) => store.state.device,
-              builder: _getDeviceInfo,
-            ),
+            _getDeviceInfo(),
           ],
         ),
       ),
-      floatingActionButton: StoreConnector<AppState, Function>(
-        converter: (store) {
-          return (action) => store.dispatch(action);
-        },
-        builder: (context, dispatch) {
-          return StoreConnector<AppState, BluetoothDevice>(
-            converter: (store) => store.state.device,
-            builder: (context, device) {
-              if (device.id != DeviceIdentifier('000')) {
-                return FloatingActionButton(
-                  heroTag: 'Dissconnect',
-                  onPressed: () => _disconnect(dispatch),
-                  tooltip: 'Dissconnect',
-                  backgroundColor: Colors.red,
-                  child: Icon(Icons.bluetooth_disabled),
-                );
-              }
-              return FloatingActionButton(
-                heroTag: 'ScanBTDevices',
-                onPressed: () => _scanDevices(dispatch),
-                tooltip: 'Scan for Devices',
-                backgroundColor: Colors.green,
-                child: Icon(Icons.bluetooth_searching),
-              );
-            },
-          );
-        },
-      ),
+      floatingActionButton: _getActionButton(),
     );
   }
 }

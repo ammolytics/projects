@@ -27,8 +27,11 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blueGrey,
         ),
-        home: HomePage(
-          key: Key('HomePage'),
+        home: StoreConnector<AppState, AppState>(
+          converter: (store) => store.state,
+          builder: (context, state) {
+            return  HomePage(key: Key('HomePage'));
+          },
         ),
       ),
     );
