@@ -38,11 +38,11 @@ UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
       if (this.updateValueCallback) {
         // Only send a notification if the value has changed.
         if (typeof this.trickler.unit === 'undefined' || this.trickler.unit !== result.unit) {
+          this.trickler.unit = result.unit
           var data = Buffer.alloc(1)
           data.writeUInt8(result.unit, 0)
           data.writeUInt8(this.trickler.unit, 0)
           this.updateValueCallback(data)
-          this.trickler.emit('unit', result.unit)
         }
       }
     })
@@ -67,17 +67,7 @@ UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResp
           callback(this.RESULT_SUCCESS)
         } else {
           this.trickler.setUnit()
-          this.trickler.on('unit', result => {
-            // Keep pressing Mode button until correct unit is selected.
-            if (unit !== result) {
-              console.log('Unit still incorrect, trying again')
-              this.trickler.setUnit()
-            } else {
-              console.log('Unit changed!')
-              this.trickler.unit = result
-              callback(this.RESULT_SUCCESS)
-            }
-          })
+          callback(this.RESULT_SUCCESS)
         }
         break
       default:
