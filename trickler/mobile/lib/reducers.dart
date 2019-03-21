@@ -5,7 +5,11 @@ import 'model.dart';
 Measurement currentMeasurementReducer(Measurement state, dynamic action) {
   if (action is SetCurrentMeasurement) {
     return action.measurement;
-  } else if (action is SetCurrentActualWeight) {
+  } else if (action is SetUnit) {
+    state.setUnit(action.unit);
+  } else if (action is SetTargetWeight) {
+    state.setTargetWeight(action.weight);
+  } else if (action is SetActualWeight) {
     state.setActualWeight(action.weight);
   }
   return state;
@@ -37,6 +41,13 @@ BluetoothDevice device(BluetoothDevice state, dynamic action) {
 BluetoothService service(BluetoothService state, dynamic action) {
   if (action is SetService) {
     return action.service;
+  }
+  return state;
+}
+
+int stability(int state, dynamic action) {
+  if (action is SetStability) {
+    return action.stability;
   }
   return state;
 }
