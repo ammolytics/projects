@@ -14,8 +14,12 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  AppState _state;
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      _state = StoreProvider.of<AppState>(context).state;
+    });
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
@@ -28,12 +32,7 @@ class _HistoryPageState extends State<HistoryPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            StoreConnector<AppState, String>(
-              converter: (store) => store.state.currentMeasurement.targetWeight.toString(),
-              builder: (context, weight) {
-                return Text('Target Weight $weight');
-              },
-            ),
+            Text('Target Weight ${_state.currentMeasurement.targetWeight}'),
           ],
         ),
       ),

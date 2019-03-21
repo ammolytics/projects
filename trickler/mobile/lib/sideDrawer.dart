@@ -5,14 +5,9 @@ import 'history.dart';
 
 import 'testBlue.dart';
 
-class SideDrawer extends StatefulWidget {
+class SideDrawer extends StatelessWidget {
   SideDrawer({ Key key }) : super(key: key);
 
-  @override
-  _SideDrawerState createState() => _SideDrawerState();
-}
-
-class _SideDrawerState extends State<SideDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
