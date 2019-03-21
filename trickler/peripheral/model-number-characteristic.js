@@ -36,12 +36,11 @@ ModelNumberCharacteristic.prototype.onReadRequest = function(offset, callback) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
     if (typeof this.trickler.modelNumber === 'undefined') {
-      this.trickler.getModelNumber()
       this.trickler.once('modelNumber', modelNumber => {
-        this.trickler.modelNumber = modelNumber
-        var data = Buffer.from(this.trickler.modelNumber)
+        var data = Buffer.from(modelNumber)
         callback(this.RESULT_SUCCESS, data)
       })
+      this.trickler.getModelNumber()
     } else {
       var data = Buffer.from(this.trickler.modelNumber)
       callback(this.RESULT_SUCCESS, data)

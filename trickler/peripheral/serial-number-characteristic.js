@@ -33,12 +33,11 @@ SerialNumberCharacteristic.prototype.onReadRequest = function(offset, callback) 
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
     if (typeof this.trickler.serialNumber === 'undefined') {
-      this.trickler.getSerialNumber()
       this.trickler.once('serialNumber', serialNumber => {
-        this.trickler.serialNumber = serialNumber
-        var data = Buffer.from(this.trickler.serialNumber)
+        var data = Buffer.from(serialNumber)
         callback(this.RESULT_SUCCESS, data)
       })
+      this.trickler.getSerialNumber()
     } else {
       var data = Buffer.from(this.trickler.serialNumber)
       callback(this.RESULT_SUCCESS, data)
