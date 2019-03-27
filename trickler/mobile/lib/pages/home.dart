@@ -31,12 +31,37 @@ class _HomePageState extends State<HomePage> {
       weight *= 15.4324;
       _dispatch(SetUnit(globals.grains));
       _dispatch(SetTargetWeight(weight));
+      _updatePeripheralUnit(globals.grains);
     } else if (unit == globals.grains) {
       weight /= 15.4324;
       _dispatch(SetUnit(globals.grams));
       _dispatch(SetTargetWeight(weight));
+      _updatePeripheralUnit(globals.grams);
     }
     _syncTextField();
+  }
+
+  void _updatePeripheralUnit(unit) {
+    BluetoothDevice device = _state.device;
+    BluetoothService service = _state.service;
+
+    if (
+      service?.characteristics != null &&
+      service.characteristics.length > 2 &&
+      service.characteristics[2].properties.write
+    ) {
+      // Write to trickler unit characteristic
+      device.writeCharacteristic(service.characteristics[2],
+        unit == globals.grains ? [0] : [1]).then((value) {
+          // Check unit characteristic was changed to the right value
+          device.readCharacteristic(service.characteristics[2]).then((readChar) {
+            if (readChar.toString() == (unit == globals.grains ? '[0]' : '[1]')) {
+              // Update unit characteristic in global state
+              _dispatch(UpdateCharacteristic(2, readChar));
+            }
+          });
+        });
+    }
   }
 
   void _updateCounter(text) {
@@ -78,22 +103,6 @@ class _HomePageState extends State<HomePage> {
     }
     return Text('You are not connected to a device!');
   }
-
-  // Base Unit toggle off of this code...
-    // if (
-    //   service?.characteristics != null &&
-    //   service.characteristics.length > 2 &&
-    //   service.characteristics[2].properties.write
-    // ) {
-    //   // Write to trickler unit characteristic
-    //   device.writeCharacteristic(service.characteristics[2],
-    //     _unit == globals.grains ? [0] : [1]).then((value) {
-    //       // Check unit characteristic was changed to the right value
-    //       device.readCharacteristic(service.characteristics[2]).then((readChar) {
-    //         print("\n\n\nUpdated Unit is ${readChar.toString() == (_unit == globals.grains ? '[0]' : '[1]')} - ${readChar.toString()}\n\n\n");
-    //       });
-    //     });
-    // }
 
   @override
   Widget build(BuildContext context) {
