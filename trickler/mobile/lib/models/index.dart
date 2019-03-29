@@ -4,4 +4,5 @@ import '../globals.dart' as globals;
 import 'dart:math';
 
 part 'measurement_model.dart';
+part 'device_state_model.dart';
 part 'app_state_model.dart';

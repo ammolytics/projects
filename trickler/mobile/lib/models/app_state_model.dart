@@ -3,48 +3,36 @@ part of 'index.dart';
 class AppState {
   Measurement currentMeasurement;
   List<Measurement> measurementHistory;
-  String connectionStatus;
-  BluetoothDevice device;
-  dynamic deviceConnection;
-  BluetoothService service;
-  List characteristics;
+  DeviceState deviceState;
 
   AppState({
     this.currentMeasurement,
     this.measurementHistory,
-    this.connectionStatus,
-    this.device,
-    this.deviceConnection,
-    this.service,
-    this.characteristics,
+    this.deviceState,
   });
 
   AppState.initialState()
   : currentMeasurement = Measurement(globals.grams, 0.0, 0.0, false),
     measurementHistory = <Measurement>[],
-    connectionStatus = globals.disconnected,
-    device = BluetoothDevice(id: DeviceIdentifier('000')),
-    deviceConnection = null,
-    service = null,
-    characteristics = [[], [], []];
+    deviceState = DeviceState.initialState();
 
   getStatusColor() {
-    if (this.connectionStatus == globals.disconnected) {
+    if (this.deviceState.connectionStatus == BluetoothDeviceState.disconnected) {
       return Color.fromARGB(255, 251, 118, 102);
-    } else if (this.connectionStatus == globals.connecting) {
+    } else if (this.deviceState.connectionStatus == BluetoothDeviceState.connecting) {
       return Color.fromARGB(255, 200, 200, 200);
-    } else if (this.connectionStatus == globals.connected) {
+    } else if (this.deviceState.connectionStatus == BluetoothDeviceState.connected) {
       return Color.fromARGB(255, 79, 186, 248);
     }
     return Colors.white;
   }
 
   getStatusIcon() {
-    if (this.connectionStatus == globals.disconnected) {
+    if (this.deviceState.connectionStatus == BluetoothDeviceState.disconnected) {
       return Icons.bluetooth_disabled;
-    } else if (this.connectionStatus == globals.connecting) {
+    } else if (this.deviceState.connectionStatus == BluetoothDeviceState.connecting) {
       return Icons.bluetooth_searching;
-    } else if (this.connectionStatus == globals.connected) {
+    } else if (this.deviceState.connectionStatus == BluetoothDeviceState.connected) {
       return Icons.bluetooth_connected;
     }
     return Icons.bluetooth;

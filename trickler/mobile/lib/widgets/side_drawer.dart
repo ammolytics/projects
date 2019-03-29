@@ -6,7 +6,9 @@ import '../pages/history.dart';
 import '../testBlue.dart';
 
 class SideDrawer extends StatelessWidget {
-  SideDrawer({ Key key }) : super(key: key);
+  final Function connectToDevice;
+  final Function disconnect;
+  SideDrawer({ Key key, this.connectToDevice, this.disconnect }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,11 @@ class SideDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DevicesPage(key: Key('DevicesPage')),
+                  builder: (context) => DevicesPage(
+                    key: Key('DevicesPage'),
+                    connectToDevice: this.connectToDevice,
+                    disconnect: this.disconnect,
+                  ),
                 ),
               );
             },

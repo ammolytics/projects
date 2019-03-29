@@ -21,9 +21,8 @@ class SetActualWeight {
   SetActualWeight(this.weight);
 }
 
-class SetConnectionStatus {
-  final String connectionStatus;
-  SetConnectionStatus(this.connectionStatus);
+class ResetDeviceState {
+  ResetDeviceState();
 }
 
 class SetDevice {
@@ -36,18 +35,23 @@ class SetDeviceConnection {
   SetDeviceConnection(this.deviceConnection);
 }
 
+class SetConnectionStatus {
+  final BluetoothDeviceState connectionStatus;
+  SetConnectionStatus(this.connectionStatus);
+}
+
 class SetService {
   final BluetoothService service;
   SetService(this.service);
 }
 
+class SetCharacteristic {
+  final int index;
+  final List characteristic;
+  SetCharacteristic(this.index, this.characteristic);
+}
+
 class AddMeasurementToHistory {
   final Measurement measurement;
   AddMeasurementToHistory(this.measurement);
-}
-
-class UpdateCharacteristic {
-  final int index;
-  final List characteristic;
-  UpdateCharacteristic(this.index, this.characteristic);
 }

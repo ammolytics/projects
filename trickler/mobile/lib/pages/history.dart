@@ -14,28 +14,29 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  AppState _state;
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      _state = StoreProvider.of<AppState>(context).state;
-    });
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-          child: Header(
-          key: Key('Header'),
-          title: widget.title,
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Target Weight ${_state.currentMeasurement.targetWeight}'),
-          ],
-        ),
-      ),
+    return StoreConnector<AppState, AppState>(
+      converter: (store) => store.state,
+      builder: (context, state) {
+        return Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(60.0),
+              child: Header(
+              key: Key('Header'),
+              title: widget.title,
+            ),
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('Target Weight ${state.currentMeasurement.targetWeight}'),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
