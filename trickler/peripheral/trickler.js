@@ -182,6 +182,20 @@ Object.defineProperties(Trickler.prototype, {
     }
   },
 
+  targetWeight: {
+    get: function() {
+      return this._targetWeight
+    },
+
+    set: function(value) {
+      console.log(`setting targetWeight from ${this._targetWeight} to ${value}`)
+      if (this._targetWeight !== value) {
+        this._targetWeight = value
+        this.emit('targetWeight', value)
+      }
+    }
+  },
+
   modelNumber: {
     get: function() {
       return this._modelNumber
