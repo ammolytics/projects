@@ -8,6 +8,9 @@ const bleno = require('bleno')
 const StabilityCharacteristic = require('./stability-characteristic')
 const WeightCharacteristic = require('./weight-characteristic')
 const UnitCharacteristic = require('./unit-characteristic')
+const TargetWeightCharacteristic = require('./target-weight-characteristic')
+const ModelNumberCharacteristic = require('./model-number-characteristic')
+const SerialNumberCharacteristic = require('./serial-number-characteristic')
 
 
 function TricklerService(trickler) {
@@ -17,6 +20,9 @@ function TricklerService(trickler) {
       new StabilityCharacteristic(trickler),
       new WeightCharacteristic(trickler),
       new UnitCharacteristic(trickler),
+      new TargetWeightCharacteristic(trickler),
+      new ModelNumberCharacteristic(trickler),
+      new SerialNumberCharacteristic(trickler),
     ]
   })
 }
