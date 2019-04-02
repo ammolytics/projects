@@ -7,6 +7,7 @@ import '../globals.dart' as globals;
 
 import '../widgets/header.dart';
 import '../widgets/side_drawer.dart';
+import '../widgets/dial.dart';
 
 class HomePage extends StatefulWidget {
   final Function connectToDevice;
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
   HomePage({ Key key, this.connectToDevice, this.disconnect }) : super(key: key);
 
   final String title = 'Trickler';
+  final dialKey = new GlobalKey<DialState>();
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -41,6 +43,7 @@ class _HomePageState extends State<HomePage> {
       _updatePeripheralUnit(globals.grams);
     }
     _syncTextField();
+    _syncDialState();
   }
 
   void _updatePeripheralUnit(unit) {
@@ -66,9 +69,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _updateWeight(double weight) {
+    _updateCounter(weight.toString());
+    _syncTextField();
+    _syncDialState();
+  }
+
   void _updateCounter(text) {
     var newWeight = double.parse(text);
     _dispatch(SetTargetWeight(newWeight));
+    _syncDialState();
   }
 
   void _submit() {
@@ -80,6 +90,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     _syncTextField();
+    _syncDialState();
 
     print('Sending $targetWeight to ${device.name}');
   }
@@ -88,6 +99,13 @@ class _HomePageState extends State<HomePage> {
     double targetWeight = _state.currentMeasurement.targetWeight;
     setState(() {
       _controller.text = '$targetWeight';
+    });
+  }
+
+  void _syncDialState() {
+    double targetWeight = _state.currentMeasurement.targetWeight;
+    setState(() {
+      widget.dialKey.currentState.setAngleFromValue(targetWeight);
     });
   }
 
@@ -127,56 +145,60 @@ class _HomePageState extends State<HomePage> {
             disconnect: widget.disconnect,
           ),
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _getConnection(),
-                Padding(
-                  padding:EdgeInsets.symmetric(horizontal: 30),
-                  child: TextField(
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                    controller: _controller,
-                    onChanged: _updateCounter,
-                    focusNode: _inputFocus,
-                    textAlign: TextAlign.center,
-                    textInputAction: TextInputAction.done,
-                    key: Key('WeightInput'),
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      // prefix centers the value
-                      prefix: SizedBox(
-                        width: 57.0,
-                        height: 40.0,
-                        child: Text(''),
+            child: Dial(
+              key: widget.dialKey,
+              updateWeight: _updateWeight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _getConnection(),
+                  Padding(
+                    padding:EdgeInsets.symmetric(horizontal: 50),
+                    child: TextField(
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      controller: _controller,
+                      onChanged: _updateCounter,
+                      focusNode: _inputFocus,
+                      textAlign: TextAlign.center,
+                      textInputAction: TextInputAction.done,
+                      key: Key('WeightInput'),
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
                       ),
-                      suffix: SizedBox(
-                        width: 57.0,
-                        height: 40.0,
-                        child: OutlineButton(
-                          onPressed: _toggleUnit,
-                          child: Text(
-                            "${_getUnit()}",
-                            key: Key('CurrentUnit'),
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueAccent,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        // prefix centers the value
+                        prefix: SizedBox(
+                          width: 57.0,
+                          height: 40.0,
+                          child: Text(''),
+                        ),
+                        suffix: SizedBox(
+                          width: 57.0,
+                          height: 40.0,
+                          child: OutlineButton(
+                            onPressed: _toggleUnit,
+                            child: Text(
+                              "${_getUnit()}",
+                              key: Key('CurrentUnit'),
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent,
+                              ),
                             ),
-                          ),
-                          splashColor: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            splashColor: Colors.blueAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           floatingActionButton: FloatingActionButton(
