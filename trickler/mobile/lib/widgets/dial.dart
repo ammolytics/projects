@@ -21,8 +21,9 @@ class DialState extends State<Dial> {
     });
   }
 
-  void _setAngleFromPosition(pos) {
-    Offset position = Offset(pos.dx, pos.dy - 60); // adjust y by 60 because of AppBar height
+  void _setAngleFromPosition(dynamic details) {
+    Offset position = Offset(details.globalPosition.dx,
+      details.globalPosition.dy - 60); // adjust y by 60 because of AppBar height
     double dx = _screenSize.width / 2 - position.dx;
     double dy = _screenSize.height / 2 - position.dy;
     double adj = dx.abs();
@@ -46,17 +47,20 @@ class DialState extends State<Dial> {
         theta = pi + theta + 0.5;
       }
     }
-    double percentage = theta / (pi + 1);
-    // Give a min and max to the percentage
-    percentage = percentage > 1 ? 1.0 : percentage;
-    percentage = percentage < 0 ? 0.0 : percentage;
+    // Reject taps that aren't close to the dial
+    if (details is !TapDownDetails || hyp > _screenSize.width / 2 - 30) {
+      double percentage = theta / (pi + 1);
+      // Give a min and max to the percentage
+      percentage = percentage > 1 ? 1.0 : percentage;
+      percentage = percentage < 0 ? 0.0 : percentage;
 
-    // Update parent, and global state w/ callback
-    widget.updateWeight(999.99 * percentage);
-    // Update local state
-    setState(() {
-      _angle = toDeg(pi + 1) * percentage;
-    });
+      // Update parent, and global state w/ callback
+      widget.updateWeight(999.99 * percentage);
+      // Update local state
+      setState(() {
+        _angle = toDeg(pi + 1) * percentage;
+      });
+    }
   }
 
   @override
@@ -67,15 +71,9 @@ class DialState extends State<Dial> {
       });
     }
     return GestureDetector(
-      onTapDown: (TapDownDetails details) {
-        _setAngleFromPosition(details.globalPosition);
-      },
-      onPanStart: (DragStartDetails details) {
-        _setAngleFromPosition(details.globalPosition);
-      },
-      onPanUpdate: (DragUpdateDetails details) {
-        _setAngleFromPosition(details.globalPosition);
-      },
+      onTapDown: _setAngleFromPosition,
+      onPanStart: _setAngleFromPosition,
+      onPanUpdate: _setAngleFromPosition,
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width,
