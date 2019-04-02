@@ -81,6 +81,13 @@ class _HomePageState extends State<HomePage> {
     _syncDialState();
   }
 
+  void _handleIncrement(bool shouldIncrement) {
+    double weight = _state.currentMeasurement.targetWeight;
+    double diff = _state.currentMeasurement.unit == globals.grams ? 0.001 : 0.02;
+    weight = shouldIncrement ? weight + diff : weight - diff;
+    _updateWeight(weight);
+  }
+
   void _submit() {
     BluetoothDevice device = _state.deviceState.device;
     double targetWeight = _state.currentMeasurement.targetWeight;
@@ -116,14 +123,6 @@ class _HomePageState extends State<HomePage> {
     return abbr[i];
   }
 
-  Widget _getConnection() {
-    BluetoothDevice device = _state.deviceState.device;
-    if (device.id != DeviceIdentifier('000')) {
-      return Text("You are connected to: ${device.name}");
-    }
-    return Text('You are not connected to a device!');
-  }
-
   @override
   Widget build(BuildContext context) {
     _dispatch = (action) => StoreProvider.of<AppState>(context).dispatch(action);
@@ -151,9 +150,8 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  _getConnection(),
                   Padding(
-                    padding:EdgeInsets.symmetric(horizontal: 50),
+                    padding: EdgeInsets.fromLTRB(50.0, 60.0, 50.0, 20.0),
                     child: TextField(
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
                       controller: _controller,
@@ -195,6 +193,29 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+                    ),
+                  ),
+                  Container(
+                    width: 200.0,
+                    height: 60.0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        FloatingActionButton(
+                          heroTag: 'RemoveBtn',
+                          onPressed: () => _handleIncrement(false),
+                          tooltip: "Remove ${_state.currentMeasurement.unit == globals.grams ? '0.001g' : '0.02gr'}",
+                          child: Icon(Icons.remove),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                        FloatingActionButton(
+                          heroTag: 'AddBtn',
+                          onPressed: () => _handleIncrement(true),
+                          tooltip: "Add ${_state.currentMeasurement.unit == globals.grams ? '0.001g' : '0.02gr'}",
+                          child: Icon(Icons.add),
+                          backgroundColor: Colors.blueAccent,
+                        ),
+                      ],
                     ),
                   ),
                 ],
