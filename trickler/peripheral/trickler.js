@@ -4,7 +4,15 @@
  */
 const util = require('util')
 const events = require('events')
+
+const rpio = require('rpio')
 const Readline = require('@serialport/parser-readline')
+
+/**
+  * PWM0 on the Rasp Pi, physical pin 12,  BCM pin 18
+  * https://pinout.xyz/pinout/pin12_gpio18
+  */
+const MOTOR_PIN = 12
 
 const TricklerUnits = {
   GRAINS: 0,
@@ -27,6 +35,11 @@ const TricklerWeightStatus = {
 }
 
 const TricklerMotorStatus = {
+  OFF: 0,
+  ON: 1,
+}
+
+const AutoModeStatus = {
   OFF: 0,
   ON: 1,
 }
@@ -77,8 +90,17 @@ const CommandMap = {
   MODE_BTN: 'U\r\n',
 }
 
+const MotorCtrlMap = {}
+MotorCtrlMap[TricklerMotorStatus.ON] = rpio.HIGH
+MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
+
 
 function Trickler(port) {
+  // Default autoMode to OFF.
+  this.autoMode = AutoModeStatus.OFF
+  // Setup GPIO for motor control
+  rpio.open(MOTOR_PIN, rpio.OUTPUT, rpio.LOW)
+
   events.EventEmitter.call(this)
   const parser = new Readline()
   // Get values from scale over serial
@@ -151,7 +173,7 @@ Object.defineProperties(Trickler.prototype, {
     set: function(value) {
       if (this._unit !== value) {
         this._unit = value
-        this.emit('unit', value)
+        this.emit('unit', this._unit)
       }
     }
   },
@@ -164,7 +186,7 @@ Object.defineProperties(Trickler.prototype, {
     set: function(value) {
       if (this._status !== value) {
         this._status = value
-        this.emit('status', value)
+        this.emit('status', this._status)
       }
     }
   },
@@ -177,7 +199,7 @@ Object.defineProperties(Trickler.prototype, {
     set: function(value) {
       if (this._weight !== value) {
         this._weight = value
-        this.emit('weight', value)
+        this.emit('weight', this._weight)
       }
     }
   },
@@ -191,7 +213,7 @@ Object.defineProperties(Trickler.prototype, {
       console.log(`setting targetWeight from ${this._targetWeight} to ${value}`)
       if (this._targetWeight !== value) {
         this._targetWeight = value
-        this.emit('targetWeight', value)
+        this.emit('targetWeight', this._targetWeight)
       }
     }
   },
@@ -205,7 +227,7 @@ Object.defineProperties(Trickler.prototype, {
       console.log(`setting modelNumber from ${this._modelNumber} to ${value}`)
       if (this._modelNumber !== value) {
         this._modelNumber = value
-        this.emit('modelNumber', value)
+        this.emit('modelNumber', this._modelNumber)
       }
     }
   },
@@ -219,16 +241,94 @@ Object.defineProperties(Trickler.prototype, {
       console.log(`setting serialNumber from ${this._serialNumber} to ${value}`)
       if (this._serialNumber !== value) {
         this._serialNumber = value
-        this.emit('serialNumber', value)
+        this.emit('serialNumber', this._serialNumber)
       }
     }
   },
+
+  autoMode: {
+    get: function() {
+      return this._autoMode
+    },
+
+    set: function(value) {
+      console.log(`setting autoMode from ${this._autoMode} to ${value}`)
+      switch(value) {
+        case AutoModeStatus.OFF:
+        case AutoModeStatus.ON:
+          this._autoMode = value
+          break
+        default:
+          console.error(`Unknown value: ${value}`)
+          break
+      }
+      this.emit('autoMode', this._autoMode)
+    }
+  }
 })
 
+Trickler.prototype.trickleCtrlFn = function() {
+  // Compare scale weight to target weight
+  var delta = this.targetWeight - this.weight
+  
+  switch(Math.sign(delta)) {
+    case 0:
+    case -0:
+      // Exact weight
+      this.controlMotor(TricklerMotorStatus.OFF)
+      this.emit('ready', TricklerWeightStatus.EQUAL)
+      break
+    case 1:
+      // Positive delta, not finished trickling
+      // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
+      if (this.weight < 0 || (this.weight === 0 && this.status === TricklerStatus.UNSTABLE)) {
+        this.controlMotor(TricklerMotorStatus.OFF)
+      } else {
+        // If it's within one gram/grain, slow down or pulse motor.
+        if (delta < 1.00) {
+          // Turn motor off, check if stable before turning back on. Interval will turn it back off momentarily.
+          this.controlMotor(TricklerMotorStatus.OFF)
+          if (this.status === TricklerStatus.STABLE) {
+            this.controlMotor(TricklerMotorStatus.ON)
+          }
+        } else {
+          // More than one gram/grain, leave the motor on.
+          this.controlMotor(TricklerMotorStatus.ON)
+        }
+      }
+      break
+    case -1:
+      // Negative delta, over throw
+      this.controlMotor(TricklerMotorStatus.OFF)
+      this.emit('ready', TricklerWeightStatus.OVER)
+      break
+  }
+}
 
-Trickler.prototype.trickle = function(weight) {
-  console.log('Running trickler...')
-  // TODO: Send commands over serial, monitor status.
+
+// Turn motor on or off
+Trickler.prototype.controlMotor = function(mode) {
+  // Control motor over GPIO.
+  rpoi.write(MOTOR_PIN, MotorCtrlMap[mode])
+}
+
+
+Trickler.prototype.trickle = function(mode) {
+  // Compare weight every 10 microseconds the min allowed by setInterval)
+  const TIMER = 10
+
+  switch(mode) {
+    case AutoModeStatus.ON:
+      console.log('Activating trickler auto mode...')
+      this._trickleInterval = setInterval(this.trickleCtrlFn, TIMER)
+      break
+
+    case AutoModeStatus.OFF:
+      console.log('Deactivating trickler auto mode...')
+      this.controlMotor(TricklerMotorStatus.OFF)
+      clearInterval(this._trickleInterval)
+      break
+  }
 }
 
 Trickler.prototype.getModelNumber = function() {
