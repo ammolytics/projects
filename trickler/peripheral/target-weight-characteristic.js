@@ -4,6 +4,8 @@
  */
 const util = require('util')
 const bleno = require('bleno')
+// TOOD: Consider using mathjs.unit for storing target/current weight.
+//const mathjs = require('mathjs')
 const trickler = require('./trickler')
 
 
@@ -14,7 +16,7 @@ function TargetWeightCharacteristic(trickler) {
     descriptors: [
       new bleno.Descriptor({
         uuid: '2901',
-        value: 'Target weight to stop at'
+        value: 'Target powder weight'
       })
     ]
   })
