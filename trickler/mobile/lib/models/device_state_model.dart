@@ -42,11 +42,25 @@ class DeviceState {
   }
 
   setCharacteristic(int i, List characteristic) {
-    if (characteristics.length > i) {
-      characteristics[i] = characteristic;
+    if (this.characteristics.length > i) {
+      this.characteristics[i] = characteristic;
     } else {
-      characteristics.add(characteristic);
+      this.characteristics.add(characteristic);
     }
+  }
+
+  String getStability() {
+    List stability = this.characteristics[0];
+    return stability.length > 0 ? globals.stabilityList[stability[0]] : '';
+  }
+  String getWeight() {
+    List weight = this.characteristics[1];
+    return weight is List<int> ? utf8.decode(weight) : '';
+  }
+
+  String getUnit() {
+    List unit = this.characteristics[2];
+    return unit.length > 0 ? globals.unitsList[unit[0]] : '';
   }
 
 }

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../pages/devices.dart';
 import '../pages/history.dart';
 
-import '../testBlue.dart';
-
 class SideDrawer extends StatelessWidget {
   final Function connectToDevice;
   final Function disconnect;
@@ -67,24 +65,6 @@ class SideDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => HistoryPage(key: Key('HistoryPage')),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text(
-              'Test Bluetooth',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FlutterBlueApp(key: Key('BluetoothPage')),
                 ),
               );
             },

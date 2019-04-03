@@ -56,16 +56,10 @@ class _HomePageState extends State<HomePage> {
       service.characteristics[2].properties.write
     ) {
       // Write to trickler unit characteristic
-      device.writeCharacteristic(service.characteristics[2],
-        unit == globals.grains ? [0] : [1]).then((value) {
-          // Check unit characteristic was changed to the right value
-          device.readCharacteristic(service.characteristics[2]).then((readChar) {
-            if (readChar.toString() == (unit == globals.grains ? '[0]' : '[1]')) {
-              // Update unit characteristic in global state
-              print('\n\n\nREAD CHAR: $readChar\n\n\n');
-            }
-          });
-        });
+      device.writeCharacteristic(
+        service.characteristics[2],
+        unit == globals.grains ? [0x00] : [0x01],
+        type: CharacteristicWriteType.withResponse);
     }
   }
 

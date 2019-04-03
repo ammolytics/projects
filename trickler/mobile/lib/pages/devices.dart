@@ -3,7 +3,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import '../models/index.dart';
 import '../actions.dart';
-import '../globals.dart' as globals;
 import '../widgets/header.dart';
 
 class DevicesPage extends StatefulWidget {
@@ -51,20 +50,6 @@ class _DevicesPageState extends State<DevicesPage> {
     _scanSubscription = null;
   }
 
-  String _getStability() {
-    return _state.deviceState.characteristics[0].length > 0 ?
-      globals.stabilityList[_state.deviceState.characteristics[0][0]] : '';
-  }
-  String _getWeight() {
-    // TODO: convert data to double
-    return _state.deviceState.characteristics[1].toString();
-  }
-
-  String _getUnit() {
-    return _state.deviceState.characteristics[2].length > 0 ?
-      globals.unitsList[_state.deviceState.characteristics[2][0]] : '';
-  }
-
   Widget _getDeviceInfo() {
     BluetoothDevice device = _state.deviceState.device;
     if (device.id != DeviceIdentifier('000')) {
@@ -82,7 +67,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
           Padding(
             padding:EdgeInsets.only(bottom: 8.0),
-            child: Text("Stability: ${_getStability()}",
+            child: Text("Stability: ${_state.deviceState.getStability()}",
               style: TextStyle(
                 fontSize: 18.0,
                 fontStyle: FontStyle.italic,
@@ -91,7 +76,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
           Padding(
             padding:EdgeInsets.only(bottom: 8.0),
-            child: Text("Weight: ${_getWeight()}",
+            child: Text("Weight: ${_state.deviceState.getWeight()}",
               style: TextStyle(
                 fontSize: 18.0,
                 fontStyle: FontStyle.italic,
@@ -100,7 +85,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
           Padding(
             padding:EdgeInsets.only(bottom: 8.0),
-            child: Text("Unit: ${_getUnit()}",
+            child: Text("Unit: ${_state.deviceState.getUnit()}",
               style: TextStyle(
                 fontSize: 18.0,
                 fontStyle: FontStyle.italic,
