@@ -1,0 +1,3 @@
+npm install -s @abandonware/bluetooth-hci-socket
+cd node_modules
+ln -s @abandonware/bluetooth-hci-socket .
