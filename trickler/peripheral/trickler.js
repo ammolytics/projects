@@ -90,6 +90,16 @@ const CommandMap = {
   MODE_BTN: 'U\r\n',
 }
 
+
+const MotorPulses = {
+  VERY_SHORT: 30
+  SHORT: 50
+  MEDIUM: 100
+  LONG: 200
+  VERY_LONG: 500
+}
+
+
 const MotorCtrlMap = {}
 MotorCtrlMap[TricklerMotorStatus.ON] = rpio.HIGH
 MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
@@ -275,31 +285,31 @@ Trickler.prototype.trickleCtrlFn = function() {
     case 0:
     case -0:
       // Exact weight
-      this.controlMotor(TricklerMotorStatus.OFF)
+      this.motorOff()
       this.emit('ready', TricklerWeightStatus.EQUAL)
       break
     case 1:
       // Positive delta, not finished trickling
       // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
       if (this.weight < 0 || (this.weight === 0 && this.status === TricklerStatus.UNSTABLE)) {
-        this.controlMotor(TricklerMotorStatus.OFF)
+        this.motorOff()
       } else {
         // If it's within one gram/grain, slow down or pulse motor.
         if (delta < 1.00) {
           // Turn motor off, check if stable before turning back on. Interval will turn it back off momentarily.
-          this.controlMotor(TricklerMotorStatus.OFF)
+          this.motorOff()
           if (this.status === TricklerStatus.STABLE) {
-            this.controlMotor(TricklerMotorStatus.ON)
+            this.pulseMotor(MotorPulses.VERY_SHORT)
           }
         } else {
           // More than one gram/grain, leave the motor on.
-          this.controlMotor(TricklerMotorStatus.ON)
+          this.motorOn()
         }
       }
       break
     case -1:
       // Negative delta, over throw
-      this.controlMotor(TricklerMotorStatus.OFF)
+      this.motorOff()
       this.emit('ready', TricklerWeightStatus.OVER)
       break
   }
@@ -309,7 +319,24 @@ Trickler.prototype.trickleCtrlFn = function() {
 // Turn motor on or off
 Trickler.prototype.controlMotor = function(mode) {
   // Control motor over GPIO.
-  rpoi.write(MOTOR_PIN, MotorCtrlMap[mode])
+  rpio.write(MOTOR_PIN, MotorCtrlMap[mode])
+}
+
+Trickler.prototype.motorOn = function() {
+  // Control motor over GPIO.
+  rpio.write(MOTOR_PIN, MotorCtrlMap.ON)
+}
+
+Trickler.prototype.motorOff = function() {
+  // Control motor over GPIO.
+  rpio.write(MOTOR_PIN, MotorCtrlMap.OFF)
+}
+
+
+// Turn motor on and back off after some delay
+Trickler.prototype.pulseMotor = function(delay) {
+  this.motorOn()
+  setTimeout(this.motorOff, delay)
 }
 
 
@@ -325,7 +352,7 @@ Trickler.prototype.trickle = function(mode) {
 
     case AutoModeStatus.OFF:
       console.log('Deactivating trickler auto mode...')
-      this.controlMotor(TricklerMotorStatus.OFF)
+      this.motorOff()
       clearInterval(this._trickleInterval)
       break
   }
