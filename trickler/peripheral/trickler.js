@@ -92,11 +92,20 @@ const CommandMap = {
 
 
 const MotorPulses = {
-  VERY_SHORT: 30
-  SHORT: 50
-  MEDIUM: 100
-  LONG: 200
-  VERY_LONG: 500
+  VERY_SHORT: 30,
+  SHORT: 50,
+  MEDIUM: 100,
+  LONG: 200,
+  VERY_LONG: 500,
+}
+
+
+const PulseSpeeds = {
+  VERY_SLOW: {ON: 15, OFF: 150},
+  SLOW: {ON: 20, OFF: 150},
+  MEDIUM: {ON: 50, OFF: 150},
+  FAST: {ON: 50, OFF: 100},
+  VERY_FAST: {ON: 50, OFF: 50},
 }
 
 
@@ -285,31 +294,31 @@ Trickler.prototype.trickleCtrlFn = function() {
     case 0:
     case -0:
       // Exact weight
-      this.motorOff()
+      this.pulseOff()
       this.emit('ready', TricklerWeightStatus.EQUAL)
       break
     case 1:
       // Positive delta, not finished trickling
       // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
       if (this.weight < 0 || (this.weight === 0 && this.status === TricklerStatus.UNSTABLE)) {
-        this.motorOff()
+        this.pulseOff()
       } else {
         // If it's within one gram/grain, slow down or pulse motor.
         if (delta < 1.00) {
           // Turn motor off, check if stable before turning back on. Interval will turn it back off momentarily.
-          this.motorOff()
+          this.pulseOff()
           if (this.status === TricklerStatus.STABLE) {
-            this.pulseMotor(MotorPulses.VERY_SHORT)
+            this.pulseOn(PulseSpeeds.VERY_SLOW)
           }
         } else {
           // More than one gram/grain, leave the motor on.
-          this.motorOn()
+          this.pulseOn(PulseSpeeds.MEDIUM)
         }
       }
       break
     case -1:
       // Negative delta, over throw
-      this.motorOff()
+      this.pulseOff()
       this.emit('ready', TricklerWeightStatus.OVER)
       break
   }
@@ -340,6 +349,37 @@ Trickler.prototype.pulseMotor = function(delay) {
 }
 
 
+Trickler.prototype._pulseTimeout = null
+
+
+// Turns off the cycle started by pulseOn.
+Trickler.prototype.pulseOff = function() {
+  clearTimeout(this._pulseTimeout)
+  this.motorOff()
+}
+
+
+// Turn motor on and off at regular intervals.
+Trickler.prototype.pulseOn = function(speed) {
+  // The short-delay function turns the motor on then calls the long-delay function.
+  var shortFn = () => {
+    clearTimeout(this._pulseTimeout)
+    this.motorOn()
+    this._pulseTimeout = setTimeout(longFn, speed.ON)
+  }
+
+  // The long-delay function turns the motor off then calls the short-delay function.
+  var longFn = () => {
+    clearTimeout(this._pulseTimeout)
+    this.motorOff()
+    this._pulseTimeout = setTimeout(shortFn, speed.OFF)
+  }
+
+  // Kick off the cycle.
+  shortFn()
+}
+
+
 Trickler.prototype.trickle = function(mode) {
   // Compare weight every 10 microseconds the min allowed by setInterval)
   const TIMER = 10
@@ -348,11 +388,12 @@ Trickler.prototype.trickle = function(mode) {
     case AutoModeStatus.ON:
       console.log('Activating trickler auto mode...')
       this._trickleInterval = setInterval(this.trickleCtrlFn, TIMER)
+      // TODO: Maybe add another listener to the input instead of using an interval?
       break
 
     case AutoModeStatus.OFF:
       console.log('Deactivating trickler auto mode...')
-      this.motorOff()
+      this.pulseOff()
       clearInterval(this._trickleInterval)
       break
   }
