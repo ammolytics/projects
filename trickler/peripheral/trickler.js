@@ -117,6 +117,9 @@ MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
 function Trickler(port) {
   // Default autoMode to OFF.
   this.autoMode = AutoModeStatus.OFF
+  if (process.env.MOCK) {
+    rpio.init({mock: 'raspi-3'})
+  }
   // Setup GPIO for motor control
   rpio.open(MOTOR_PIN, rpio.OUTPUT, rpio.LOW)
 
