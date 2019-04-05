@@ -6,7 +6,7 @@ class DeviceState {
   dynamic deviceConnection;
   BluetoothDeviceState connectionStatus;
   BluetoothService service;
-  List characteristics;
+  TricklerChars characteristics;
 
   DeviceState(
     this.device,
@@ -21,7 +21,7 @@ class DeviceState {
     deviceConnection = null,
     connectionStatus = BluetoothDeviceState.disconnected,
     service = null,
-    characteristics = [[], [], []];
+    characteristics = TricklerChars.initialState();
 
   FlutterBlue flutterBlue = FlutterBlue.instance;
 
@@ -41,26 +41,26 @@ class DeviceState {
     this.service = service;
   }
 
-  setCharacteristic(int i, List characteristic) {
-    if (this.characteristics.length > i) {
-      this.characteristics[i] = characteristic;
-    } else {
-      this.characteristics.add(characteristic);
-    }
-  }
+  setCharacteristic(Guid uuid, List value) => this.characteristics.setCharacteristic(uuid, value);
 
+  String getStability() => this.characteristics.stability;
+  double getWeight() => this.characteristics.actualWeight;
+  String getUnit() => this.characteristics.unit;
+
+  /*
   String getStability() {
-    List stability = this.characteristics[0];
-    return stability.length > 0 ? globals.stabilityList[stability[0]] : '';
+    List stability = this.characteristics.length > 0 ? this.characteristics[0] : [];
+    return stability.length > 0 ? STABILITY_LIST[stability[0]] : '';
   }
   String getWeight() {
-    List weight = this.characteristics[1];
+    List weight = this.characteristics.length > 1 ? this.characteristics[1] : [];
     return weight is List<int> ? utf8.decode(weight) : '';
   }
 
   String getUnit() {
-    List unit = this.characteristics[2];
-    return unit.length > 0 ? globals.unitsList[unit[0]] : '';
+    List unit = this.characteristics.length > 2 ? this.characteristics[2] : [];
+    return unit.length > 0 ? UNIT_LIST[unit[0]] : '';
   }
+  */
 
 }

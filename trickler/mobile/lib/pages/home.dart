@@ -3,7 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import '../models/index.dart';
 import '../actions.dart';
-import '../globals.dart' as globals;
+import '../globals.dart';
 
 import '../widgets/header.dart';
 import '../widgets/side_drawer.dart';
@@ -31,16 +31,16 @@ class _HomePageState extends State<HomePage> {
   void _toggleUnit() {
     double weight = _state.currentMeasurement.targetWeight;
     String unit = _state.currentMeasurement.unit;
-    if (unit == globals.grams) {
+    if (unit == GRAMS) {
       weight *= 15.4324;
-      _dispatch(SetUnit(globals.grains));
+      _dispatch(SetUnit(GRAINS));
       _dispatch(SetTargetWeight(weight));
-      _updatePeripheralUnit(globals.grains);
-    } else if (unit == globals.grains) {
+      _updatePeripheralUnit(GRAINS);
+    } else if (unit == GRAINS) {
       weight /= 15.4324;
-      _dispatch(SetUnit(globals.grams));
+      _dispatch(SetUnit(GRAMS));
       _dispatch(SetTargetWeight(weight));
-      _updatePeripheralUnit(globals.grams);
+      _updatePeripheralUnit(GRAMS);
     }
     _syncTextField();
     _syncDialState();
@@ -49,16 +49,17 @@ class _HomePageState extends State<HomePage> {
   void _updatePeripheralUnit(unit) {
     BluetoothDevice device = _state.deviceState.device;
     BluetoothService service = _state.deviceState.service;
+    BluetoothCharacteristic unitChar = service.characteristics
+      .where((char) => char.uuid.toString() == UNIT_CHAR_UUID).single;
 
     if (
-      service?.characteristics != null &&
-      service.characteristics.length > 2 &&
-      service.characteristics[2].properties.write
+      unitChar != null &&
+      unitChar.properties.write
     ) {
       // Write to trickler unit characteristic
       device.writeCharacteristic(
-        service.characteristics[2],
-        unit == globals.grains ? [0x00] : [0x01],
+        unitChar,
+        unit == GRAINS ? [0x00] : [0x01],
         type: CharacteristicWriteType.withResponse);
     }
   }
@@ -77,7 +78,7 @@ class _HomePageState extends State<HomePage> {
 
   void _handleIncrement(bool shouldIncrement) {
     double weight = _state.currentMeasurement.targetWeight;
-    double diff = _state.currentMeasurement.unit == globals.grams ? 0.001 : 0.02;
+    double diff = _state.currentMeasurement.unit == GRAMS ? 0.001 : 0.02;
     weight = shouldIncrement ? weight + diff : weight - diff;
     _updateWeight(weight);
   }
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
   String _getUnit() {
     String unit = _state.currentMeasurement.unit;
     List<String> abbr = ['gr', 'g'];
-    int i = globals.unitsList.indexOf(unit);
+    int i = UNIT_LIST.indexOf(unit);
     return abbr[i];
   }
 
@@ -198,14 +199,14 @@ class _HomePageState extends State<HomePage> {
                         FloatingActionButton(
                           heroTag: 'RemoveBtn',
                           onPressed: () => _handleIncrement(false),
-                          tooltip: "Remove ${_state.currentMeasurement.unit == globals.grams ? '0.001g' : '0.02gr'}",
+                          tooltip: "Remove ${_state.currentMeasurement.unit == GRAMS ? '0.001g' : '0.02gr'}",
                           child: Icon(Icons.remove),
                           backgroundColor: Colors.redAccent,
                         ),
                         FloatingActionButton(
                           heroTag: 'AddBtn',
                           onPressed: () => _handleIncrement(true),
-                          tooltip: "Add ${_state.currentMeasurement.unit == globals.grams ? '0.001g' : '0.02gr'}",
+                          tooltip: "Add ${_state.currentMeasurement.unit == GRAMS ? '0.001g' : '0.02gr'}",
                           child: Icon(Icons.add),
                           backgroundColor: Colors.blueAccent,
                         ),

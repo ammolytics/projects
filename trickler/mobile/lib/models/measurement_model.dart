@@ -11,7 +11,7 @@ class Measurement {
   Measurement(this.unit, this.targetWeight, this.actualWeight, this.isComplete);
 
   setUnit(unit) {
-    if (globals.unitsList.indexOf(unit) != -1) {
+    if (UNIT_LIST.indexOf(unit) != -1) {
       this.unit = unit;
     }
   }
@@ -43,7 +43,7 @@ class Measurement {
 
   roundWeight(weight) {
     double value = double.parse(weight.toStringAsFixed(4));
-    int decimals = this.unit == globals.grams ? 3 : 2;
+    int decimals = this.unit == GRAMS ? 3 : 2;
     decimals = pow(10, decimals);
     value *= decimals;
     value = value.round() / decimals;

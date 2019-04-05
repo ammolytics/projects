@@ -12,7 +12,7 @@ DeviceState deviceState(DeviceState state, dynamic action) {
   } else if (action is SetService) {
     state.setService(action.service);
   } else if (action is SetCharacteristic) {
-    state.setCharacteristic(action.index, action.characteristic);
+    state.setCharacteristic(action.uuid, action.characteristic);
   }
   return state;
 }

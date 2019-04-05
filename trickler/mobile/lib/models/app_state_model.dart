@@ -12,7 +12,7 @@ class AppState {
   });
 
   AppState.initialState()
-  : currentMeasurement = Measurement(globals.grams, 0.0, 0.0, false),
+  : currentMeasurement = Measurement(GRAINS, 0.0, 0.0, false),
     measurementHistory = <Measurement>[],
     deviceState = DeviceState.initialState();
 

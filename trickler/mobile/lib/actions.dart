@@ -46,9 +46,9 @@ class SetService {
 }
 
 class SetCharacteristic {
-  final int index;
+  final Guid uuid;
   final List characteristic;
-  SetCharacteristic(this.index, this.characteristic);
+  SetCharacteristic(this.uuid, this.characteristic);
 }
 
 class AddMeasurementToHistory {

@@ -3,7 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:redux/redux.dart';
 
-import 'globals.dart' as globals;
+import 'globals.dart';
 import 'actions.dart';
 import 'models/index.dart';
 import 'reducers/index.dart';
@@ -40,50 +40,31 @@ class MyApp extends StatelessWidget {
     store.state.deviceState.device.discoverServices().then((services) {
       List<BluetoothCharacteristic> chars = [];
       services.forEach((service) {
-        if (service.uuid.toString() == globals.tricklerServiceId) {
+        if (service.uuid.toString() == TRICKLER_SERVICE_UUID) {
           store.dispatch(SetService(service));
-          service.characteristics.forEach((char) {
-            chars.add(char);
-          });
+          chars = service.characteristics;
         }
       });
       _readCharacteristics(chars, 0);
     });
   }
-
+  
   _readCharacteristics(List<BluetoothCharacteristic> chars, int i) {
     BluetoothDevice device = store.state.deviceState.device;
-    List characteristics = store.state.deviceState.characteristics;
-    // Rucursively read characteristics one at a time
-    List<String> charNames = ['STABLITY', 'WEIGHT', 'UNIT'];
+    // Asynchronously read characteristics one at a time
 
     BluetoothCharacteristic char = chars[i];
-    if (char.properties.read) {
-      print('\n\n\nREADING ${charNames[i]}...\n\n\n');
+    if (char.properties.read && DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
       device.readCharacteristic(char).then((readChar) {
-        print('\n\n${charNames[i]} PROPERTIES');
-        print('NOTIFY: ${char.properties.notify}');
-        print('READ: ${char.properties.read}');
-        print('WRITE: ${char.properties.write}\n\n');
-        print('${charNames[i]}: ${char.value}\n\n');
         // Update global state to reflect characteristics
-        if (characteristics.length > i) {
-          characteristics[i] = readChar;
-        } else {
-          characteristics.add(readChar);
+        store.dispatch(SetCharacteristic(char.uuid, readChar));
+        if (i + 1 < chars.length) {
+          _readCharacteristics(chars, i + 1);
         }
-        store.dispatch(SetCharacteristic(i, characteristics[i]));
-        if (i + 1 >= 3) {
-          // Only loop through the first 3 characteristics.
-          // This prevents index out of range error if
-          // additional characteristics are available.
-          return [readChar];
-        }
-        return List.from([readChar])..addAll(_readCharacteristics(chars, i + 1));
       });
-    } else {
-      print('\n\n\nCAN\'T READ ${charNames[i]}');
-      print('\n\n${charNames[i]} PROPERTIES');
+    } else if (DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
+      print('\n\n\nCAN\'T READ ${char.uuid.toString()}');
+      print('\n\n${char.uuid.toString()} PROPERTIES');
       print('NOTIFY: ${char.properties.notify}');
       print('READ: ${char.properties.read}');
       print('WRITE: ${char.properties.write}\n\n');
@@ -91,8 +72,8 @@ class MyApp extends StatelessWidget {
   }
 
   _disconnect() {
-    store.state.deviceState.deviceConnection?.cancel();
     print('\n\n\nDisconnecting...\n\n\n\n');
+    store.state.deviceState.deviceConnection?.cancel();
     store.dispatch(ResetDeviceState());
   }
 
