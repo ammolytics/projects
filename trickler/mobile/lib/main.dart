@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:redux/redux.dart';
+import 'dart:async';
 
 import 'globals.dart';
 import 'actions.dart';
@@ -45,8 +46,22 @@ class MyApp extends StatelessWidget {
           chars = service.characteristics;
         }
       });
-      _readCharacteristics(chars, 0);
+      // _readCharacteristics(chars, 0);
+      _subscribeToChars(chars);
     });
+  }
+
+  _subscribeToChars(List<BluetoothCharacteristic> chars) async {
+    BluetoothDevice device = store.state.deviceState.device;
+    BluetoothCharacteristic char = chars.where((c) => c.uuid.toString() == WEIGHT_CHAR_UUID).single;
+    await device.setNotifyValue(char, true);
+    if (char.properties.read && char.properties.notify) {
+      print('\n\n\n WEIGHT_CHAR: $char\n\n\n');
+      device.onValueChanged(char).listen((data) {
+        print('\n\n\n UPDATE DATA: $data\n\n\n');
+      });
+    }
+    print('\n\n\nIS NOTIFYING: ${char.isNotifying}\n\n\n');
   }
   
   _readCharacteristics(List<BluetoothCharacteristic> chars, int i) {
