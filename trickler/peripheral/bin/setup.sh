@@ -16,13 +16,13 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo mkdir -p /usr/local/lib/nodejs;
     sudo tar -xJvf node-v8.15.1-linux-armv7l.tar.xz -C /usr/local/lib/nodejs;
     rm node-v8.15.1-linux-armv7l.tar.xz;
-    echo "\nexport PATH=$PATH:/usr/local/lib/nodejs/node-v8.15.1-linux-armv7l/bin" >> ~/.profile;
-    source ~/.profile;
+    sudo ln -s /usr/local/lib/nodejs/node-v8.15.1-linux-armv7l/bin/node /usr/bin/node
+    sudo ln -s /usr/local/lib/nodejs/node-v8.15.1-linux-armv7l/bin/npm /usr/bin/npm
+    sudo ln -s /usr/local/lib/nodejs/node-v8.15.1-linux-armv7l/bin/npx /usr/bin/npx
   fi
 fi
 
 
-npm install -g npm
 npm install -g prebuild
 npm install -g node-gyp
 npm install
