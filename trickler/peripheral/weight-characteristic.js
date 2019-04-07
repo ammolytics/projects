@@ -39,7 +39,7 @@ WeightCharacteristic.prototype.sendWeightNotification = function(result) {
   if (this.updateValueCallback) {
     var data = Buffer.from(Number(result).toString())
     if (process.env.DEBUG) {
-      console.debug(`Sending weight notification: ${data}`)
+      console.log(`Sending weight notification: ${data}`)
     }
     this.updateValueCallback(data)
   }

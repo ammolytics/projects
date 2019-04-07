@@ -220,6 +220,9 @@ Object.defineProperties(Trickler.prototype, {
 
     set: function(value) {
       if (this._weight !== value) {
+        if (process.env.DEBUG) {
+          console.log(`Weight updated from ${this._weight} to ${value}`)
+        } 
         this._weight = value
         this.emit('weight', this._weight)
       }
