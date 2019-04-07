@@ -15,3 +15,4 @@ npm install -g npm
 npm install -g prebuild
 npm install -g node-gyp
 npm install
+npm install bluetooth-hci-socket@npm:@abandonware/bluetooth-hci-socket
