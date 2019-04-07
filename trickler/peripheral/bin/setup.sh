@@ -6,7 +6,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   xcode-select --install;
 fi
 
-nodeenv -n 10.15.3 .venv
+nodeenv -n 8.15.1 .venv
 source .venv/bin/activate
 npm install -g npm
 npm install -g prebuild
