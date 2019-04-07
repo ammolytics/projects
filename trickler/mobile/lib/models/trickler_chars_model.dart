@@ -1,6 +1,7 @@
 part of 'index.dart';
 
 class TricklerChars {
+  List<StreamSubscription> subscriptions;
   bool autoMode;
   double actualWeight;
   double targetWeight;
@@ -8,6 +9,7 @@ class TricklerChars {
   String unit;
 
   TricklerChars(
+    this.subscriptions,
     this.autoMode,
     this.actualWeight,
     this.targetWeight,
@@ -16,11 +18,20 @@ class TricklerChars {
   );
 
   TricklerChars.initialState()
-  : autoMode = false,
+  : subscriptions = [],
+    autoMode = false,
     actualWeight = 0.0,
     targetWeight = 0.0,
     stability = UNSTABLE,
     unit = GRAINS;
+
+  addSubscription(StreamSubscription subscription) {
+    this.subscriptions.add(subscription);
+  }
+
+  clearSubscriptions() {
+    this.subscriptions = [];
+  }
 
   setCharacteristic(Guid uuid, List value) {
     switch(uuid.toString()) {

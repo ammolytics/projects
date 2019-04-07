@@ -1,5 +1,6 @@
 import 'package:flutter_blue/flutter_blue.dart';
 import 'models/index.dart';
+import 'dart:async';
 
 class SetCurrentMeasurement {
   final Measurement measurement;
@@ -51,7 +52,16 @@ class SetCharacteristic {
   SetCharacteristic(this.uuid, this.characteristic);
 }
 
+class AddSubscription {
+  final StreamSubscription subscription;
+  AddSubscription(this.subscription);
+}
+
 class AddMeasurementToHistory {
   final Measurement measurement;
   AddMeasurementToHistory(this.measurement);
+}
+
+class ClearSubscriptions {
+  ClearSubscriptions();
 }

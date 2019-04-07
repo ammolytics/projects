@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   Function _dispatch;
 
   FocusNode _inputFocus = FocusNode();
-  TextEditingController _controller = TextEditingController(text: '0.0');
+  TextEditingController _controller = TextEditingController(text: '');
 
   void _toggleUnit() {
     double weight = _state.currentMeasurement.targetWeight;
@@ -86,14 +86,8 @@ class _HomePageState extends State<HomePage> {
   void _submit() {
     BluetoothDevice device = _state.deviceState.device;
     double targetWeight = _state.currentMeasurement.targetWeight;
-
-    if (_inputFocus.hasFocus) {
-      _inputFocus.unfocus();
-    }
-
     _syncTextField();
     _syncDialState();
-
     print('Sending $targetWeight to ${device.name}');
   }
 
@@ -101,6 +95,9 @@ class _HomePageState extends State<HomePage> {
     double targetWeight = _state.currentMeasurement.targetWeight;
     setState(() {
       _controller.text = '$targetWeight';
+      if (_inputFocus.hasFocus) {
+        _inputFocus.unfocus();
+      }
     });
   }
 
@@ -148,9 +145,10 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: EdgeInsets.fromLTRB(50.0, 60.0, 50.0, 20.0),
                     child: TextField(
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
                       controller: _controller,
                       onChanged: _updateCounter,
+                      onEditingComplete: _syncTextField,
                       focusNode: _inputFocus,
                       textAlign: TextAlign.center,
                       textInputAction: TextInputAction.done,
@@ -160,6 +158,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                       ),
                       decoration: InputDecoration(
+                        hintText: '0.0',
                         border: InputBorder.none,
                         // prefix centers the value
                         prefix: SizedBox(

@@ -46,33 +46,27 @@ class MyApp extends StatelessWidget {
           chars = service.characteristics;
         }
       });
-      // _readCharacteristics(chars, 0);
-      _subscribeToChars(chars);
+      _readCharacteristics(chars, 0);
     });
-  }
-
-  _subscribeToChars(List<BluetoothCharacteristic> chars) async {
-    BluetoothDevice device = store.state.deviceState.device;
-    BluetoothCharacteristic char = chars.where((c) => c.uuid.toString() == WEIGHT_CHAR_UUID).single;
-    await device.setNotifyValue(char, true);
-    if (char.properties.read && char.properties.notify) {
-      print('\n\n\n WEIGHT_CHAR: $char\n\n\n');
-      device.onValueChanged(char).listen((data) {
-        print('\n\n\n UPDATE DATA: $data\n\n\n');
-      });
-    }
-    print('\n\n\nIS NOTIFYING: ${char.isNotifying}\n\n\n');
   }
   
   _readCharacteristics(List<BluetoothCharacteristic> chars, int i) {
     BluetoothDevice device = store.state.deviceState.device;
-    // Asynchronously read characteristics one at a time
+    // Asynchronously read & subscribe to characteristics one at a time
 
     BluetoothCharacteristic char = chars[i];
     if (char.properties.read && DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
-      device.readCharacteristic(char).then((readChar) {
-        // Update global state to reflect characteristics
+      device.readCharacteristic(char).then((readChar) async {
         store.dispatch(SetCharacteristic(char.uuid, readChar));
+        if (char.properties.notify) {
+          // Subscribe to chars with notifications
+          await device.setNotifyValue(char, true);
+          StreamSubscription sub = device.onValueChanged(char).listen((data) {
+            store.dispatch(SetCharacteristic(char.uuid, data));
+          });
+          store.dispatch(AddSubscription(sub));
+        }
+
         if (i + 1 < chars.length) {
           _readCharacteristics(chars, i + 1);
         }
@@ -87,6 +81,10 @@ class MyApp extends StatelessWidget {
   }
 
   _disconnect() {
+    store.state.deviceState.characteristics.subscriptions.forEach((sub) {
+      sub.cancel();
+    });
+    store.dispatch(ClearSubscriptions());
     print('\n\n\nDisconnecting...\n\n\n\n');
     store.state.deviceState.deviceConnection?.cancel();
     store.dispatch(ResetDeviceState());

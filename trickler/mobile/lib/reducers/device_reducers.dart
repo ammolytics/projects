@@ -13,6 +13,10 @@ DeviceState deviceState(DeviceState state, dynamic action) {
     state.setService(action.service);
   } else if (action is SetCharacteristic) {
     state.setCharacteristic(action.uuid, action.characteristic);
+  } else if (action is AddSubscription) {
+    state.characteristics.addSubscription(action.subscription);
+  } else if (action is ClearSubscriptions) {
+    state.characteristics.clearSubscriptions();
   }
   return state;
 }
