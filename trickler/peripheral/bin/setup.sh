@@ -31,5 +31,5 @@ npm install
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Linux
   echo "Linux";
-  npm install bluetooth-hci-socket@npm:@abandonware/bluetooth-hci-socket;
+  npm install --no-save bluetooth-hci-socket@npm:@abandonware/bluetooth-hci-socket;
 fi
