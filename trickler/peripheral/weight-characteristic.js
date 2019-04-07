@@ -54,7 +54,7 @@ WeightCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueC
   this.updateValueCallback = updateValueCallback
   console.log(`Subscribed to weight characteristic. fn: ${this.sendWeightNotification}, updateFn: ${updateValueCallback}, this: ${this}`)
 
-  this.trickler.on('weight', this.sendWeightNotification)
+  this.trickler.on('weight', this.sendWeightNotification.bind(this))
 }
 
 
@@ -63,7 +63,7 @@ WeightCharacteristic.prototype.onUnsubscribe = function() {
   this.updateValueCallback = null
   console.log('Unsubscribed from weight characteristic')
 
-  this.trickler.removeListener('weight', this.sendWeightNotification)
+  this.trickler.removeListener('weight', this.sendWeightNotification.bind(this))
 }
 
 

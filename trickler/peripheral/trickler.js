@@ -136,10 +136,6 @@ function Trickler(port) {
       status: StatusMap[rawStatus]
     }
 
-    if (process.env.DEBUG) {
-      console.debug(line)
-    }
-
     switch (values.status) {
       case undefined:
         // Unit not ready yet.
