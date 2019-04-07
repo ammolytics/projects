@@ -49,7 +49,7 @@ StabilityCharacteristic.prototype.onSubscribe = function(maxValueSize, updateVal
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
 
-  this.trickler.on('status', this.sendStatusNotification)
+  this.trickler.on('status', this.sendStatusNotification.bind(this))
 }
 
 
@@ -57,7 +57,7 @@ StabilityCharacteristic.prototype.onUnsubscribe = function() {
   this.maxValueSize = null
   this.updateValueCallback = null
 
-  this.trickler.removeListener('status', this.sendStatusNotification)
+  this.trickler.removeListener('status', this.sendStatusNotification.bind(this))
 }
 
 

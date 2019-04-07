@@ -50,7 +50,7 @@ UnitCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCal
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
 
-  this.trickler.on('unit', this.sendUnitNotification)
+  this.trickler.on('unit', this.sendUnitNotification.bind(this))
 }
 
 
@@ -58,7 +58,7 @@ UnitCharacteristic.prototype.onUnsubscribe = function() {
   this.maxValueSize = null
   this.updateValueCallback = null
 
-  this.trickler.removeListener('unit', this.sendUnitNotification)
+  this.trickler.removeListener('unit', this.sendUnitNotification.bind(this))
 }
 
 
