@@ -10,7 +10,7 @@ const trickler = require('./trickler')
 function AutoModeCharacteristic(trickler) {
   bleno.Characteristic.call(this, {
     uuid: '10000005-be5f-4b43-a49f-76f2d65c6e28',
-    properties: ['notify', 'read', 'write'],
+    properties: ['read', 'write', 'notify'],
     descriptors: [
       new bleno.Descriptor({
         uuid: '2901',
