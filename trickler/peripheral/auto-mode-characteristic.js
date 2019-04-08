@@ -48,10 +48,13 @@ AutoModeCharacteristic.prototype.autoTrickleListener = function(result) {
 AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG)
-  } else if (data.length === 0) {
+  } else if (data.length !== 1) {
     callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH)
   } else {
     var autoMode = data.readUInt8(0)
+    console.log(`request to switch autoMode from ${this.trickler.autoMode} to ${autoMode}`)
+    this.trickler.once('autoMode', this.sendAutoModeNotification)
+    this.trickler.autoMode = autoMode
 
     switch (autoMode) {
       case trickler.AutoModeStatus.ON:
@@ -61,8 +64,6 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
         this.trickler.removeListener('ready', this.autoTrickleListener)
         break
     }
-    this.trickler.once('autoMode', this.sendAutoModeNotification)
-    this.trickler.autoMode = autoMode
     this.trickler.trickle(this.trickler.autoMode)
     callback(this.RESULT_SUCCESS)
   }
