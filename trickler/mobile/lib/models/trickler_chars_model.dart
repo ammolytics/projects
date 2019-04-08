@@ -36,7 +36,7 @@ class TricklerChars {
   setCharacteristic(Guid uuid, List value) {
     switch(uuid.toString()) {
       case AUTO_MODE_CHAR_UUID:
-        this.autoMode = value.length > 0;
+        this.autoMode = value[0] != 0;
         break;
       case WEIGHT_CHAR_UUID:
         this.actualWeight = double.parse(utf8.decode(value));

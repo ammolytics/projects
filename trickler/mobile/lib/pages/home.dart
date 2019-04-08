@@ -36,26 +36,31 @@ class _HomePageState extends State<HomePage> {
       weight *= 15.4324;
       _dispatch(SetUnit(GRAINS));
       _dispatch(SetTargetWeight(weight));
-      _updatePeripheralChar(UNIT_CHAR_UUID, [0x00]);
+      _updatePeripheralChar(UNIT_CHAR_UUID, [0x00]).then((_) {
+        _updatePeripheralChar(TARGET_WEIGHT_CHAR_UUID, utf8.encode('${_state.currentMeasurement.targetWeight}'));
+      });
     } else if (unit == GRAINS) {
       weight /= 15.4324;
       _dispatch(SetUnit(GRAMS));
       _dispatch(SetTargetWeight(weight));
-      _updatePeripheralChar(UNIT_CHAR_UUID, [0x01]);
+      _updatePeripheralChar(UNIT_CHAR_UUID, [0x01]).then((_) {
+        _updatePeripheralChar(TARGET_WEIGHT_CHAR_UUID, utf8.encode('${_state.currentMeasurement.targetWeight}'));
+      });
     }
     _sync();
   }
 
-  void _updatePeripheralChar(String uuid, dynamic value) {
+  Future _updatePeripheralChar(String uuid, dynamic value) {
     BluetoothDevice device = _state.deviceState.device;
     BluetoothService service = _state.deviceState.service;
     dynamic characteristic = service?.characteristics != null ?
       service.characteristics.where((char) => char.uuid.toString() == uuid).single : null;
 
     if (characteristic != null && characteristic.properties.write) {
-      device.writeCharacteristic(characteristic, value,
+      return device.writeCharacteristic(characteristic, value,
         type: CharacteristicWriteType.withResponse);
     }
+    return Future(() {});
   }
 
   void _updateWeight(double weight) {
@@ -67,8 +72,7 @@ class _HomePageState extends State<HomePage> {
     var newWeight = text.length > 0 ?
       double.parse(text) : 0.0;
     _dispatch(SetTargetWeight(newWeight));
-    _updatePeripheralChar(TARGET_WEIGHT_CHAR_UUID, utf8.encode('$newWeight'));
-    _syncDialState();
+    _sync();
   }
 
   void _handleIncrement(bool shouldIncrement) {
@@ -80,12 +84,16 @@ class _HomePageState extends State<HomePage> {
 
   void _toggleAutoMode() {
     bool autoMode = _state.deviceState.characteristics.autoMode;
-    _updatePeripheralChar(AUTO_MODE_CHAR_UUID, autoMode ? [0x1] : [0x0]);
+    _updatePeripheralChar(AUTO_MODE_CHAR_UUID, autoMode ? [0x00] : [0x01]);
   }
 
   void _sync() {
     _syncTextField();
     _syncDialState();
+    double weight = _state.currentMeasurement.targetWeight;
+    if (_state.deviceState.characteristics.targetWeight != weight) {
+      _updatePeripheralChar(TARGET_WEIGHT_CHAR_UUID, utf8.encode('$weight'));
+    }
   }
 
   void _syncTextField() {
@@ -149,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                       keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
                       controller: _controller,
                       onChanged: _updateCounter,
-                      onEditingComplete: _syncTextField,
+                      onEditingComplete: _sync,
                       focusNode: () {
                         _inputFocus.addListener(() { setState(() {}); });
                         return _inputFocus;
@@ -239,13 +247,13 @@ class _HomePageState extends State<HomePage> {
                 onPressed: _toggleAutoMode,
                 tooltip: 'Turn Off Auto Mode',
                 backgroundColor: Colors.red,
-                child: Icon(Icons.stop),
+                child: Icon(Icons.pause),
               ) : FloatingActionButton(
                 heroTag: 'turnAutoModeOn',
                 onPressed: _toggleAutoMode,
                 tooltip: 'Turn On Auto Mode',
                 backgroundColor: Colors.blue,
-                child: Icon(Icons.sync),
+                child: Icon(Icons.play_arrow),
               ),
             ],
           ),
