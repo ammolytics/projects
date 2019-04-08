@@ -47,20 +47,4 @@ class DeviceState {
   double getWeight() => this.characteristics.actualWeight;
   String getUnit() => this.characteristics.unit;
 
-  /*
-  String getStability() {
-    List stability = this.characteristics.length > 0 ? this.characteristics[0] : [];
-    return stability.length > 0 ? STABILITY_LIST[stability[0]] : '';
-  }
-  String getWeight() {
-    List weight = this.characteristics.length > 1 ? this.characteristics[1] : [];
-    return weight is List<int> ? utf8.decode(weight) : '';
-  }
-
-  String getUnit() {
-    List unit = this.characteristics.length > 2 ? this.characteristics[2] : [];
-    return unit.length > 0 ? UNIT_LIST[unit[0]] : '';
-  }
-  */
-
 }

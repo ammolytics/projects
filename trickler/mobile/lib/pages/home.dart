@@ -35,43 +35,36 @@ class _HomePageState extends State<HomePage> {
       weight *= 15.4324;
       _dispatch(SetUnit(GRAINS));
       _dispatch(SetTargetWeight(weight));
-      _updatePeripheralUnit(GRAINS);
+      _updatePeripheralChar(UNIT_CHAR_UUID, [0x00]);
     } else if (unit == GRAINS) {
       weight /= 15.4324;
       _dispatch(SetUnit(GRAMS));
       _dispatch(SetTargetWeight(weight));
-      _updatePeripheralUnit(GRAMS);
+      _updatePeripheralChar(UNIT_CHAR_UUID, [0x01]);
     }
-    _syncTextField();
-    _syncDialState();
+    _sync();
   }
 
-  void _updatePeripheralUnit(unit) {
+  void _updatePeripheralChar(String uuid, dynamic value) {
     BluetoothDevice device = _state.deviceState.device;
     BluetoothService service = _state.deviceState.service;
-    BluetoothCharacteristic unitChar = service.characteristics
-      .where((char) => char.uuid.toString() == UNIT_CHAR_UUID).single;
+    dynamic characteristic = service?.characteristics != null ?
+      service.characteristics.where((char) => char.uuid.toString() == uuid).single : null;
 
-    if (
-      unitChar != null &&
-      unitChar.properties.write
-    ) {
-      // Write to trickler unit characteristic
-      device.writeCharacteristic(
-        unitChar,
-        unit == GRAINS ? [0x00] : [0x01],
+    if (characteristic != null && characteristic.properties.write) {
+      device.writeCharacteristic(characteristic, value,
         type: CharacteristicWriteType.withResponse);
     }
   }
 
   void _updateWeight(double weight) {
     _updateCounter(weight.toString());
-    _syncTextField();
-    _syncDialState();
+    _sync();
   }
 
   void _updateCounter(text) {
-    var newWeight = double.parse(text);
+    var newWeight = text.length > 0 ?
+      double.parse(text) : 0.0;
     _dispatch(SetTargetWeight(newWeight));
     _syncDialState();
   }
@@ -83,18 +76,21 @@ class _HomePageState extends State<HomePage> {
     _updateWeight(weight);
   }
 
-  void _submit() {
-    BluetoothDevice device = _state.deviceState.device;
-    double targetWeight = _state.currentMeasurement.targetWeight;
+  void _toggleAutoMode() {
+    bool autoMode = _state.deviceState.characteristics.autoMode;
+    _updatePeripheralChar(AUTO_MODE_CHAR_UUID, autoMode ? [0x1] : [0x0]);
+  }
+
+  void _sync() {
     _syncTextField();
     _syncDialState();
-    print('Sending $targetWeight to ${device.name}');
   }
 
   void _syncTextField() {
     double targetWeight = _state.currentMeasurement.targetWeight;
+    String unit = _state.currentMeasurement.unit;
     setState(() {
-      _controller.text = '$targetWeight';
+      _controller.text = targetWeight == 0.0 ? '' : targetWeight.toStringAsFixed(unit == GRAINS ? 2 : 3);
       if (_inputFocus.hasFocus) {
         _inputFocus.unfocus();
       }
@@ -109,8 +105,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   String _getUnit() {
+    return _getAbbrFromUnit(['gr', 'g']);
+  }
+
+  String _getAbbrFromUnit(List<String> abbr) {
     String unit = _state.currentMeasurement.unit;
-    List<String> abbr = ['gr', 'g'];
     int i = UNIT_LIST.indexOf(unit);
     return abbr[i];
   }
@@ -149,7 +148,10 @@ class _HomePageState extends State<HomePage> {
                       controller: _controller,
                       onChanged: _updateCounter,
                       onEditingComplete: _syncTextField,
-                      focusNode: _inputFocus,
+                      focusNode: () {
+                        _inputFocus.addListener(() { setState(() {}); });
+                        return _inputFocus;
+                      }(),
                       textAlign: TextAlign.center,
                       textInputAction: TextInputAction.done,
                       key: Key('WeightInput'),
@@ -158,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                       ),
                       decoration: InputDecoration(
-                        hintText: '0.0',
+                        hintText: _getAbbrFromUnit(['0.00', '0.000']),
                         border: InputBorder.none,
                         // prefix centers the value
                         prefix: SizedBox(
@@ -216,12 +218,34 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            heroTag: 'SubmitBtn',
-            onPressed: _submit,
-            tooltip: 'Toggle Unit',
-            backgroundColor: Color.fromARGB(255, 11, 145, 227),
-            child: Icon(Icons.check),
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              _inputFocus.hasFocus ? Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: FloatingActionButton(
+                  heroTag: 'closeKeyboard',
+                  onPressed: _sync,
+                  tooltip: 'Close Keyboard',
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.keyboard_hide),
+                  mini: true,
+                ),
+              ) : _state.deviceState.characteristics.autoMode ?
+              FloatingActionButton(
+                heroTag: 'turnAutoModeOff',
+                onPressed: _toggleAutoMode,
+                tooltip: 'Turn Off Auto Mode',
+                backgroundColor: Colors.red,
+                child: Icon(Icons.stop),
+              ) : FloatingActionButton(
+                heroTag: 'turnAutoModeOn',
+                onPressed: _toggleAutoMode,
+                tooltip: 'Turn On Auto Mode',
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.sync),
+              ),
+            ],
           ),
         );
       },
