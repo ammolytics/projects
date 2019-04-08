@@ -26,16 +26,15 @@ function AutoModeCharacteristic(trickler) {
 util.inherits(AutoModeCharacteristic, bleno.Characteristic)
 
 
-/**
 AutoModeCharacteristic.prototype.onReadRequest = function(offset, callback) {
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
-    var data = Buffer.from(Number(this.trickler.targetWeight).toString())
+    var data = new Buffer(1);
+    data.writeUInt8(this.trickler.autoMode, 0);
     callback(this.RESULT_SUCCESS, data)
   }
 }
-**/
 
 AutoModeCharacteristic.prototype.autoTrickleListener = function(result) {
   if (self.updateValueCallback) {
