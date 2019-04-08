@@ -63,9 +63,35 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
         break
     }
 
+    this.trickler.once('autoMode', this.sendAutoModeNotification)
     this.trickler.trickle(this.trickler.autoMode)
     callback(this.RESULT_SUCCESS)
   }
+}
+
+
+AutoModeCharacteristic.prototype.sendAutoModeNotification = function(result) {
+  if (this.updateValueCallback) {
+    var data = Buffer.alloc(1)
+    data.writeUInt8(result, 0)
+    this.updateValueCallback(data)
+  }
+}
+
+
+AutoModeCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  this.maxValueSize = maxValueSize
+  this.updateValueCallback = updateValueCallback
+
+  this.trickler.on('autoMode', this.sendAutoModeNotification.bind(this))
+}
+
+
+AutoModeCharacteristic.prototype.onUnsubscribe = function() {
+  this.maxValueSize = null
+  this.updateValueCallback = null
+
+  this.trickler.removeListener('autoMode', this.sendAutoModeNotification.bind(this))
 }
 
 module.exports = AutoModeCharacteristic
