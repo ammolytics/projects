@@ -109,7 +109,10 @@ const PulseSpeeds = {
 }
 
 
-const MotorCtrlMap = {}
+const MotorCtrlMap = {
+  ON: rpio.HIGH,
+  OFF: rpio.LOW,
+}
 MotorCtrlMap[TricklerMotorStatus.ON] = rpio.HIGH
 MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
 
