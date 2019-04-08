@@ -1,3 +1,4 @@
+import 'dart:convert' show utf8;
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
@@ -66,6 +67,7 @@ class _HomePageState extends State<HomePage> {
     var newWeight = text.length > 0 ?
       double.parse(text) : 0.0;
     _dispatch(SetTargetWeight(newWeight));
+    _updatePeripheralChar(TARGET_WEIGHT_CHAR_UUID, utf8.encode('$newWeight'));
     _syncDialState();
   }
 
