@@ -376,14 +376,14 @@ Trickler.prototype.pulseOn = function(speed) {
   var shortFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOn()
-    this._pulseTimeout = setTimeout(longFn, speed.ON)
+    this._pulseTimeout = setTimeout(longFn.bind(this), speed.ON)
   }
 
   // The long-delay function turns the motor off then calls the short-delay function.
   var longFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOff()
-    this._pulseTimeout = setTimeout(shortFn, speed.OFF)
+    this._pulseTimeout = setTimeout(shortFn.bind(this), speed.OFF)
   }
 
   // Kick off the cycle.
@@ -398,7 +398,7 @@ Trickler.prototype.trickle = function(mode) {
   switch(mode) {
     case AutoModeStatus.ON:
       console.log('Activating trickler auto mode...')
-      this._trickleInterval = setInterval(this.trickleCtrlFn, TIMER)
+      this._trickleInterval = setInterval(this.trickleCtrlFn.bind(this), TIMER)
       // TODO: Maybe add another listener to the input instead of using an interval?
       break
 
