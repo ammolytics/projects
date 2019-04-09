@@ -373,6 +373,7 @@ Trickler.prototype.pulseOff = function() {
 // Turn motor on and off at regular intervals.
 Trickler.prototype.pulseOn = function(speed) {
   // The short-delay function turns the motor on then calls the long-delay function.
+  console.log(`Setting pulse speeds to: ${speed}`)
   var shortFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOn()
