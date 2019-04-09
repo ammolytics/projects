@@ -294,7 +294,7 @@ Object.defineProperties(Trickler.prototype, {
 Trickler.prototype.trickleCtrlFn = function() {
   // Compare scale weight to target weight
   var delta = this.targetWeight - this.weight
-  console.log(`delta: ${delta}, this: ${this}`)
+  console.log(`targetWeight: ${this.targetWeight}, weight: ${this.weight}, delta: ${delta}, this: ${this}`)
   
   switch(Math.sign(delta)) {
     case 0:
