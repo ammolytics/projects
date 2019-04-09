@@ -327,7 +327,7 @@ Trickler.prototype.trickleCtrlFn = function() {
     case 1:
       // Positive delta, not finished trickling
       // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
-      if (this.weight < 0 || (this.weight === 0 && this.stableTime() <== 200)) {
+      if (this.weight < 0 || (this.weight === 0 && this.stableTime() <= 200)) {
         console.log('Wait for stability...')
         this.pulseOff()
       } else {
