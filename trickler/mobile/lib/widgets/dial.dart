@@ -47,8 +47,13 @@ class DialState extends State<Dial> {
         theta = pi + theta + 0.5;
       }
     }
-    // Reject taps that aren't close to the dial
-    if (details is !TapDownDetails || hyp > _screenSize.width / 2 - 30) {
+    // Reject taps that aren't close to the dial UI
+    if (
+      details is !TapDownDetails && // Allow Drags within 0.1 of the dial
+      theta >= -0.1 && theta <= pi + 1.1 ||
+      hyp > _screenSize.width / 2 - 30 && // Allow taps within 0.05 of the dial
+      theta >= -0.05 && theta <= pi + 1.05
+    ) {
       double percentage = theta / (pi + 1);
       // Give a min and max to the percentage
       percentage = percentage > 1 ? 1.0 : percentage;
