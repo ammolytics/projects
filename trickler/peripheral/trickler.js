@@ -337,12 +337,18 @@ Trickler.prototype.trickleCtrlFn = function() {
           // Turn motor on slow trickle.
           console.log('Slow trickle...')
           this.pulseSpeed = PulseSpeeds.VERY_SLOW
-          this.pulseOn()
+          // Only turn pulse on if it's off.
+          if (this._pulseTimeout === null) {
+            this.pulseOn()
+          }
         } else {
           // More than one gram/grain, leave the motor on.
           console.log('Medium trickle...')
           this.pulseSpeed = PulseSpeeds.MEDIUM
-          this.pulseOn()
+          // Only turn pulse on if it's off.
+          if (this._pulseTimeout === null) {
+            this.pulseOn()
+          }
         }
       }
       break
@@ -382,9 +388,16 @@ Trickler.prototype.pulseMotor = function(delay) {
 
 Trickler.prototype._pulseTimeout = null
 
+
+Trickler.prototype.clearPulse = function() {
+  clearTimeout(this._pulseTimeout)
+  this._pulseTimeout = null
+}
+
+
 // Turns off the pulse cycle.
 Trickler.prototype.pulseOff = function() {
-  clearTimeout(this._pulseTimeout)
+  this.clearPulse()
   this.motorOff()
 }
 
@@ -392,14 +405,14 @@ Trickler.prototype.pulseOff = function() {
 // Turn motor on and off at regular intervals.
 Trickler.prototype.pulseOn = function() {
   var shortFn = () => {
-    clearTimeout(this._pulseTimeout)
+    this.clearPulse()
     this.motorOn()
     this._pulseTimeout = setTimeout(longFn.bind(this), this._pulseSpeed.ON)
   }
 
   // The long-delay function turns the motor off then calls the short-delay function.
   var longFn = () => {
-    clearTimeout(this._pulseTimeout)
+    this.clearPulse()
     this.motorOff()
     this._pulseTimeout = setTimeout(shortFn.bind(this), this._pulseSpeed.OFF)
   }
