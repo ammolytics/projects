@@ -109,17 +109,19 @@ MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
 
 
 function Trickler(port) {
-  // Default autoMode to OFF.
-  this.targetWeight = 0.0
-  this.autoMode = AutoModeStatus.OFF
-  this.pulseSpeed = PulseSpeeds.MEDIUM
+  events.EventEmitter.call(this)
+
+  // Setup GPIO for motor control
   if (process.env.MOCK) {
     rpio.init({mock: 'raspi-3'})
   }
-  // Setup GPIO for motor control
   rpio.open(MOTOR_PIN, rpio.OUTPUT, rpio.LOW)
 
-  events.EventEmitter.call(this)
+  // Default values.
+  this.autoMode = AutoModeStatus.OFF
+  this.pulseSpeed = PulseSpeeds.MEDIUM
+  this.targetWeight = 0.0
+
   const parser = new Readline()
   // Get values from scale over serial
   this.port = port
@@ -160,15 +162,6 @@ function Trickler(port) {
         this.status = values.status
         this.unit = values.unit
         this.weight = values.weight
-
-        // Make sure the unit is ready first, unit is defined.
-        if (typeof values.unit !== 'undefined') {
-          //console.log(`${now}: ${rawStatus}, ${rawWeight}, ${rawUnit}, ${values.status}, ${values.unit}`)
-          if (typeof this.unit === 'undefined') {
-            //this.unit = values.unit
-          }
-          //this.emit('ready', values)
-        }
         break
     }
   })
@@ -232,8 +225,8 @@ Object.defineProperties(Trickler.prototype, {
     },
 
     set: function(value) {
-      console.log(`setting targetWeight from ${this._targetWeight} to ${value}`)
       if (this._targetWeight !== value) {
+        console.log(`setting targetWeight from ${this._targetWeight} to ${value}`)
         this._targetWeight = value
         this.emit('targetWeight', this._targetWeight)
       }
@@ -279,6 +272,7 @@ Object.defineProperties(Trickler.prototype, {
         case AutoModeStatus.OFF:
         case AutoModeStatus.ON:
           this._autoMode = value
+          this.trickle(value)
           break
         default:
           console.error(`Unknown value: ${value}`)
@@ -359,12 +353,6 @@ Trickler.prototype.trickleCtrlFn = function() {
 }
 
 
-// Turn motor on or off
-Trickler.prototype.controlMotor = function(mode) {
-  // Control motor over GPIO.
-  rpio.write(MOTOR_PIN, MotorCtrlMap[mode])
-}
-
 Trickler.prototype.motorOn = function() {
   // Control motor over GPIO.
   rpio.write(MOTOR_PIN, MotorCtrlMap.ON)
@@ -376,13 +364,6 @@ Trickler.prototype.motorOff = function() {
 }
 
 
-// Turn motor on and back off after some delay
-Trickler.prototype.pulseMotor = function(delay) {
-  this.motorOn()
-  setTimeout(this.motorOff, delay)
-}
-
-
 Trickler.prototype._pulseTimeout = null
 
 
@@ -391,6 +372,23 @@ Trickler.prototype.clearPulse = function() {
   this._pulseTimeout = null
 }
 
+Trickler.prototype._runFn = function() {
+  this.clearPulse()
+  this.motorOn()
+  this._pulseTimeout = setTimeout(this._waitFn.bind(this), this.pulseSpeed.ON)
+}
+
+Trickler.prototype._waitFn = function() {
+  this.clearPulse()
+  this.motorOff()
+  this._pulseTimeout = setTimeout(this._runFn.bind(this), this.pulseSpeed.OFF)
+}
+
+// Turn motor on and off at regular intervals.
+Trickler.prototype.pulseOn = function() {
+  // Kick off the cycle.
+  this._runFn()
+}
 
 // Turns off the pulse cycle.
 Trickler.prototype.pulseOff = function() {
@@ -398,28 +396,55 @@ Trickler.prototype.pulseOff = function() {
   this.motorOff()
 }
 
-
-// Turn motor on and off at regular intervals.
-Trickler.prototype.pulseOn = function() {
-  var shortFn = () => {
-    this.clearPulse()
-    this.motorOn()
-    this._pulseTimeout = setTimeout(longFn.bind(this), this._pulseSpeed.ON)
-  }
-
-  // The long-delay function turns the motor off then calls the short-delay function.
-  var longFn = () => {
-    this.clearPulse()
-    this.motorOff()
-    this._pulseTimeout = setTimeout(shortFn.bind(this), this._pulseSpeed.OFF)
-  }
-
-  // Kick off the cycle.
-  shortFn()
-}
-
 Trickler.prototype.stableTime = function() {
   return new Date() - this._stableSince
+}
+
+// When autoMode=ON, called every time weight is updated.
+Trickler.prototype.trickleListener = function(weight) {
+  var delta = this.targetWeight - weight
+  console.log(`targetWeight: ${this.targetWeight}, weight: ${weight}, delta: ${delta}, this: ${this}`)
+
+
+  switch(Math.sign(delta)) {
+    case 0:
+    case -0:
+      // Exact weight
+      this.pulseOff()
+      console.log('exact weight reached')
+      this.emit('ready', TricklerWeightStatus.EQUAL)
+      break
+    case -1:
+      // Negative delta, over throw
+      this.pulseOff()
+      console.log('Over throw!')
+      this.emit('ready', TricklerWeightStatus.OVER)
+      break
+    case 1:
+      // Positive delta, not finished trickling
+      // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
+      if (this.weight < 0 || (this.weight === 0 && this.stableTime() <= 200)) {
+        console.log('Pan was removed, waiting...')
+        this.pulseOff()
+      } else {
+        if (delta <= 1.0) {
+          console.log('Very slow trickle...')
+          this.pulseSpeed = PulseSpeeds.VERY_SLOW
+        } else if (delta < 2.0) {
+          console.log('Slow trickle...')
+          this.pulseSpeed = PulseSpeeds.SLOW
+        } else {
+          console.log('Medium trickle...')
+          this.pulseSpeed = PulseSpeeds.MEDIUM
+        }
+
+        // If the pulse control is off turn it on.
+        if (this._pulseTimeout === null) {
+          this.pulseOn()
+        }
+      }
+      break
+  }
 }
 
 Trickler.prototype.trickle = function(mode) {
@@ -429,14 +454,16 @@ Trickler.prototype.trickle = function(mode) {
   switch(mode) {
     case AutoModeStatus.ON:
       console.log('Activating trickler auto mode...')
-      this._trickleInterval = setInterval(this.trickleCtrlFn.bind(this), TIMER)
+      //this._trickleInterval = setInterval(this.trickleCtrlFn.bind(this), TIMER)
       // TODO: Maybe add another listener to the input instead of using an interval?
+      this.on('weight', this.trickleListener.bind(this))
       break
 
     case AutoModeStatus.OFF:
       console.log('Deactivating trickler auto mode...')
       this.pulseOff()
-      clearInterval(this._trickleInterval)
+      //clearInterval(this._trickleInterval)
+      this.removeListener('weight', this.trickleListener.bind(this))
       break
   }
 }

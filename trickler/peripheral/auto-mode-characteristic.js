@@ -81,7 +81,6 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
         this.trickler.removeListener('ready', this.sendAutoModeNotification.bind(this))
         break
     }
-    this.trickler.trickle(this.trickler.autoMode)
     callback(this.RESULT_SUCCESS)
   }
 }
