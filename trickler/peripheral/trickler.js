@@ -120,6 +120,7 @@ MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
 function Trickler(port) {
   // Default autoMode to OFF.
   this.autoMode = AutoModeStatus.OFF
+  this.pulseSpeed = PulseSpeeds.MEDIUM
   if (process.env.MOCK) {
     rpio.init({mock: 'raspi-3'})
   }
@@ -210,6 +211,10 @@ Object.defineProperties(Trickler.prototype, {
         this._status = value
         this.emit('status', this._status)
       }
+      // Update the timestamp every time it's reported UNSTABLE.
+      if (this._status === TricklerStatus.UNSTABLE) {
+        this._stableSince = new Date()
+      }
     }
   },
 
@@ -289,7 +294,21 @@ Object.defineProperties(Trickler.prototype, {
       }
       this.emit('autoMode', this._autoMode)
     }
-  }
+  },
+
+  pulseSpeed: {
+    get: function() {
+      return this._pulseSpeed
+    },
+
+    set: function(value) {
+      if (this._pulseSpeed !== value && Object.keys(PulseSpeeds).indexOf(value) !== -1) {
+        console.log(`setting pulseSpeed from ${this._pulseSpeed} to ${value}`)
+        this._pulseSpeed = value
+        this.emit('pulseSpeed', this._pulseSpeed)
+      }
+    }
+  },
 })
 
 Trickler.prototype.trickleCtrlFn = function() {
@@ -308,22 +327,21 @@ Trickler.prototype.trickleCtrlFn = function() {
     case 1:
       // Positive delta, not finished trickling
       // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
-      if (this.weight < 0 || (this.weight === 0 && this.status === TricklerStatus.UNSTABLE)) {
+      if (this.weight < 0 || (this.weight === 0 && this.stableTime() <== 200)) {
         console.log('Wait for stability...')
         this.pulseOff()
       } else {
         // If it's within one gram/grain, slow down or pulse motor.
         if (delta < 1.00) {
-          // Turn motor off, check if stable before turning back on. Interval will turn it back off momentarily.
-          this.pulseOff()
-          if (this.status === TricklerStatus.STABLE) {
-            console.log('Slow trickle...')
-            this.pulseOn(PulseSpeeds.VERY_SLOW)
-          }
+          // Turn motor on slow trickle.
+          console.log('Slow trickle...')
+          this.pulseSpeed = PulseSpeeds.VERY_SLOW
+          this.pulseOn()
         } else {
           // More than one gram/grain, leave the motor on.
           console.log('Medium trickle...')
-          this.pulseOn(PulseSpeeds.MEDIUM)
+          this.pulseSpeed = PulseSpeeds.MEDIUM
+          this.pulseOn()
         }
       }
       break
@@ -363,8 +381,7 @@ Trickler.prototype.pulseMotor = function(delay) {
 
 Trickler.prototype._pulseTimeout = null
 
-
-// Turns off the cycle started by pulseOn.
+// Turns off the pulse cycle.
 Trickler.prototype.pulseOff = function() {
   clearTimeout(this._pulseTimeout)
   this.motorOff()
@@ -372,26 +389,27 @@ Trickler.prototype.pulseOff = function() {
 
 
 // Turn motor on and off at regular intervals.
-Trickler.prototype.pulseOn = function(speed) {
-  // The short-delay function turns the motor on then calls the long-delay function.
-  console.log(`Setting pulse speeds to: ${speed}`)
+Trickler.prototype.pulseOn = function() {
   var shortFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOn()
-    this._pulseTimeout = setTimeout(longFn.bind(this), speed.ON)
+    this._pulseTimeout = setTimeout(longFn.bind(this), this.pulseSpeed.ON)
   }
 
   // The long-delay function turns the motor off then calls the short-delay function.
   var longFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOff()
-    this._pulseTimeout = setTimeout(shortFn.bind(this), speed.OFF)
+    this._pulseTimeout = setTimeout(shortFn.bind(this), this.pulseSpeed.OFF)
   }
 
   // Kick off the cycle.
   shortFn()
 }
 
+Trickler.prototype.stableTime = function() {
+  return new Date() - this._stableSince
+}
 
 Trickler.prototype.trickle = function(mode) {
   // Compare weight every 10 microseconds the min allowed by setInterval)
