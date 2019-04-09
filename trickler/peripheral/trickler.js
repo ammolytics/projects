@@ -297,61 +297,6 @@ Object.defineProperties(Trickler.prototype, {
   },
 })
 
-Trickler.prototype.trickleCtrlFn = function() {
-  // Compare scale weight to target weight
-  var delta = this.targetWeight - this.weight
-  console.log(`targetWeight: ${this.targetWeight}, weight: ${this.weight}, delta: ${delta}, this: ${this}`)
-  
-  switch(Math.sign(delta)) {
-    case 0:
-    case -0:
-      // Exact weight
-      this.pulseOff()
-      console.log('exact weight reached')
-      this.emit('ready', TricklerWeightStatus.EQUAL)
-      break
-    case 1:
-      // Positive delta, not finished trickling
-      // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
-      if (this.weight < 0 || (this.weight === 0 && this.stableTime() <= 200)) {
-        console.log('Wait for stability...')
-        this.pulseOff()
-      } else {
-        // If it's within one gram/grain, slow down or pulse motor.
-        this.pulseOff()
-        if (delta < 1.00) {
-          // Turn motor on slow trickle.
-          console.log('Very slow trickle...')
-          this.pulseSpeed = PulseSpeeds.VERY_SLOW
-          // Only turn pulse on if it's off.
-          if (this.stableTime() >= 200 && this._pulseTimeout === null) {
-            this.pulseOn()
-          }
-        } else {
-          // More than one gram/grain, leave the motor on.
-          if (delta < 1.5) {
-            console.log('Slow trickle...')
-            this.pulseSpeed = PulseSpeeds.SLOW
-          } else {
-            console.log('Medium trickle...')
-            this.pulseSpeed = PulseSpeeds.MEDIUM
-          }
-          // Only turn pulse on if it's off.
-          if (this._pulseTimeout === null) {
-            this.pulseOn()
-          }
-        }
-      }
-      break
-    case -1:
-      // Negative delta, over throw
-      this.pulseOff()
-      console.log('Over throw!')
-      this.emit('ready', TricklerWeightStatus.OVER)
-      break
-  }
-}
-
 
 Trickler.prototype.motorOn = function() {
   // Control motor over GPIO.
@@ -427,15 +372,18 @@ Trickler.prototype.trickleListener = function(weight) {
         console.log('Pan was removed, waiting...')
         this.pulseOff()
       } else {
-        if (delta <= 1.0) {
+        if (delta <= 0.5) {
           console.log('Very slow trickle...')
           this.pulseSpeed = PulseSpeeds.VERY_SLOW
-        } else if (delta < 2.0) {
+        } else if (delta <= 1.0) {
           console.log('Slow trickle...')
           this.pulseSpeed = PulseSpeeds.SLOW
-        } else {
+        } else if (delta < 2.0) {
           console.log('Medium trickle...')
           this.pulseSpeed = PulseSpeeds.MEDIUM
+        } else {
+          console.log('Fast trickle...')
+          this.pulseSpeed = PulseSpeeds.FAST
         }
 
         // If the pulse control is off turn it on.
@@ -454,8 +402,6 @@ Trickler.prototype.trickle = function(mode) {
   switch(mode) {
     case AutoModeStatus.ON:
       console.log('Activating trickler auto mode...')
-      //this._trickleInterval = setInterval(this.trickleCtrlFn.bind(this), TIMER)
-      // TODO: Maybe add another listener to the input instead of using an interval?
       var result = this.on('weight', this.trickleListener.bind(this))
       console.log(`listener: ${this.trickleListener}, result: ${result}`)
       // force emit to kick things off.
@@ -465,7 +411,6 @@ Trickler.prototype.trickle = function(mode) {
     case AutoModeStatus.OFF:
       console.log('Deactivating trickler auto mode...')
       this.pulseOff()
-      //clearInterval(this._trickleInterval)
       this.removeListener('weight', this.trickleListener.bind(this))
       break
   }
