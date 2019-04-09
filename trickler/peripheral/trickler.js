@@ -330,7 +330,7 @@ Trickler.prototype.trickleCtrlFn = function() {
           console.log('Very slow trickle...')
           this.pulseSpeed = PulseSpeeds.VERY_SLOW
           // Only turn pulse on if it's off.
-          if (this.stableTime() >== 200 && this._pulseTimeout === null) {
+          if (this.stableTime() >= 200 && this._pulseTimeout === null) {
             this.pulseOn()
           }
         } else {
