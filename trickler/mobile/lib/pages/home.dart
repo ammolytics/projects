@@ -160,7 +160,12 @@ class _HomePageState extends State<HomePage> {
                       onChanged: _updateCounter,
                       onEditingComplete: _sync,
                       focusNode: () {
-                        _inputFocus.addListener(() { setState(() {}); });
+                        _inputFocus.addListener(() { setState(() {
+                          _controller.selection = TextSelection(
+                            baseOffset: _controller.text.length,
+                            extentOffset: _controller.text.length,
+                          );
+                        }); });
                         return _inputFocus;
                       }(),
                       textAlign: TextAlign.center,
