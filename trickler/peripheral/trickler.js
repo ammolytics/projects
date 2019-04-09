@@ -458,6 +458,8 @@ Trickler.prototype.trickle = function(mode) {
       // TODO: Maybe add another listener to the input instead of using an interval?
       var result = this.on('weight', this.trickleListener.bind(this))
       console.log(`listener: ${this.trickleListener}, result: ${result}`)
+      // force emit to kick things off.
+      this.emit('weight', this.weight)
       break
 
     case AutoModeStatus.OFF:
