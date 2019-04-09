@@ -393,14 +393,14 @@ Trickler.prototype.pulseOn = function() {
   var shortFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOn()
-    this._pulseTimeout = setTimeout(longFn.bind(this), this.pulseSpeed.ON)
+    this._pulseTimeout = setTimeout(longFn.bind(this), this._pulseSpeed.ON)
   }
 
   // The long-delay function turns the motor off then calls the short-delay function.
   var longFn = () => {
     clearTimeout(this._pulseTimeout)
     this.motorOff()
-    this._pulseTimeout = setTimeout(shortFn.bind(this), this.pulseSpeed.OFF)
+    this._pulseTimeout = setTimeout(shortFn.bind(this), this._pulseSpeed.OFF)
   }
 
   // Kick off the cycle.
