@@ -397,7 +397,10 @@ Trickler.prototype.trickleListener = function(weight) {
 
 Trickler.prototype.trickle = function(mode) {
   // Compare weight every 10 microseconds the min allowed by setInterval)
-  const TIMER = 10
+  this.pulseOff()
+  this.removeListener('weight', this.trickleListener.bind(this))
+  this.removeListener('weight', this.trickleListener)
+  this.pulseOff()
 
   switch(mode) {
     case AutoModeStatus.ON:
@@ -412,7 +415,6 @@ Trickler.prototype.trickle = function(mode) {
       console.log('Deactivating trickler auto mode...')
       this.pulseOff()
       this.removeListener('weight', this.trickleListener.bind(this))
-      this.pulseOff()
       this.removeListener('weight', this.trickleListener)
       this.pulseOff()
       break
