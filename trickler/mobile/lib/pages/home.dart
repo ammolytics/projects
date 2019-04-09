@@ -132,6 +132,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, state) {
         _state = state;
         return Scaffold(
+          resizeToAvoidBottomPadding: false,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(60.0),
             child: Header(
@@ -232,7 +233,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               _inputFocus.hasFocus ? Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, MediaQuery.of(context).viewInsets.bottom),
                 child: FloatingActionButton(
                   heroTag: 'closeKeyboard',
                   onPressed: _sync,
