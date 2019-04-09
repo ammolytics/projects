@@ -332,6 +332,7 @@ Trickler.prototype.trickleCtrlFn = function() {
         this.pulseOff()
       } else {
         // If it's within one gram/grain, slow down or pulse motor.
+        this.pulseOff()
         if (delta < 1.00) {
           // Turn motor on slow trickle.
           console.log('Slow trickle...')
