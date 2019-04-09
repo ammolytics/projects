@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     var newWeight = text.length > 0 ?
       double.parse(text) : 0.0;
     _dispatch(SetTargetWeight(newWeight));
-    _sync();
+    _syncDialState();
   }
 
   void _handleIncrement(bool shouldIncrement) {
