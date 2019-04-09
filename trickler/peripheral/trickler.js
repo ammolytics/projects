@@ -192,8 +192,8 @@ Object.defineProperties(Trickler.prototype, {
     },
 
     set: function(value) {
-      console.log(`Unit updated from ${this._unit} to ${value}`)
       if (this._unit !== value) {
+        console.log(`Unit updated from ${this._unit} to ${value}`)
         this._unit = value
         this.emit('unit', this._unit)
       }
