@@ -375,10 +375,10 @@ Trickler.prototype.trickleListener = function(weight) {
         if (delta <= 0.1) {
           console.log('Very slow trickle...')
           this.pulseSpeed = PulseSpeeds.VERY_SLOW
-        } else if (delta <= 0.5) {
+        } else if (delta <= 0.2) {
           console.log('Slow trickle...')
           this.pulseSpeed = PulseSpeeds.SLOW
-        } else if (delta < 1.5) {
+        } else if (delta < 0.8) {
           console.log('Medium trickle...')
           this.pulseSpeed = PulseSpeeds.MEDIUM
         } else {
