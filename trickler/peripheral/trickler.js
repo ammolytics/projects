@@ -91,15 +91,6 @@ const CommandMap = {
 }
 
 
-const MotorPulses = {
-  VERY_SHORT: 30,
-  SHORT: 50,
-  MEDIUM: 100,
-  LONG: 200,
-  VERY_LONG: 500,
-}
-
-
 const PulseSpeeds = {
   VERY_SLOW: {ON: 15, OFF: 150},
   SLOW: {ON: 20, OFF: 150},
@@ -119,6 +110,7 @@ MotorCtrlMap[TricklerMotorStatus.OFF] = rpio.LOW
 
 function Trickler(port) {
   // Default autoMode to OFF.
+  this.targetWeight = 0.0
   this.autoMode = AutoModeStatus.OFF
   this.pulseSpeed = PulseSpeeds.MEDIUM
   if (process.env.MOCK) {
@@ -335,16 +327,21 @@ Trickler.prototype.trickleCtrlFn = function() {
         this.pulseOff()
         if (delta < 1.00) {
           // Turn motor on slow trickle.
-          console.log('Slow trickle...')
+          console.log('Very slow trickle...')
           this.pulseSpeed = PulseSpeeds.VERY_SLOW
           // Only turn pulse on if it's off.
-          if (this._pulseTimeout === null) {
+          if (this.stableTime() >== 200 && this._pulseTimeout === null) {
             this.pulseOn()
           }
         } else {
           // More than one gram/grain, leave the motor on.
-          console.log('Medium trickle...')
-          this.pulseSpeed = PulseSpeeds.MEDIUM
+          if (delta < 1.5) {
+            console.log('Slow trickle...')
+            this.pulseSpeed = PulseSpeeds.SLOW
+          } else {
+            console.log('Medium trickle...')
+            this.pulseSpeed = PulseSpeeds.MEDIUM
+          }
           // Only turn pulse on if it's off.
           if (this._pulseTimeout === null) {
             this.pulseOn()
@@ -475,6 +472,5 @@ module.exports.UnitMap = UnitMap
 module.exports.StatusMap = StatusMap
 module.exports.ErrorCodeMap = ErrorCodeMap
 module.exports.CommandMap = CommandMap
-module.exports.MotorPulses = MotorPulses
 module.exports.PulseSpeeds = PulseSpeeds
 module.exports.MotorCtrlMap = MotorCtrlMap
