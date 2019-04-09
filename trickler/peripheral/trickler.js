@@ -302,7 +302,7 @@ Object.defineProperties(Trickler.prototype, {
     },
 
     set: function(value) {
-      if (this._pulseSpeed !== value && Object.keys(PulseSpeeds).indexOf(value) !== -1) {
+      if (this._pulseSpeed !== value) {
         console.log(`setting pulseSpeed from ${this._pulseSpeed} to ${value}`)
         this._pulseSpeed = value
         this.emit('pulseSpeed', this._pulseSpeed)
