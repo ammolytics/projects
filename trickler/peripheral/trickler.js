@@ -294,18 +294,21 @@ Object.defineProperties(Trickler.prototype, {
 Trickler.prototype.trickleCtrlFn = function() {
   // Compare scale weight to target weight
   var delta = this.targetWeight - this.weight
+  console.log(`delta: ${delta}, this: ${this}`)
   
   switch(Math.sign(delta)) {
     case 0:
     case -0:
       // Exact weight
       this.pulseOff()
+      console.log('exact weight reached')
       this.emit('ready', TricklerWeightStatus.EQUAL)
       break
     case 1:
       // Positive delta, not finished trickling
       // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
       if (this.weight < 0 || (this.weight === 0 && this.status === TricklerStatus.UNSTABLE)) {
+        console.log('Wait for stability...')
         this.pulseOff()
       } else {
         // If it's within one gram/grain, slow down or pulse motor.
@@ -313,10 +316,12 @@ Trickler.prototype.trickleCtrlFn = function() {
           // Turn motor off, check if stable before turning back on. Interval will turn it back off momentarily.
           this.pulseOff()
           if (this.status === TricklerStatus.STABLE) {
+            console.log('Slow trickle...')
             this.pulseOn(PulseSpeeds.VERY_SLOW)
           }
         } else {
           // More than one gram/grain, leave the motor on.
+          console.log('Medium trickle...')
           this.pulseOn(PulseSpeeds.MEDIUM)
         }
       }
@@ -324,6 +329,7 @@ Trickler.prototype.trickleCtrlFn = function() {
     case -1:
       // Negative delta, over throw
       this.pulseOff()
+      console.log('Over throw!')
       this.emit('ready', TricklerWeightStatus.OVER)
       break
   }
