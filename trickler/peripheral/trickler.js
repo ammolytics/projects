@@ -123,6 +123,7 @@ function Trickler(port) {
   rpio.open(MOTOR_PIN, rpio.OUTPUT, rpio.LOW)
 
   // Default values.
+  this._stableSince = new Date()
   this.autoMode = AutoModeStatus.OFF
   this.runningMode = RunningMode.NOGO
   this.pulseSpeed = PulseSpeeds.MEDIUM
@@ -410,6 +411,7 @@ Trickler.prototype.trickleListener = function(weight) {
   switch(this.runningMode) {
     case RunningMode.NOGO:
       // Reached EQUAL or OVER. Waiting for empty pan on scale (zero/stable).
+      console.log(`weight: ${weight}, status: ${this.status}, stableTime: ${this.stableTime()}`)
       if (weight === 0 && this.status === TricklerStatus.STABLE && this.stableTime() >= 100) {
         // Turn back on after stable weight of zero for at least a second.
         this.runningMode = RunningMode.GO
