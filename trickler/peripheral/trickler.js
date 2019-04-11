@@ -414,11 +414,14 @@ Trickler.prototype.trickleListener = function(weight) {
     case RunningMode.NOGO:
       // Reached EQUAL or OVER. Waiting for empty pan on scale (zero/stable).
       console.log(`weight: ${weight}, status: ${this.status}, stableTime: ${this.stableTime()}`)
-      if (weight === 0 && this.status === TricklerStatus.STABLE && this.stableTime() >= 100) {
+      if (weight >= 0 && this.status === TricklerStatus.STABLE && this.stableTime() >= 1000) {
         // Turn back on after stable weight of zero for at least a second.
         console.log(`Setting mode to GO and kicking it off.`)
         this.runningMode = RunningMode.GO
         this.runnerFn(weight)
+      } else {
+        // give things a delayed kick to try again.
+        setTimeout(() => { this.emit('weight', this.weight) }, 100)
       }
       break
     case RunningMode.GO:
