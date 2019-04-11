@@ -408,6 +408,8 @@ Trickler.prototype.runnerFn = function(weight) {
 
 // When autoMode=ON, called every time weight is updated.
 Trickler.prototype.trickleListener = function(weight) {
+  weight = Number(weight)
+
   switch(this.runningMode) {
     case RunningMode.NOGO:
       // Reached EQUAL or OVER. Waiting for empty pan on scale (zero/stable).
