@@ -203,7 +203,7 @@ Object.defineProperties(Trickler.prototype, {
         this.emit('status', this._status)
       }
       // Update the timestamp every time it's reported UNSTABLE.
-      if (this._status === TricklerStatus.UNSTABLE) {
+      if (this._status !== TricklerStatus.STABLE) {
         this._stableSince = new Date()
       }
     }
