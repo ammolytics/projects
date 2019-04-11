@@ -279,6 +279,7 @@ Object.defineProperties(Trickler.prototype, {
         case AutoModeStatus.ON:
           this._autoMode = value
           this.runningMode = RunningMode.NOGO
+          console.log(`stableTime: ${this.stableTime()}`)
           this.trickle(value)
           break
         default:
@@ -409,7 +410,7 @@ Trickler.prototype.trickleListener = function(weight) {
   switch(this.runningMode) {
     case RunningMode.NOGO:
       // Reached EQUAL or OVER. Waiting for empty pan on scale (zero/stable).
-      if (weight === 0 && this.stableTime() >= 1000) {
+      if (weight === 0 && this.status === TricklerStatus.STABLE && this.stableTime() >= 100) {
         // Turn back on after stable weight of zero for at least a second.
         this.runningMode = RunningMode.GO
       }
