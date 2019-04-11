@@ -44,6 +44,11 @@ const AutoModeStatus = {
   ON: 1,
 }
 
+const RunningMode = {
+  NOGO: 0,
+  GO: 1,
+}
+
 const UnitMap = {
   'GN': TricklerUnits.GRAINS,
   'g': TricklerUnits.GRAMS,
@@ -119,6 +124,7 @@ function Trickler(port) {
 
   // Default values.
   this.autoMode = AutoModeStatus.OFF
+  this.runningMode = RunningMode.NOGO
   this.pulseSpeed = PulseSpeeds.MEDIUM
   this.targetWeight = 0.0
 
@@ -272,6 +278,7 @@ Object.defineProperties(Trickler.prototype, {
         case AutoModeStatus.OFF:
         case AutoModeStatus.ON:
           this._autoMode = value
+          this.runningMode = RunningMode.NOGO
           this.trickle(value)
           break
         default:
@@ -345,32 +352,33 @@ Trickler.prototype.stableTime = function() {
   return new Date() - this._stableSince
 }
 
-// When autoMode=ON, called every time weight is updated.
-Trickler.prototype.trickleListener = function(weight) {
+Trickler.prototype.runnerFn = function(weight) {
   var delta = this.targetWeight - weight
-  console.log(`targetWeight: ${this.targetWeight}, weight: ${weight}, delta: ${delta}, this: ${this}`)
-
+  console.log(`targetWeight: ${this.targetWeight}, weight: ${weight}, delta: ${delta}`)
 
   switch(Math.sign(delta)) {
     case 0:
     case -0:
       // Exact weight
       this.pulseOff()
+      this.runningMode = RunningMode.NOGO
       console.log('exact weight reached')
       this.emit('ready', TricklerWeightStatus.EQUAL)
       break
     case -1:
       // Negative delta, over throw
       this.pulseOff()
+      this.runningMode = RunningMode.NOGO
       console.log('Over throw!')
       this.emit('ready', TricklerWeightStatus.OVER)
       break
     case 1:
       // Positive delta, not finished trickling
-      // If scale weight is < 0 and not stable, pan is removed and motor should stay off.
-      if (this.weight < 0 || (this.weight === 0 && this.stableTime() <= 500)) {
+      // If scale weight is < 0 pan is removed and motor should stay off.
+      if (weight < 0) {
         console.log('Pan was removed, waiting...')
         this.pulseOff()
+        this.runningMode = RunningMode.NOGO
       } else {
         if (delta <= 0.1) {
           console.log('Very slow trickle...')
@@ -393,6 +401,25 @@ Trickler.prototype.trickleListener = function(weight) {
       }
       break
   }
+}
+
+
+// When autoMode=ON, called every time weight is updated.
+Trickler.prototype.trickleListener = function(weight) {
+  switch(this.runningMode) {
+    case RunningMode.NOGO:
+      // Reached EQUAL or OVER. Waiting for empty pan on scale (zero/stable).
+      if (weight === 0 && this.stableTime() >= 1000) {
+        // Turn back on after stable weight of zero for at least a second.
+        this.runningMode = RunningMode.GO
+      }
+      break
+    case RunningMode.GO:
+      // Empty pan on scale, should trickle up.
+      this.runnerFn(weight)
+      break
+  }
+
 }
 
 Trickler.prototype.trickle = function(mode) {
@@ -448,6 +475,7 @@ module.exports.TricklerStatus = TricklerStatus
 module.exports.TricklerWeightStatus = TricklerWeightStatus
 module.exports.TricklerMotorStatus = TricklerMotorStatus
 module.exports.AutoModeStatus = AutoModeStatus
+module.exports.RunningMode = RunningMode
 module.exports.UnitMap = UnitMap
 module.exports.StatusMap = StatusMap
 module.exports.ErrorCodeMap = ErrorCodeMap
