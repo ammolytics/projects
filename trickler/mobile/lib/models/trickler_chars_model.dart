@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Ammolytics and contributors. All rights reserved.
+ * Released under the MIT license. See LICENSE file in the project root for details.
+ */
 part of 'index.dart';
 
 class TricklerChars {

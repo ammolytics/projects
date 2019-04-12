@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Ammolytics and contributors. All rights reserved.
+ * Released under the MIT license. See LICENSE file in the project root for details.
+ */
 import 'dart:convert' show utf8;
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Ammolytics and contributors. All rights reserved.
+ * Released under the MIT license. See LICENSE file in the project root for details.
+ */
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
