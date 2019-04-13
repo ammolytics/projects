@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Ammolytics and contributors. All rights reserved.
+ * Released under the MIT license. See LICENSE file in the project root for details.
+ */
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -91,10 +95,6 @@ class DialState extends State<Dial> {
   }
 }
 
-/**
- * Copyright (c) Ammolytics and contributors. All rights reserved.
- * Released under the MIT license. See LICENSE file in the project root for details.
- */
 class DialPainter extends CustomPainter {
   double angle;
   DialPainter({this.angle});
