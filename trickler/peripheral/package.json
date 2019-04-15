@@ -1,12 +1,12 @@
 {
   "name": "trickler",
   "version": "1.0.0",
-  "description": "",
+  "description": "Automatic, Bluetooth-controlled powder trickler controller",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
+  "repository": "git@github.com:ammolytics/projects.git",
   "author": "Eric Higgins <eric@ammolytics.com>",
   "license": "MIT",
   "dependencies": {
