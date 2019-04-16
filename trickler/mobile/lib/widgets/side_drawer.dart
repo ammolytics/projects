@@ -19,18 +19,27 @@ class SideDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            padding: EdgeInsets.only(top: 60),
-            child: Text(
-              'Trickler',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  width: 67,
+                  height: 48,
+                  child: Image.asset('assets/logo.png'),
+                ),
+                Text(
+                  'Trickler',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Color.fromARGB(255, 56, 56, 56),
             ),
           ),
           ListTile(
