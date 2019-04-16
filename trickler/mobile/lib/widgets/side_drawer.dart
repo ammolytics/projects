@@ -19,22 +19,40 @@ class SideDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                SizedBox(
-                  width: 67,
-                  height: 48,
-                  child: Image.asset('assets/logo.png'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(
+                      width: 23,
+                      height: 16,
+                      child: Image.asset('assets/logo.png'),
+                    ),
+                    Text(
+                      'Ammolytics',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
-                  'Trickler',
+                  'Open Trickler',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 40,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+                SizedBox( // This centers the text above
+                  width: 5,
+                  height: 16,
                 ),
               ],
             ),

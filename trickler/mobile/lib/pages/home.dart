@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
   final Function disconnect;
   HomePage({ Key key, this.connectToDevice, this.disconnect }) : super(key: key);
 
-  final String title = 'Trickler';
+  final String title = 'Open Trickler';
   final dialKey = new GlobalKey<DialState>();
 
   @override
