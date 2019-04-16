@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
-        title: 'Trickler Mobile',
+        title: 'Open Trickler',
         theme: ThemeData(
           primarySwatch: Colors.blueGrey,
         ),
