@@ -30,6 +30,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   test: ^1.5.3
+  flutter_launcher_icons: "^0.7.0"
+
+flutter_icons:
+  image_path: "icon/logo.png"
+  android: true 
+  ios: true
 
 
 # For information on the generic Dart part of this file, see the
