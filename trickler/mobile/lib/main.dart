@@ -2,6 +2,7 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -13,6 +14,9 @@ import 'models/index.dart';
 import 'reducers/index.dart';
 import 'pages/home.dart';
 
+/// main is initial function of the app. It is responsible for creating
+/// a Redux Store, and running an instance of the app with that store.
+
 void main() {
   final store = Store<AppState>(appStateReducer, initialState: AppState.initialState());
 
@@ -20,6 +24,9 @@ void main() {
     store: store,
   ));
 }
+
+/// MyApp is the wrapper class for the whole app. It provides the given
+/// store to all child widgets. As well as handling global app configurations.
 
 class MyApp extends BluetoothApp {
   final Store<AppState> store;
@@ -40,8 +47,8 @@ class MyApp extends BluetoothApp {
         ),
         home: HomePage(
           key: Key('HomePage'),
-          connectToDevice: (device) => connectToDevice(device),
-          disconnect: () => disconnect(),
+          connectToDevice: (device) => connectToDevice(device), // These functions are passed down to the Devices Page, allowing it to
+          disconnect: () => disconnect(),                       // interact with a bluetooth device while still keeping the process global.
         ),
       ),
     );
