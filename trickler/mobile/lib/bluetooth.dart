@@ -25,6 +25,7 @@ abstract class BluetoothApp extends StatelessWidget {
   /// If connected to the device it will call _findTricklerService, otherwise it will call disconnect.
 
   connectToDevice(BluetoothDevice device) {
+    store.dispatch(SetConnectionStatus(BluetoothDeviceState.connecting));
     dynamic deviceConnection = flutterBlue
       .connect(device, timeout: Duration(seconds: 4)) // Attempt to connect for 4 seconds
       .listen((s) {

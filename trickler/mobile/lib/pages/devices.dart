@@ -26,10 +26,14 @@ class _DevicesPageState extends State<DevicesPage> {
   FlutterBlue _flutterBlue = FlutterBlue.instance;
 
   dynamic _scanSubscription;
+  bool _isScanning = false;
 
   void _scanDevices() {
     try {
       bool foundPeripheral = false;
+      setState(() {
+        _isScanning = true;
+      });
       // Listen for BT Devices for 5 seconds
       _scanSubscription = _flutterBlue.scan(timeout: const Duration(seconds: 5)).listen((scanResult) {
         if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
@@ -49,12 +53,16 @@ class _DevicesPageState extends State<DevicesPage> {
   void _stopScan() {
     // Stop scanning...
     _scanSubscription?.cancel();
-    _scanSubscription = null;
+    setState(() {
+      _scanSubscription = null;
+      _isScanning = false;
+    });
   }
 
   Widget _getDeviceInfo() {
     BluetoothDevice device = _state.deviceState.device;
-    if (device.id != DeviceIdentifier('000')) {
+    BluetoothDeviceState status = _state.deviceState.connectionStatus;
+    if (status == BluetoothDeviceState.connected) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -96,33 +104,59 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
         ],
       );
+    } else {
+      String text= 'You are not connected to a device!';
+      if (status == BluetoothDeviceState.connecting) {
+        text = 'Connecting to a Trickler Device...';
+      } else if (_isScanning) {
+        text = 'Scanning for a Trickler Device...';
+      }
+      return Text(text,
+        style: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
+        ),
+      );
     }
-    return Text('You are not connected to a device!',
-      style: TextStyle(
-        fontSize: 18.0,
-        fontWeight: FontWeight.bold,
-      ),
-    );
   }
 
   _getActionButton() {
-    BluetoothDevice device = _state.deviceState.device;
-    if (device.id != DeviceIdentifier('000')) {
-      return FloatingActionButton(
+    BluetoothDeviceState status = _state.deviceState.connectionStatus;
+    FloatingActionButton button;
+    if (_isScanning) {
+      button = FloatingActionButton(
+        heroTag: 'Scanning',
+        onPressed: () {},
+        tooltip: 'Scanning...',
+        backgroundColor: Colors.grey,
+        child: Icon(Icons.bluetooth_searching),
+      );
+    } else if (status == BluetoothDeviceState.connected) {
+      button = FloatingActionButton(
         heroTag: 'Disconnect',
         onPressed: widget.disconnect,
         tooltip: 'Disconnect',
         backgroundColor: Colors.red,
         child: Icon(Icons.bluetooth_disabled),
       );
+    } else if (status == BluetoothDeviceState.connecting) {
+      button = FloatingActionButton(
+        heroTag: 'Connecting',
+        onPressed: () {},
+        tooltip: 'Connecting...',
+        backgroundColor: Colors.grey,
+        child: Icon(Icons.bluetooth_connected),
+      );
+    } else {
+      button = FloatingActionButton(
+        heroTag: 'ScanBTDevices',
+        onPressed: _scanDevices,
+        tooltip: 'Scan for Devices',
+        backgroundColor: Colors.green,
+        child: Icon(Icons.bluetooth_searching),
+      );
     }
-    return FloatingActionButton(
-      heroTag: 'ScanBTDevices',
-      onPressed: _scanDevices,
-      tooltip: 'Scan for Devices',
-      backgroundColor: Colors.green,
-      child: Icon(Icons.bluetooth_searching),
-    );
+    return button;
   }
 
   @override
