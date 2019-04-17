@@ -1,7 +1,5 @@
-/**
- * Copyright (c) Ammolytics and contributors. All rights reserved.
- * Released under the MIT license. See LICENSE file in the project root for details.
- */
+/// Copyright (c) Ammolytics and contributors. All rights reserved.
+/// Released under the MIT license. See LICENSE file in the project root for details.
 const GRAINS = 'GRAINS';
 const GRAMS = 'GRAMS';
 const UNIT_LIST = [
