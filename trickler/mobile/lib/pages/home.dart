@@ -241,7 +241,9 @@ class _HomePageState extends State<HomePage> {
           floatingActionButton: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              _inputFocus.hasFocus ? Padding(
+              _inputFocus.hasFocus &&
+              MediaQuery.of(context).viewInsets.bottom > 0 ?
+              Padding(
                 padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, MediaQuery.of(context).viewInsets.bottom),
                 child: FloatingActionButton(
                   heroTag: 'closeKeyboard',
