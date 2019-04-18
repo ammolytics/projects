@@ -1,8 +1,13 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 import 'package:flutter_blue/flutter_blue.dart';
 import 'models/index.dart';
 import 'dart:async';
+
+/// Actions are a way to send data from a widget to a reducer via the dispatch method.
+/// Each action class is used to identify the type of action, and the data member/s of
+/// each class are used to represent the data being sent.
 
 class SetCurrentMeasurement {
   final Measurement measurement;

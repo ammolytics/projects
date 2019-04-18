@@ -1,10 +1,12 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../models/index.dart';
-
 import '../widgets/header.dart';
+
+/// HistoryPage is responsible for passing a title to _HistoryPageState.
 
 class HistoryPage extends StatefulWidget {
   HistoryPage({ Key key }) : super(key: key);
@@ -14,6 +16,9 @@ class HistoryPage extends StatefulWidget {
   @override
   _HistoryPageState createState() => _HistoryPageState();
 }
+
+/// _HistoryPageState is meant to be a place that displays all measurments in the measurementHistory.
+/// However, right now it just displays the current targetWieght.
 
 class _HistoryPageState extends State<HistoryPage> {
   @override

@@ -1,6 +1,10 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 part of 'index.dart';
+
+/// AppState is the model that represents the entirety of the global state for the application.
+/// It contains a currentMeasurement, mesurementHistory, and a deviceState.
 
 class AppState {
   Measurement currentMeasurement;
@@ -18,6 +22,8 @@ class AppState {
     measurementHistory = <Measurement>[],
     deviceState = DeviceState.initialState();
 
+  /// getStatusColor returns a color that reflects the current connectionStatus
+
   getStatusColor() {
     if (this.deviceState.connectionStatus == BluetoothDeviceState.disconnected) {
       return Color.fromARGB(255, 251, 118, 102);
@@ -28,6 +34,8 @@ class AppState {
     }
     return Colors.white;
   }
+
+  /// getStatusIcon returns an icon that reflects the current connectionStatus
 
   getStatusIcon() {
     if (this.deviceState.connectionStatus == BluetoothDeviceState.disconnected) {

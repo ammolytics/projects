@@ -1,8 +1,11 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 part of 'index.dart';
 
-DeviceState deviceState(DeviceState state, dynamic action) {
+/// deviceStateReducer is the reducer that handles all actions related to the global deviceState data.
+
+DeviceState deviceStateReducer(DeviceState state, dynamic action) {
   if (action is ResetDeviceState) {
     return new DeviceState.initialState();
   } else if (action is SetDevice) {

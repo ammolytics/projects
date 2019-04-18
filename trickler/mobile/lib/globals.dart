@@ -1,5 +1,6 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 const GRAINS = 'GRAINS';
 const GRAMS = 'GRAMS';
 const UNIT_LIST = [
@@ -29,6 +30,7 @@ const WEIGHT_CHAR_UUID = '10000001-be5f-4b43-a49f-76f2d65c6e28';
 const MODEL_NUMBER_CHAR_UUID = '00002a24-0000-1000-8000-00805f9b34fb';
 const SERIAL_NUMBER_CHAR_UUID = '00002a25-0000-1000-8000-00805f9b34fb';
 
+// These UUIDs will be ignored by the _readCharacteristics method in bluetooth.dart
 const DONT_READ_CHARS = [
   MODEL_NUMBER_CHAR_UUID,
   SERIAL_NUMBER_CHAR_UUID,

@@ -1,15 +1,17 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../models/index.dart';
 
-class Header extends StatelessWidget {
-  Header({ Key key, this.title, this.iconColor, this.onClick }) : super(key: key);
+/// Header is meant to be used as a Material appBar for every Scaffold. It will reflect
+/// the given title, and the current connectionStatus of the global DeviceState.
 
+class Header extends StatelessWidget {
   final String title;
-  final Color iconColor;
-  final Function onClick;
+
+  Header({ Key key, this.title }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

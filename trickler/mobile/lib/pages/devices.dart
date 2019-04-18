@@ -1,11 +1,15 @@
 /// Copyright (c) Ammolytics and contributors. All rights reserved.
 /// Released under the MIT license. See LICENSE file in the project root for details.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import '../models/index.dart';
 import '../actions.dart';
 import '../widgets/header.dart';
+
+/// DevicesPage is responsible foor passing the given connectToDevice,
+/// and disconnect methods, as well as a title to the _DevicesPageState.
 
 class DevicesPage extends StatefulWidget {
   final Function connectToDevice;
@@ -18,6 +22,8 @@ class DevicesPage extends StatefulWidget {
   _DevicesPageState createState() => _DevicesPageState();
 }
 
+/// _DevicesPageState allows the user to attempt to connect and disconnect to a Trickler device.
+
 class _DevicesPageState extends State<DevicesPage> {
   AppState _state;
   Function _dispatch;
@@ -27,6 +33,10 @@ class _DevicesPageState extends State<DevicesPage> {
 
   dynamic _scanSubscription;
   bool _isScanning = false;
+
+  /// _scanDevices is responsible for scanning for near by bluetooth devices, and checking to
+  /// see if the device is Trickler. If it finds trickler it will connect to the device can
+  /// call _stopScan. If it is unable to find Trickler within 5 seconds it will call _stopScan.
 
   void _scanDevices() {
     try {
@@ -50,6 +60,9 @@ class _DevicesPageState extends State<DevicesPage> {
     }
   }
 
+  /// _stopScan cancels the _scanSubscription and sets _scanSubscription
+  /// and _isScanning back to their inital values.
+
   void _stopScan() {
     // Stop scanning...
     _scanSubscription?.cancel();
@@ -58,6 +71,10 @@ class _DevicesPageState extends State<DevicesPage> {
       _isScanning = false;
     });
   }
+
+  /// _getDeviceInfo returns a list of Text Widgets that represent the stability, unit, and weight
+  /// characteristics' values, while connected to the device. Otherwise it returns a Text widget
+  /// reflecting the current connectionStatus.
 
   Widget _getDeviceInfo() {
     BluetoothDevice device = _state.deviceState.device;
@@ -119,6 +136,11 @@ class _DevicesPageState extends State<DevicesPage> {
       );
     }
   }
+
+  /// _getActionButton returns an action button that corresponds to the current ConnectionStatus.
+  /// The button shown when the device is disconnected will call _scanDevices onPressed. The
+  /// buttons shown when the device is connected will call disconnect onPressed. The buttons shown
+  /// during the scanning and connecting states are disabled and will not do anything onPressed.
 
   _getActionButton() {
     BluetoothDeviceState status = _state.deviceState.connectionStatus;
