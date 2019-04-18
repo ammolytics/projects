@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import '../globals.dart';
-import 'dart:math';
+import '../helpers.dart';
 import 'dart:async';
 import 'dart:convert' show utf8;
 
