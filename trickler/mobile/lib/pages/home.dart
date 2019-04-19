@@ -44,13 +44,14 @@ class _HomePageState extends State<HomePage> {
   Function _dispatch;
 
   double _prevTargetWeight = 0.0;
+  bool _prevAutoMode = false;
   String _prevUnit = GRAINS;
 
-  /// _syncTextField updates the textField to reflect the current targetWeight, as long as the user
+  /// _updateTextField updates the textField to reflect the current targetWeight, as long as the user
   /// isn't currently using the textField to update the targetWeight value. It has an optional
   /// override parameter that will update the textField without the weight being changed.
 
-  void _syncTextField({ bool override = false }) {
+  void _updateTextField({ bool override = false }) {
     double targetWeight = _state.currentMeasurement.targetWeight;
     String unit = _state.currentMeasurement.unit;
     if (_prevTargetWeight != targetWeight || override) {
@@ -71,46 +72,43 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  /// _syncPeripheral is responsible for making sure that the peripheral's state matches the
-  /// global currentMeasurement. It will update values that are not in sync.
+  /// _updatePeripheral is responsible for detecting any changes to the currentMeasurement,
+  /// and writing them to their respective peripheral characteristics.
 
-  void _syncPeripheral() {
+  void _updatePeripheral() async {
     double targetWeight = _state.currentMeasurement.targetWeight;
+    bool autoMode = _state.currentMeasurement.isMeasuring;
     String unit = _state.currentMeasurement.unit;
-    if (_prevTargetWeight != targetWeight && _prevUnit != unit) {
-      // Update Unit and TargetWeight
-      _updatePeripheralChar(
-        UNIT_CHAR_UUID,
-        unit == GRAINS ? [0x00] : [0x01]
-      ).then((_) {
-        _updatePeripheralChar(
-          TARGET_WEIGHT_CHAR_UUID,
-          utf8.encode('$targetWeight')
-        );
-      });
-      _prevUnit = unit;
-      _prevTargetWeight = targetWeight;
-    } else if (_prevTargetWeight != targetWeight) {
-      // Update TargetWeight
-      _updatePeripheralChar(
+
+    if (_prevTargetWeight != targetWeight) {
+      await _updatePeripheralChar(
         TARGET_WEIGHT_CHAR_UUID,
         utf8.encode('$targetWeight')
       );
       _prevTargetWeight = targetWeight;
-    } else if (_prevUnit != unit) {
-      // Update Unit
-      _updatePeripheralChar(
+    }
+    
+    if (_prevUnit != unit) {
+      await _updatePeripheralChar(
         UNIT_CHAR_UUID,
         unit == GRAINS ? [0x00] : [0x01]
       );
       _prevUnit = unit;
     }
+
+    if (_prevAutoMode != autoMode) {
+      await _updatePeripheralChar(
+        AUTO_MODE_CHAR_UUID,
+        autoMode ? [0x01] : [0x00]
+      );
+      _prevAutoMode = autoMode;
+    }
   }
 
-  /// _syncMeasurement updates any currentMeasurement values that
+  /// _updateMeasurement updates any currentMeasurement values that
   /// are supposed to be overriden by the peripheral's state.
 
-  _syncMeasurement() {
+  _updateMeasurement() {
     double actualDeviceWeight = _state.deviceState.characteristics.actualWeight;
     double actualMeasurementWeight = _state.currentMeasurement.actualWeight;
     if (actualDeviceWeight != actualMeasurementWeight) {
@@ -148,7 +146,7 @@ class _HomePageState extends State<HomePage> {
             heroTag: 'closeKeyboard',
             onPressed: () {
               inputFocus.unfocus();
-              _syncTextField(override: true);
+              _updateTextField(override: true);
             },
             tooltip: 'Close Keyboard',
             backgroundColor: Colors.grey,
@@ -157,7 +155,7 @@ class _HomePageState extends State<HomePage> {
           ) : AutoModeButton(
             key: Key('AutoModeButton'),
             state: _state,
-            updatePeripheralChar: _updatePeripheralChar,
+            dispatch: _dispatch,
           ),
     );
   }
@@ -188,7 +186,7 @@ class _HomePageState extends State<HomePage> {
               key: widget.inputKey,
               state: _state,
               dispatch: _dispatch,
-              syncValue: () => _syncTextField(override: true),
+              syncValue: () => _updateTextField(override: true),
             ),
             WeightButtons(
               key: Key('Weight Buttons'),
@@ -211,9 +209,9 @@ class _HomePageState extends State<HomePage> {
       converter: (store) => store.state,
       builder: (context, state) {
         _state = state;
-        _syncTextField();
-        _syncPeripheral();
-        _syncMeasurement();
+        _updateTextField();
+        _updatePeripheral();
+        _updateMeasurement();
         return _getScaffold();
       }
     );

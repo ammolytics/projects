@@ -8,12 +8,20 @@ part of 'index.dart';
 class Measurement {
   String unit;
   double targetWeight;
-  double actualWeight = 0.0;
-  bool isComplete = false;
+  double actualWeight;
+  bool isMeasuring;
+  bool isComplete;
+
+  Measurement(
+    this.unit,
+    this.targetWeight,
+    this.actualWeight,
+    this.isMeasuring,
+    this.isComplete,
+  );
+
   final startTime = DateTime.now();
   DateTime endTime;
-
-  Measurement(this.unit, this.targetWeight, this.actualWeight, this.isComplete);
 
   setUnit(unit) {
     if (UNIT_LIST.indexOf(unit) != -1) {
