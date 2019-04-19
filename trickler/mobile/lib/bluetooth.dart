@@ -20,9 +20,9 @@ abstract class BluetoothApp extends StatelessWidget {
 
   final FlutterBlue flutterBlue = FlutterBlue.instance;
 
-  /// connectToDevice attempts to connect to a given BluetoothDevice.
-  /// It is responsible for updating Connection Status, and Device Connection in global state.
-  /// If connected to the device it will call _findTricklerService, otherwise it will call disconnect.
+  /// connectToDevice attempts to connect to a given BluetoothDevice. It is responsible for
+  /// updating Connection Status, and Device Connection in the global DeviceState. If connected
+  /// to the device it will call _findTricklerService, otherwise it will call disconnect.
 
   connectToDevice(BluetoothDevice device) {
     store.dispatch(SetConnectionStatus(BluetoothDeviceState.connecting));
@@ -40,8 +40,8 @@ abstract class BluetoothApp extends StatelessWidget {
   }
 
   /// _findTricklerService reads the services being advertised by the device. It is responsible
-  /// for finding a service that matches the TRICKLER_SERVICE_UUID, and saving it to global state.
-  /// Then it calls _readCharacteristics and passes in the service's charactersitics.
+  /// for finding a service that matches the TRICKLER_SERVICE_UUID, and saving it to the global
+  /// DeviceState. Then it calls _readCharacteristics and passes in the service's charactersitics.
 
   _findTricklerService() {
     store.state.deviceState.device.discoverServices().then((services) {
@@ -52,11 +52,11 @@ abstract class BluetoothApp extends StatelessWidget {
     });
   }
 
-  /// _readCharacteristics asynchronously reads given BluetoothCharactersitics one by one.
-  /// It is responsible for reading, and setting an initial value for the characterisitic.
-  /// As well as subscribing to any notify enabled charactersitics, and saving the updated values to global state.
-  /// Once it is finished reading the characteristic at the given index it will call itself
-  /// With the given characteristics, and the given index plus one to continue to sequence.
+  /// _readCharacteristics asynchronously reads given BluetoothCharactersitics one by one in a Future Chain.
+  /// It is responsible for reading, and setting an initial value for the characterisitic. As well as
+  /// subscribing to any notify enabled charactersitics, and saving the updated values to global state. Once
+  /// it is finished reading the characteristic at the given index it will call itself with the given
+  /// characteristics, and the given index plus one to continue down the chain, until it gets to the end.
 
   _readCharacteristics(List<BluetoothCharacteristic> chars, int i) { 
     BluetoothDevice device = store.state.deviceState.device;
@@ -71,7 +71,7 @@ abstract class BluetoothApp extends StatelessWidget {
           StreamSubscription sub = device.onValueChanged(char).listen((data) {
             store.dispatch(SetCharacteristic(char.uuid, data));
           });
-          store.dispatch(AddSubscription(sub)); // Save subscription to global state so we can cancel it on disconnect.
+          store.dispatch(AddSubscription(sub)); // Save subscription so we can cancel it on disconnect.
         }
 
         if (i + 1 < chars.length) {

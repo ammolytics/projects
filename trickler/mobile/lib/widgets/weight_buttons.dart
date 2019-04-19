@@ -29,7 +29,7 @@ class WeightButtons extends StatelessWidget {
     this.dispatch(SetTargetWeight(weight));
   }
 
-  /// _getTooltip returns a tooltip notifying the user of how much the target weight will changed by.
+  /// _getTooltip returns a tooltip notifying the user of how much the target weight will be changed by.
 
   String _getTooltip(String prefix) {
     String value = this.state.currentMeasurement.unit == GRAMS ? '0.001g' : '0.02gr';

@@ -54,10 +54,10 @@ class WeightInputState extends State<WeightInput> {
     widget.dispatch(SetTargetWeight(weight));
   }
 
-  /// _focusListener is a callback function intended to be used by a
-  /// listener. It moes the users cursor to the end of the textInput.
+  /// _handleFocus is a callback function intended to be used by a
+  /// listener. It moves the users cursor to the end of the textField.
 
-  void _focusListener() {
+  void _handleFocus() {
     setState(() {
       controller.selection = TextSelection(
         baseOffset: controller.text.length,
@@ -67,10 +67,10 @@ class WeightInputState extends State<WeightInput> {
   }
 
   /// _getFocusNodeWithListener returns a FocusNode with a
-  /// listener that calls _focusListener on focus change.
+  /// listener that calls _handleFocus on focus change.
 
   FocusNode _getFocusNodeWithListener() {
-    inputFocus.addListener(_focusListener);
+    inputFocus.addListener(_handleFocus);
     return inputFocus;
   }
 
@@ -121,7 +121,7 @@ class WeightInputState extends State<WeightInput> {
   @protected
   @mustCallSuper
   void deactivate() {
-    inputFocus.removeListener(_focusListener);
+    inputFocus.removeListener(_handleFocus);
     super.deactivate();
   }
 }

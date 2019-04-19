@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../pages/devices.dart';
 import '../pages/history.dart';
 
-/// SideDrawer is meant to be used as the Material sideDrawer for any Scaffold that
+/// SideDrawer is meant to be used as a Material sideDrawer for any Scaffold that
 /// requires Navigation functionallity. It is responsible for passing the given
 /// connectToDevice, and disconnect methods to any page that requires them. As well
 /// as providing the user the ability to navigate between pages.

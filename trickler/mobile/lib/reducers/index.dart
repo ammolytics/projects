@@ -6,7 +6,7 @@ import '../models/index.dart';
 
 /// A reducer is a function that takes the previous state and an action, and then returns the next state.
 /// These reducers create the next state by looking at the action type, which is represented by what object
-/// the action is an instance of, and the action data, which is represented by the actions datamembers.
+/// the action is an instance of, and the action data, which is represented by the actions data members.
 
 part 'measurement_reducers.dart';
 part 'device_reducers.dart';

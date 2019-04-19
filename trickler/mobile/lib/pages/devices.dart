@@ -8,7 +8,7 @@ import '../models/index.dart';
 import '../actions.dart';
 import '../widgets/header.dart';
 
-/// DevicesPage is responsible foor passing the given connectToDevice,
+/// DevicesPage is responsible for passing the given connectToDevice,
 /// and disconnect methods, as well as a title to the _DevicesPageState.
 
 class DevicesPage extends StatefulWidget {
@@ -35,7 +35,7 @@ class _DevicesPageState extends State<DevicesPage> {
   bool _isScanning = false;
 
   /// _scanDevices is responsible for scanning for near by bluetooth devices, and checking to
-  /// see if the device is Trickler. If it finds trickler it will connect to the device can
+  /// see if the device is Trickler. If it finds trickler it will connect to the device and
   /// call _stopScan. If it is unable to find Trickler within 5 seconds it will call _stopScan.
 
   void _scanDevices() {
@@ -64,7 +64,6 @@ class _DevicesPageState extends State<DevicesPage> {
   /// and _isScanning back to their inital values.
 
   void _stopScan() {
-    // Stop scanning...
     _scanSubscription?.cancel();
     setState(() {
       _scanSubscription = null;
@@ -139,7 +138,7 @@ class _DevicesPageState extends State<DevicesPage> {
 
   /// _getActionButton returns an action button that corresponds to the current ConnectionStatus.
   /// The button shown when the device is disconnected will call _scanDevices onPressed. The
-  /// buttons shown when the device is connected will call disconnect onPressed. The buttons shown
+  /// button shown when the device is connected will call disconnect onPressed. The buttons shown
   /// during the scanning and connecting states are disabled and will not do anything onPressed.
 
   _getActionButton() {

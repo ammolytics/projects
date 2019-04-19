@@ -12,7 +12,7 @@ import 'models/index.dart';
 import 'reducers/index.dart';
 import 'pages/home.dart';
 
-/// main is initial function of the app. It is responsible for creating
+/// main is the initial function of the app. It is responsible for creating
 /// a Redux Store, and running an instance of the app with that store.
 
 void main() {
