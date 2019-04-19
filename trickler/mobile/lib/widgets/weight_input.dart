@@ -14,13 +14,13 @@ import '../widgets/toggle_unit_button.dart';
 class WeightInput extends StatefulWidget {
   final AppState state;
   final Function dispatch;
-  final Function syncStates;
+  final Function syncValue;
 
   WeightInput({
     Key key,
     this.state,
     this.dispatch,
-    this.syncStates,
+    this.syncValue,
   }) : super(key: key);
 
   WeightInputState createState() => WeightInputState();
@@ -98,7 +98,7 @@ class WeightInputState extends State<WeightInput> {
         onChanged: _setWeightFromText,
         onEditingComplete: () {
           inputFocus.unfocus();
-          widget.syncStates();
+          widget.syncValue();
         },
         textAlign: TextAlign.center,
         textInputAction: TextInputAction.done,

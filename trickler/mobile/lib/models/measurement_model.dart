@@ -27,16 +27,19 @@ class Measurement {
     this.targetWeight = weight;
   }
 
-  /// setActualWeight is meant to be used in conjunction with the bluetooth weight characteristic
-  /// subscription. It is supposed to set the end time stamp once the measurement is complete.
+  /// setActualWeight is a setter method responsible for updating
+  /// the actualWeight, as well as isComplete, and endTime.
 
   setActualWeight(weight) {
     weight = capWeight(weight);
     weight = roundWeight(weight, this.unit);
     this.actualWeight = weight;
-    if (this.actualWeight >= this.targetWeight) {
+    if (this.actualWeight >= this.targetWeight && this.targetWeight != 0.0) {
       this.isComplete = true;
       this.endTime = DateTime.now();
+    } else {
+      this.isComplete = false;
+      this.endTime = null;
     }
   }
 }
