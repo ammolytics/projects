@@ -17,14 +17,3 @@ Measurement currentMeasurementReducer(Measurement state, dynamic action) {
   }
   return state;
 }
-
-/// measuermentsReducer is the reducer that handles all actions related to the global measurementHistory data.
-
-List<Measurement> measuermentsReducer(List<Measurement> state, dynamic action) {
-  if (action is AddMeasurementToHistory) {
-    return []
-      ..addAll(state)
-      ..add(action.measurement);
-  }
-  return state;
-}

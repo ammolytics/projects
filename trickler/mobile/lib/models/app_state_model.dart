@@ -4,22 +4,19 @@
 part of 'index.dart';
 
 /// AppState is the model that represents the entirety of the global state for the application.
-/// It contains a currentMeasurement, mesurementHistory, and a deviceState.
+/// It contains a currentMeasurement, and a deviceState.
 
 class AppState {
   Measurement currentMeasurement;
-  List<Measurement> measurementHistory;
   DeviceState deviceState;
 
   AppState({
     this.currentMeasurement,
-    this.measurementHistory,
     this.deviceState,
   });
 
   AppState.initialState()
   : currentMeasurement = Measurement(GRAINS, 0.0, 0.0, false),
-    measurementHistory = <Measurement>[],
     deviceState = DeviceState.initialState();
 
   /// getStatusColor returns a color that reflects the current connectionStatus

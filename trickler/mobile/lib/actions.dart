@@ -64,11 +64,6 @@ class AddSubscription {
   AddSubscription(this.subscription);
 }
 
-class AddMeasurementToHistory {
-  final Measurement measurement;
-  AddMeasurementToHistory(this.measurement);
-}
-
 class ClearSubscriptions {
   ClearSubscriptions();
 }

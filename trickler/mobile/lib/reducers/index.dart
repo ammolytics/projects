@@ -17,7 +17,6 @@ part 'device_reducers.dart';
 AppState appStateReducer(AppState state, action) {
   return AppState(
     currentMeasurement: currentMeasurementReducer(state.currentMeasurement, action),
-    measurementHistory: measuermentsReducer(state.measurementHistory, action),
     deviceState: deviceStateReducer(state.deviceState, action),
   );
 }
