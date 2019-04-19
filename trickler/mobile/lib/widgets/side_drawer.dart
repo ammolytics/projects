@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 import '../pages/devices.dart';
-import '../pages/history.dart';
 
 /// SideDrawer is meant to be used as a Material sideDrawer for any Scaffold that
 /// requires Navigation functionallity. It is responsible for passing the given
@@ -69,24 +68,6 @@ class SideDrawer extends StatelessWidget {
                     connectToDevice: this.connectToDevice,
                     disconnect: this.disconnect,
                   ),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            title: Text(
-              'Measurement History',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HistoryPage(key: Key('HistoryPage')),
                 ),
               );
             },
