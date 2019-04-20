@@ -457,7 +457,9 @@ Trickler.prototype.trickle = function(mode) {
     case AutoModeStatus.OFF:
       console.log('Deactivating trickler auto mode...')
       this.pulseOff()
-      this.removeListener('weight', this._trickleListenerRef)
+      if (typeof this._trickleListenerRef !== 'undefined') {
+        this.removeListener('weight', this._trickleListenerRef)
+      }
       this.pulseOff()
       break
   }
