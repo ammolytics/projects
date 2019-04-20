@@ -84,7 +84,7 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
         this.trickler.on('ready', this._autoModeNotifyRef)
         break
       case trickler.AutoModeStatus.OFF:
-        this.trickler.removeListener('ready', this._autoModeNotifyRef
+        this.trickler.removeListener('ready', this._autoModeNotifyRef)
         break
     }
     callback(this.RESULT_SUCCESS)
