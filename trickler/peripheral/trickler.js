@@ -446,7 +446,7 @@ Trickler.prototype.trickle = function(mode) {
     case AutoModeStatus.ON:
       console.log('Activating trickler auto mode...')
       if (typeof this._trickleListenerRef === 'undefined') {
-        this._trickleListenerRef = this.tricklerListener.bind(this)
+        this._trickleListenerRef = this.trickleListener.bind(this)
       }
       var result = this.on('weight', this._trickleListenerRef)
       console.log(`listener: ${this.trickleListener}, result: ${result}`)
