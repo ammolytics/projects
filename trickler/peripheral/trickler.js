@@ -437,7 +437,9 @@ Trickler.prototype.trickleListener = function(weight) {
 
 Trickler.prototype.trickle = function(mode) {
   // Compare weight every 10 microseconds the min allowed by setInterval)
-  this.removeListener('weight', this._trickleListenerRef)
+  if (typeof this._trickleListenerRef !== 'undefined') {
+    this.removeListener('weight', this._trickleListenerRef)
+  }
   this.pulseOff()
 
   switch(mode) {
