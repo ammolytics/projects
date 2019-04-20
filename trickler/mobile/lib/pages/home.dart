@@ -8,6 +8,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import '../models/index.dart';
 import '../globals.dart';
 import '../helpers.dart';
+import '../actions.dart';
 
 import '../widgets/header.dart';
 import '../widgets/side_drawer.dart';
@@ -43,68 +44,76 @@ class _HomePageState extends State<HomePage> {
   Function _dispatch;
 
   double _prevTargetWeight = 0.0;
+  bool _prevAutoMode = false;
   String _prevUnit = GRAINS;
 
-  /// _syncTextField updates the textField to reflect the given targetWeight, as long
-  /// as the user isn't currently using the textField to update the targetWeight value.
+  /// _updateTextField updates the textField to reflect the current targetWeight, as long as the user
+  /// isn't currently using the textField to update the targetWeight value. It has an optional
+  /// override parameter that will update the textField without the weight being changed.
 
-  void _syncTextField(double targetWeight, String unit) {
-    String weightString = targetWeight.toStringAsFixed(unit == GRAINS ? 2 : 3);
-    TextEditingController controller = widget.inputKey.currentState.controller;
-    FocusNode inputFocus = widget.inputKey.currentState.inputFocus;
+  void _updateTextField({ bool override = false }) {
+    double targetWeight = _state.currentMeasurement.targetWeight;
+    String unit = _state.currentMeasurement.unit;
+    if (_prevTargetWeight != targetWeight || override) {
+      String weightString = targetWeight.toStringAsFixed(unit == GRAINS ? 2 : 3);
+      TextEditingController controller = widget.inputKey.currentState.controller;
+      FocusNode inputFocus = widget.inputKey.currentState.inputFocus;
 
-    double weightFromText = double.parse(controller.text.length > 0 ? controller.text : '0.0');
-    weightFromText = capWeight(weightFromText);
-    weightFromText = roundWeight(weightFromText, unit);
+      double weightFromText = double.parse(controller.text.length > 0 ? controller.text : '0.0');
+      weightFromText = capWeight(weightFromText);
+      weightFromText = roundWeight(weightFromText, unit);
 
-    if (inputFocus.hasFocus && targetWeight != weightFromText) {
-      inputFocus.unfocus();
-      controller.text = targetWeight > 0 ? weightString : '';
-    } else if (!inputFocus.hasFocus && weightString != controller.text) {
-      controller.text = targetWeight > 0 ? weightString : '';
+      if (inputFocus.hasFocus && targetWeight != weightFromText) {
+        inputFocus.unfocus();
+        controller.text = targetWeight > 0 ? weightString : '';
+      } else if (!inputFocus.hasFocus && weightString != controller.text) {
+        controller.text = targetWeight > 0 ? weightString : '';
+      }
     }
   }
 
-  /// _syncPeripheral updates the Trickler peripheral characteristics with the given targetWeight and unit.
+  /// _updatePeripheral is responsible for detecting any changes to the currentMeasurement,
+  /// and writing them to their respective peripheral characteristics.
 
-  void _syncPeripheral(double targetWeight, String unit, bool shouldUpdateWeight, bool shouldUpdateUnit) {
-    if (shouldUpdateWeight && shouldUpdateUnit) {
-      _updatePeripheralChar(
-        UNIT_CHAR_UUID,
-        unit == GRAINS ? [0x00] : [0x01]
-      ).then((_) {
-        _updatePeripheralChar(
-          TARGET_WEIGHT_CHAR_UUID,
-          utf8.encode('$targetWeight')
-        );
-      });
-      _prevUnit = unit;
-      _prevTargetWeight = targetWeight;
-    } else if (shouldUpdateWeight) {
-      _updatePeripheralChar(
+  void _updatePeripheral() async {
+    double targetWeight = _state.currentMeasurement.targetWeight;
+    bool autoMode = _state.currentMeasurement.isMeasuring;
+    String unit = _state.currentMeasurement.unit;
+
+    if (_prevTargetWeight != targetWeight) {
+      await _updatePeripheralChar(
         TARGET_WEIGHT_CHAR_UUID,
         utf8.encode('$targetWeight')
       );
       _prevTargetWeight = targetWeight;
-    } else if (shouldUpdateUnit) {
-      _updatePeripheralChar(
+    }
+    
+    if (_prevUnit != unit) {
+      await _updatePeripheralChar(
         UNIT_CHAR_UUID,
         unit == GRAINS ? [0x00] : [0x01]
       );
       _prevUnit = unit;
     }
+
+    if (_prevAutoMode != autoMode) {
+      await _updatePeripheralChar(
+        AUTO_MODE_CHAR_UUID,
+        autoMode ? [0x01] : [0x00]
+      );
+      _prevAutoMode = autoMode;
+    }
   }
 
-  /// _syncStates calls _syncTextField if needed as well as _syncPeripheral. It has an optional
-  /// override parameter that allows the textField to be synced with out the weight being updated.
+  /// _updateMeasurement updates any currentMeasurement values that
+  /// are supposed to be overriden by the peripheral's state.
 
-  void _syncStates({ bool override = false }) {
-    double targetWeight = _state.currentMeasurement.targetWeight;
-    String unit = _state.currentMeasurement.unit;
-    if (_prevTargetWeight != targetWeight || override) {
-      _syncTextField(targetWeight, unit);
+  _updateMeasurement() {
+    double actualDeviceWeight = _state.deviceState.characteristics.actualWeight;
+    double actualMeasurementWeight = _state.currentMeasurement.actualWeight;
+    if (actualDeviceWeight != actualMeasurementWeight) {
+      _dispatch(SetActualWeight(actualDeviceWeight));
     }
-    _syncPeripheral(targetWeight, unit, _prevTargetWeight != targetWeight, _prevUnit != unit);
   }
 
   /// _updatePeripheralChar attempts to write to the bluetooth device and update
@@ -137,7 +146,7 @@ class _HomePageState extends State<HomePage> {
             heroTag: 'closeKeyboard',
             onPressed: () {
               inputFocus.unfocus();
-              _syncStates(override: true);
+              _updateTextField(override: true);
             },
             tooltip: 'Close Keyboard',
             backgroundColor: Colors.grey,
@@ -146,53 +155,64 @@ class _HomePageState extends State<HomePage> {
           ) : AutoModeButton(
             key: Key('AutoModeButton'),
             state: _state,
-            updatePeripheralChar: _updatePeripheralChar,
+            dispatch: _dispatch,
           ),
+    );
+  }
+
+  /// _getScaffold returns a Material Scaffold, which contains
+  /// all UI elements and widgets for the home page widget.
+
+  Widget _getScaffold() {
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: Header(
+          key: Key('Header'),
+          title: widget.title,
+        ),
+      ),
+      drawer: SideDrawer(
+        key: Key('SideDrawer'),
+        connectToDevice: widget.connectToDevice,
+        disconnect: widget.disconnect,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            WeightInput(
+              key: widget.inputKey,
+              state: _state,
+              dispatch: _dispatch,
+              syncValue: () => _updateTextField(override: true),
+            ),
+            WeightButtons(
+              key: Key('Weight Buttons'),
+              state: _state,
+              dispatch: _dispatch,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: _getFloatingActionButton(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     _dispatch = (action) => StoreProvider.of<AppState>(context).dispatch(action);
+
+    /// StoreConnector provides the app with the current global AppState.
     return StoreConnector<AppState, AppState>(
       converter: (store) => store.state,
       builder: (context, state) {
         _state = state;
-        _syncStates();
-        return Scaffold(
-          resizeToAvoidBottomPadding: false,
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60.0),
-            child: Header(
-              key: Key('Header'),
-              title: widget.title,
-            ),
-          ),
-          drawer: SideDrawer(
-            key: Key('SideDrawer'),
-            connectToDevice: widget.connectToDevice,
-            disconnect: widget.disconnect,
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                WeightInput(
-                  key: widget.inputKey,
-                  state: _state,
-                  dispatch: _dispatch,
-                  syncStates: () => _syncStates(override: true),
-                ),
-                WeightButtons(
-                  key: Key('Weight Buttons'),
-                  state: _state,
-                  dispatch: _dispatch,
-                ),
-              ],
-            ),
-          ),
-          floatingActionButton: _getFloatingActionButton(),
-        );
+        _updateTextField();
+        _updatePeripheral();
+        _updateMeasurement();
+        return _getScaffold();
       }
     );
   }

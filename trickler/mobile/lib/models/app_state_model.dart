@@ -16,7 +16,7 @@ class AppState {
   });
 
   AppState.initialState()
-  : currentMeasurement = Measurement(GRAINS, 0.0, 0.0, false),
+  : currentMeasurement = Measurement(GRAINS, 0.0, 0.0, false, false),
     deviceState = DeviceState.initialState();
 
   /// getStatusColor returns a color that reflects the current connectionStatus

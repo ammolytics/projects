@@ -3,31 +3,31 @@
 
 import 'package:flutter/material.dart';
 import '../models/index.dart';
-import '../globals.dart';
+import '../actions.dart';
 
 /// AutoModeButton creates a FloatingActionButton that allows the user to
 /// toggle the auto mode characteristic on the bluetooth device.
 
 class AutoModeButton extends StatelessWidget {
   final AppState state;
-  final Function updatePeripheralChar;
+  final Function dispatch;
 
   AutoModeButton({
     Key key,
     this.state,
-    this.updatePeripheralChar,
+    this.dispatch,
   }) : super(key: key);
 
-  /// _toggleAutoMode is responsible for updating the AutoMode char to be the opposite of its current value.
+  /// _toggleAutoMode dispatches the opposite of the current isMeasuring value.
 
   void _toggleAutoMode() {
-    bool autoMode = this.state.deviceState.characteristics.autoMode;
-    this.updatePeripheralChar(AUTO_MODE_CHAR_UUID, autoMode ? [0x00] : [0x01]);
+    bool autoMode = this.state.currentMeasurement.isMeasuring;
+    this.dispatch(SetIsMeasuring(!autoMode));
   }
 
   @override
   Widget build(BuildContext context) {
-    return this.state.deviceState.characteristics.autoMode ?
+    return this.state.currentMeasurement.isMeasuring ?
       FloatingActionButton(
         heroTag: 'turnAutoModeOff',
         onPressed: _toggleAutoMode,

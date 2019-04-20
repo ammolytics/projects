@@ -29,6 +29,11 @@ class SetActualWeight {
   SetActualWeight(this.weight);
 }
 
+class SetIsMeasuring {
+  final bool isMeasuring;
+  SetIsMeasuring(this.isMeasuring);
+}
+
 class ResetDeviceState {
   ResetDeviceState();
 }

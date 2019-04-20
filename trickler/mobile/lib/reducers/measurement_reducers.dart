@@ -14,6 +14,8 @@ Measurement currentMeasurementReducer(Measurement state, dynamic action) {
     state.setTargetWeight(action.weight);
   } else if (action is SetActualWeight) {
     state.setActualWeight(action.weight);
+  } else if (action is SetIsMeasuring) {
+    state.isMeasuring = action.isMeasuring;
   }
   return state;
 }
