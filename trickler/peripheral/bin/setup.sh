@@ -23,8 +23,8 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 
 
-npm install -g prebuild
-npm install -g node-gyp
+sudo npm install -g prebuild
+sudo npm install -g node-gyp
 npm install
 
 
