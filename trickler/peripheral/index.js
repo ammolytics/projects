@@ -26,6 +26,10 @@ const TRICKLER = new trickler.Trickler(port)
 var deviceInfoService = new DeviceInfoService(TRICKLER)
 var service = new TricklerService(TRICKLER)
 
+// Set trickler instance on the Mock for monitoring.
+if (process.env.MOCK) {
+  MockScale.setTrickler(TRICKLER)
+}
 
 //
 // Wait until the BLE radio powers on before attempting to advertise.

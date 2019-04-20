@@ -49,7 +49,10 @@ AutoModeCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValu
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
 
-  this.trickler.on('autoMode', this.sendAutoModeNotification.bind(this))
+  if (typeof this._autoModeNotifyRef === 'undefined') {
+    this._autoModeNotifyRef = this.sendAutoModeNotification.bind(this)
+  }
+  this.trickler.on('autoMode', this._autoModeNotifyRef)
 }
 
 
@@ -57,7 +60,7 @@ AutoModeCharacteristic.prototype.onUnsubscribe = function() {
   this.maxValueSize = null
   this.updateValueCallback = null
 
-  this.trickler.removeListener('autoMode', this.sendAutoModeNotification.bind(this))
+  this.trickler.removeListener('autoMode', this._autoModeNotifyRef)
 }
 
 
@@ -70,15 +73,18 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
   } else {
     var autoMode = data.readUInt8(0)
     console.log(`request to switch autoMode from ${this.trickler.autoMode} to ${autoMode}`)
-    this.trickler.once('autoMode', this.sendAutoModeNotification.bind(this))
+    if (typeof this._autoModeNotifyRef === 'undefined') {
+      this._autoModeNotifyRef = this.sendAutoModeNotification.bind(this)
+    }
+    this.trickler.once('autoMode', this._autoModeNotifyRef)
     this.trickler.autoMode = autoMode
 
     switch (autoMode) {
       case trickler.AutoModeStatus.ON:
-        this.trickler.on('ready', this.sendAutoModeNotification.bind(this))
+        this.trickler.on('ready', this._autoModeNotifyRef)
         break
       case trickler.AutoModeStatus.OFF:
-        this.trickler.removeListener('ready', this.sendAutoModeNotification.bind(this))
+        this.trickler.removeListener('ready', this._autoModeNotifyRef
         break
     }
     callback(this.RESULT_SUCCESS)

@@ -135,10 +135,14 @@ function Trickler(port) {
   this.port.pipe(parser)
 
   parser.on('data', line => {
-    var now = new Date(Date.now()).toISOString()
+    var now = new Date().toISOString()
     var rawStatus = line.substr(0, 2).trim()
     var values = {
       status: StatusMap[rawStatus]
+    }
+
+    if (process.env.VERBOSE) {
+      console.log(`${now}]  [${line}`)
     }
 
     switch (values.status) {
@@ -433,15 +437,16 @@ Trickler.prototype.trickleListener = function(weight) {
 
 Trickler.prototype.trickle = function(mode) {
   // Compare weight every 10 microseconds the min allowed by setInterval)
-  this.pulseOff()
-  this.removeListener('weight', this.trickleListener.bind(this))
-  this.removeListener('weight', this.trickleListener)
+  this.removeListener('weight', this._trickleListenerRef)
   this.pulseOff()
 
   switch(mode) {
     case AutoModeStatus.ON:
       console.log('Activating trickler auto mode...')
-      var result = this.on('weight', this.trickleListener.bind(this))
+      if (typeof this._trickleListenerRef === 'undefined') {
+        this._trickleListenerRef = this.tricklerListener.bind(this)
+      }
+      var result = this.on('weight', this._trickleListenerRef)
       console.log(`listener: ${this.trickleListener}, result: ${result}`)
       // force emit to kick things off.
       this.emit('weight', this.weight)
@@ -450,8 +455,7 @@ Trickler.prototype.trickle = function(mode) {
     case AutoModeStatus.OFF:
       console.log('Deactivating trickler auto mode...')
       this.pulseOff()
-      this.removeListener('weight', this.trickleListener.bind(this))
-      this.removeListener('weight', this.trickleListener)
+      this.removeListener('weight', this._trickleListenerRef)
       this.pulseOff()
       break
   }
