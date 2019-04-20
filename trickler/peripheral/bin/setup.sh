@@ -23,6 +23,7 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 fi
 
 
+sudo npm install -g npm@latest
 sudo npm install -g prebuild
 sudo npm install -g node-gyp
 npm install
