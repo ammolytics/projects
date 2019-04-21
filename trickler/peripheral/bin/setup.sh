@@ -26,6 +26,7 @@ fi
 sudo npm install -g npm@latest
 sudo npm install -g prebuild
 sudo npm install -g node-gyp
+sudo npm install -g pm2@latest 
 npm install
 
 
@@ -33,4 +34,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   # Linux
   echo "Linux";
   npm install --no-save bluetooth-hci-socket@npm:@abandonware/bluetooth-hci-socket;
+  sudo ln -s /usr/local/lib/nodejs/node-v8.16.0-linux-armv6l/lib/node_modules/pm2/bin/pm2 /usr/bin/pm2
+  sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 fi
