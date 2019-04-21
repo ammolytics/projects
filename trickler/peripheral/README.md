@@ -21,6 +21,13 @@ From the menu:
 - Change `Network > Hostname` from `raspberrypi` to `opentrickler` 
 - Run `Advanced Options > Expand Filesystem` to provide more space on the SD card
 
+After making this changes, select `Finish`. It will ask if you want to reboot, select `Yes`.
+At this point, you will be disconnected. It'll take about 60 seconds for the system to come back online with a new hostname.
+
+Reconnect with SSH
+```
+ssh pi@opentrickler.local
+```
 
 Install system dependencies
 
