@@ -1,3 +1,52 @@
-## Wiring
+# Open Trickler Controller
 
-https://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors?view=all
+This portion of the Open Trickler is used to control the scale and trickler motor. It's designed to be run on a Raspberry Pi Zero W, but any similar system which supports Bluetooth will likely work as well.
+
+# Instructions
+
+[Download](https://www.raspberrypi.org/downloads/raspbian/) and [install](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) Raspbian Lite
+I recommend [enabling SSH and Wifi](https://desertbot.io/blog/setup-pi-zero-w-headless-wifi)
+
+Install system dependencies
+
+```
+sudo apt-get update
+sudo apt-get install -yqq git bluetooth bluez libbluetooth-dev libudev-dev
+```
+
+Get a copy of the Open Trickler code
+```
+git clone https://github.com/ammolytics/projects.git
+```
+
+Run the Open Trickler setup
+_**Note:** The `setup.sh` script is intended for the Pi Zero W. If you're using a different board, you'll need to change the version of NodeJS from `armv6l` to match the chipset of your system._
+```
+cd projects/trickler/peripheral
+./bin/setup.sh
+```
+
+Start the Open Trickler
+```
+node index.js
+```
+
+To run it as a service
+```
+pm2 start index.js
+pm2 startup systemd
+sudo env PATH=$PATH:/usr/local/lib/nodejs/node-v8.16.0-linux-armv6l/bin /usr/local/lib/nodejs/node-v8.16.0-linux-armv6l/lib/node_modules/pm2/bin/pm2 startup systemd -u pi --hp /home/pi
+pm2 save
+sudo systemctl start pm2-pi
+systemctl status pm2-pi
+```
+
+
+## References
+- [Headless Raspberry Pi Zero W Setup](https://dev.to/vorillaz/headless-raspberry-pi-zero-w-setup-3llj)
+- [Headless Raspberry Pi Zero W setup with SSH and Wi-Fi](https://medium.com/@jay_proulx/headless-raspberry-pi-zero-w-setup-with-ssh-and-wi-fi-8ddd8c4d2742)
+- [Raspberry Pi Zero Headless Quick Start](https://learn.adafruit.com/raspberry-pi-zero-creation?view=all)
+- [Headless Pi Zero W WiFi Setup (Mac)](https://desertbot.io/blog/setup-pi-zero-w-headless-wifi)
+- [bleno Instructions](https://github.com/noble/bleno)
+- [Arduino Lesson 13: DC Motors](https://learn.adafruit.com/adafruit-arduino-lesson-13-dc-motors?view=all)
+- [How To Set Up a Node.js Application for Production on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04)
