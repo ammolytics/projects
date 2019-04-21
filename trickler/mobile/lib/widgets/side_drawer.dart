@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../pages/devices.dart';
+import '../pages/about.dart';
 
 /// SideDrawer is meant to be used as a Material sideDrawer for any Scaffold that
 /// requires Navigation functionallity. It is responsible for passing the given
@@ -67,6 +68,26 @@ class SideDrawer extends StatelessWidget {
                     key: Key('DevicesPage'),
                     connectToDevice: this.connectToDevice,
                     disconnect: this.disconnect,
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            title: Text(
+              'About Trickler',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AboutPage(
+                    key: Key('AboutPage'),
                   ),
                 ),
               );
