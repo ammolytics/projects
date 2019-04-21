@@ -448,8 +448,7 @@ Trickler.prototype.trickle = function(mode) {
       if (typeof this._trickleListenerRef === 'undefined') {
         this._trickleListenerRef = this.trickleListener.bind(this)
       }
-      var result = this.on('weight', this._trickleListenerRef)
-      console.log(`listener: ${this.trickleListener}, result: ${result}`)
+      this.on('weight', this._trickleListenerRef)
       // force emit to kick things off.
       this.emit('weight', this.weight)
       break

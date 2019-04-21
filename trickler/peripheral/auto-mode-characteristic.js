@@ -35,6 +35,7 @@ AutoModeCharacteristic.prototype.sendAutoModeNotification = function(result) {
 }
 
 AutoModeCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`autoMode read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
@@ -46,6 +47,7 @@ AutoModeCharacteristic.prototype.onReadRequest = function(offset, callback) {
 
 
 AutoModeCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  console.log(`Subscribe from autoMode`)
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
 
@@ -57,6 +59,7 @@ AutoModeCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValu
 
 
 AutoModeCharacteristic.prototype.onUnsubscribe = function() {
+  console.log(`Unsubscribe from autoMode`)
   this.maxValueSize = null
   this.updateValueCallback = null
 
@@ -65,7 +68,7 @@ AutoModeCharacteristic.prototype.onUnsubscribe = function() {
 
 
 AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
-  console.log(`onWrite called: ${arguments}`)
+  console.log(`autoMode write request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG)
   } else if (data.length !== 1) {

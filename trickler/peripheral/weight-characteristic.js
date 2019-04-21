@@ -26,6 +26,7 @@ util.inherits(WeightCharacteristic, bleno.Characteristic)
 
 
 WeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`weight read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
@@ -37,7 +38,7 @@ WeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
 
 WeightCharacteristic.prototype.sendWeightNotification = function(result) {
   if (process.env.DEBUG) {
-    console.log(`Trying to send weight: ${result}, fn: ${this.updateValueCallback}`)
+    console.log(`Trying to send weight: ${result}`)
   }
   if (this.updateValueCallback) {
     var data = Buffer.from(Number(result).toString())
@@ -52,7 +53,7 @@ WeightCharacteristic.prototype.sendWeightNotification = function(result) {
 WeightCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
-  console.log(`Subscribed to weight characteristic. fn: ${this.sendWeightNotification}, updateFn: ${updateValueCallback}, this: ${this}`)
+  console.log(`Subscribed to weight characteristic.`)
 
   if (typeof this._weightNotifyRef === 'undefined') {
     this._weightNotifyRef = this.sendWeightNotification.bind(this)

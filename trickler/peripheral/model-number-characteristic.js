@@ -32,6 +32,7 @@ util.inherits(ModelNumberCharacteristic, bleno.Characteristic)
 
 
 ModelNumberCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`model number read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {

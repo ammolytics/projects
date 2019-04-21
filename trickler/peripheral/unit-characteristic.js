@@ -27,6 +27,7 @@ util.inherits(UnitCharacteristic, bleno.Characteristic)
 
 
 UnitCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`unit read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
@@ -47,6 +48,7 @@ UnitCharacteristic.prototype.sendUnitNotification = function(result) {
 
 
 UnitCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  console.log(`Subscribed to unit`)
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
 
@@ -58,6 +60,7 @@ UnitCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCal
 
 
 UnitCharacteristic.prototype.onUnsubscribe = function() {
+  console.log(`Unsubscribed from unit`)
   this.maxValueSize = null
   this.updateValueCallback = null
 
@@ -66,6 +69,7 @@ UnitCharacteristic.prototype.onUnsubscribe = function() {
 
 
 UnitCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
+  console.log(`unit write request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG)
   } else if (data.length !== 1) {

@@ -26,6 +26,7 @@ util.inherits(StabilityCharacteristic, bleno.Characteristic)
 
 
 StabilityCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`stability read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
@@ -46,6 +47,7 @@ StabilityCharacteristic.prototype.sendStatusNotification = function(result) {
 
 
 StabilityCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+  console.log(`Subscribed to stability.`)
   this.maxValueSize = maxValueSize
   this.updateValueCallback = updateValueCallback
 
@@ -58,6 +60,7 @@ StabilityCharacteristic.prototype.onSubscribe = function(maxValueSize, updateVal
 
 
 StabilityCharacteristic.prototype.onUnsubscribe = function() {
+  console.log(`Unsubscribed from stability.`)
   this.maxValueSize = null
   this.updateValueCallback = null
 
