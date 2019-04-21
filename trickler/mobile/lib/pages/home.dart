@@ -111,7 +111,7 @@ class _HomePageState extends State<HomePage> {
   _updateMeasurement() {
     double actualDeviceWeight = _state.deviceState.characteristics.actualWeight;
     double actualMeasurementWeight = _state.currentMeasurement.actualWeight;
-    if (actualDeviceWeight != actualMeasurementWeight) {
+    if (!actualDeviceWeight.isNaN && actualDeviceWeight != actualMeasurementWeight) {
       _dispatch(SetActualWeight(actualDeviceWeight));
     }
   }

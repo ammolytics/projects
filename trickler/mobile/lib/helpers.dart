@@ -22,7 +22,7 @@ double roundWeight(weight, unit) {
   double value = double.parse(weight.toStringAsFixed(4));
   int decimals = unit == GRAMS ? 3 : 2;
   decimals = pow(10, decimals);
-  value *= decimals;
-  value = value.round() / decimals;
+  value *= decimals.toDouble();
+  value = value.round() / decimals.toDouble();
   return value;
 }
