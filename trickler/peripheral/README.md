@@ -4,8 +4,23 @@ This portion of the Open Trickler is used to control the scale and trickler moto
 
 # Instructions
 
-[Download](https://www.raspberrypi.org/downloads/raspbian/) and [install](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) Raspbian Lite
+[Download](https://www.raspberrypi.org/downloads/raspbian/) and [install](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) Raspbian Lite.
 I recommend [enabling SSH and Wifi](https://desertbot.io/blog/setup-pi-zero-w-headless-wifi)
+
+Once booted, connect via SSH
+```
+ssh pi@raspberrypi@local
+```
+
+Initial configuration
+```
+sudo raspi-config
+```
+
+From the menu:
+- Change `Network > Hostname` from `raspberrypi` to `opentrickler` 
+- Run `Advanced Options > Expand Filesystem` to provide more space on the SD card
+
 
 Install system dependencies
 
