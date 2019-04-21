@@ -36,6 +36,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Linux";
   npm install --no-save bluetooth-hci-socket@npm:@abandonware/bluetooth-hci-socket;
   sudo npm install -g pm2@latest;
-  sudo ln -s /usr/local/lib/nodejs/$VERS/lib/node_modules/pm2/bin/pm2 /usr/bin/pm2;
+  sudo ln -fs /usr/local/lib/nodejs/$VERS/lib/node_modules/pm2/bin/pm2 /usr/bin/pm2;
   sudo setcap cap_net_raw+eip $(eval readlink -f `which node`);
 fi
