@@ -332,12 +332,16 @@ Trickler.prototype.clearPulse = function() {
 
 Trickler.prototype._runFn = function() {
   this.clearPulse()
+  // Prevent pulseOn from being fired until it's reset below.
+  this._pulseTimeout = -1
   this.motorOn()
   this._pulseTimeout = setTimeout(this._waitFn.bind(this), this.pulseSpeed.ON)
 }
 
 Trickler.prototype._waitFn = function() {
   this.clearPulse()
+  // Prevent pulseOn from being fired until it's reset below.
+  this._pulseTimeout = -1
   this.motorOff()
   this._pulseTimeout = setTimeout(this._runFn.bind(this), this.pulseSpeed.OFF)
 }
@@ -386,10 +390,10 @@ Trickler.prototype.runnerFn = function(weight) {
         this.pulseOff()
         this.runningMode = RunningMode.NOGO
       } else {
-        if (delta <= 0.1) {
+        if (delta <= 0.2) {
           console.log('Very slow trickle...')
           this.pulseSpeed = PulseSpeeds.VERY_SLOW
-        } else if (delta <= 0.2) {
+        } else if (delta <= 0.4) {
           console.log('Slow trickle...')
           this.pulseSpeed = PulseSpeeds.SLOW
         } else if (delta < 0.8) {
@@ -417,7 +421,7 @@ Trickler.prototype.trickleListener = function(weight) {
   switch(this.runningMode) {
     case RunningMode.NOGO:
       // Reached EQUAL or OVER. Waiting for empty pan on scale (zero/stable).
-      if (weight >= 0 && this.status === TricklerStatus.STABLE && this.stableTime() >= 1000) {
+      if (weight >= 0 && this.status === TricklerStatus.STABLE && this.stableTime() >= 2000) {
         // Turn back on after stable weight of zero for at least a second.
         console.log(`Setting mode to GO and kicking it off.`)
         this.runningMode = RunningMode.GO
