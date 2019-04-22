@@ -11,10 +11,13 @@ PODS:
     - Flutter
     - Protobuf
   - Protobuf (3.6.1)
+  - url_launcher (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
   - flutter_blue (from `.symlinks/plugins/flutter_blue/ios`)
+  - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -26,12 +29,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/flutter/ios"
   flutter_blue:
     :path: ".symlinks/plugins/flutter_blue/ios"
+  url_launcher:
+    :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
   "!ProtoCompiler": c9526df99fafd398a393def617ae18d3774b7232
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
   flutter_blue: 2552a05424464ae985bc8b28db6c251c7fd9dfe1
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
+  url_launcher: 92b89c1029a0373879933c21642958c874539095
 
 PODFILE CHECKSUM: 3389836f37640698630b8f0670315d626d5f1469
 
