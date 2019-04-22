@@ -29,6 +29,7 @@ util.inherits(SerialNumberCharacteristic, bleno.Characteristic)
 
 
 SerialNumberCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`serial number read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {

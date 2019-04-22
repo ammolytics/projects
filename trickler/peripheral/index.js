@@ -10,16 +10,20 @@ const trickler = require('./trickler')
 const DeviceInfoService = require('./device-info-service')
 const TricklerService = require('./trickler-service')
 
+// The last argument passed in should be the device path (e.g. /dev/ttyUSB0)
+const devPath = process.argv[process.argv.length - 1]
+const BAUD_RATE = 19200
+
 // Create mock binding if env MOCK is set.
 if (process.env.MOCK) {
   console.log('Using Mock interface')
   const MockScale = require('./mock-scale')
   SerialPort.Binding = MockScale
   // Create a port and enable the echo and recording.
-  MockScale.createPort('/dev/ttyUSB0', { echo: true, record: true })
+  MockScale.createPort(devPath, { echo: true, record: true })
 }
 
-const port = new SerialPort('/dev/ttyUSB0', { baudRate: 19200 })
+const port = new SerialPort(devPath, { baudRate: BAUD_RATE })
 const PERIPHERAL_NAME = 'Trickler'
 const TRICKLER = new trickler.Trickler(port)
 

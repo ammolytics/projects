@@ -29,6 +29,7 @@ util.inherits(TargetWeightCharacteristic, bleno.Characteristic)
 
 
 TargetWeightCharacteristic.prototype.onReadRequest = function(offset, callback) {
+  console.log(`target weight read request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG, null)
   } else {
@@ -40,6 +41,7 @@ TargetWeightCharacteristic.prototype.onReadRequest = function(offset, callback) 
 
 
 TargetWeightCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
+  console.log(`target weight write request`)
   if (offset) {
     callback(this.RESULT_ATTR_NOT_LONG)
   } else if (data.length === 0) {

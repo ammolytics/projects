@@ -50,17 +50,19 @@ cd projects/trickler/peripheral
 
 Start the Open Trickler
 ```
-node index.js
+node index.js /dev/ttyUSB0
 ```
 
 To run it as a service
 ```
-pm2 start index.js
+pm2 start ecosystem.config.js
 pm2 startup systemd
-sudo env PATH=$PATH:/usr/local/lib/nodejs/node-v8.16.0-linux-armv6l/bin /usr/local/lib/nodejs/node-v8.16.0-linux-armv6l/lib/node_modules/pm2/bin/pm2 startup systemd -u pi --hp /home/pi
+```
+Run the command that it returns, which will look something like `sudo env PATH=$PATH:/usr/local/.../node_modules/pm2/bin/pm2 startup systemd -u pi --hp /home/pi
+`
+```
 pm2 save
 sudo systemctl start pm2-pi
-systemctl status pm2-pi
 ```
 
 
