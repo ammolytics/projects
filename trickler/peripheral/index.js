@@ -38,10 +38,12 @@ bleno.on('stateChange', function(state) {
   console.log(`on -> stateChange: ${state}`)
   if (state === 'poweredOn') {
     bleno.startAdvertising(PERIPHERAL_NAME, [service.uuid], function(err) {
-      console.log(err);
-    });
+      if (err) {
+        console.log(err)
+      }
+    })
   } else {
-    bleno.stopAdvertising();
+    bleno.stopAdvertising()
   }
 })
 
@@ -49,11 +51,11 @@ bleno.on('stateChange', function(state) {
 bleno.on('advertisingStart', function(err) {
   console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
   if (!err) {
-    console.log('advertising...');
+    console.log('advertising...')
     bleno.setServices([
       deviceInfoService,
       service
-    ]);
+    ])
   }
 })
 
