@@ -9,10 +9,10 @@ const rpio = require('rpio')
 const Readline = require('@serialport/parser-readline')
 
 /**
-  * Raspberry Pi: physical pin 11,  BCM pin 17
-  * https://pinout.xyz/pinout/pin11_gpio17
+  * Raspberry Pi: physical pin 15, BCM pin 22
+  * https://pinout.xyz/pinout/pin15_gpio22
   */
-const MOTOR_PIN = 11
+const MOTOR_PIN = 15
 
 const TricklerUnits = {
   GRAINS: 0,
