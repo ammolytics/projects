@@ -35,33 +35,37 @@ var service = new TricklerService(TRICKLER)
 // If you don't have a BLE radio, then it will never power on!
 //
 bleno.on('stateChange', function(state) {
+  console.log(`on -> stateChange: ${state}`)
   if (state === 'poweredOn') {
-    //
-    // We will also advertise the service ID in the advertising packet,
-    // so it's easier to find.
-    //
     bleno.startAdvertising(PERIPHERAL_NAME, [service.uuid], function(err) {
-      if (err) {
-        console.log(err);
-      }
+      console.log(err);
     });
-  }
-  else {
+  } else {
     bleno.stopAdvertising();
   }
 })
 
 
 bleno.on('advertisingStart', function(err) {
+  console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
   if (!err) {
     console.log('advertising...');
-    //
-    // Once we are advertising, it's time to set up our services,
-    // along with our characteristics.
-    //
     bleno.setServices([
       deviceInfoService,
       service
     ]);
   }
 })
+
+bleno.on('advertisingStop', function() {
+  console.log('on -> advertisingStop')
+})
+
+bleno.on('advertisingStartError', function(err) {
+  console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
+})
+
+bleno.on('disconnect', function(clientAddress) {
+  console.log(`Client disconnected: ${clientAddress}`)
+})
+
