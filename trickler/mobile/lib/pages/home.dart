@@ -75,13 +75,13 @@ class _HomePageState extends State<HomePage> {
   /// _updatePeripheral is responsible for detecting any changes to the currentMeasurement,
   /// and writing them to their respective peripheral characteristics.
 
-  void _updatePeripheral() async {
+  void _updatePeripheral() {
     double targetWeight = _state.currentMeasurement.targetWeight;
     bool autoMode = _state.currentMeasurement.isMeasuring;
     String unit = _state.currentMeasurement.unit;
 
     if (_prevTargetWeight != targetWeight) {
-      await _updatePeripheralChar(
+      _updatePeripheralChar(
         TARGET_WEIGHT_CHAR_UUID,
         utf8.encode('$targetWeight')
       );
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
     }
     
     if (_prevUnit != unit) {
-      await _updatePeripheralChar(
+      _updatePeripheralChar(
         UNIT_CHAR_UUID,
         unit == GRAINS ? [0x00] : [0x01]
       );
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     if (_prevAutoMode != autoMode) {
-      await _updatePeripheralChar(
+      _updatePeripheralChar(
         AUTO_MODE_CHAR_UUID,
         autoMode ? [0x01] : [0x00]
       );
@@ -119,17 +119,14 @@ class _HomePageState extends State<HomePage> {
   /// _updatePeripheralChar attempts to write to the bluetooth device and update
   /// the characteristic with the given uuid to reflect the given value.
 
-  Future _updatePeripheralChar(String uuid, dynamic value) {
+  void _updatePeripheralChar(String uuid, dynamic value) async {
     BluetoothDevice device = _state.deviceState.device;
     BluetoothService service = _state.deviceState.service;
     dynamic characteristic = service?.characteristics != null ?
       service.characteristics.where((char) => char.uuid.toString() == uuid).single : null;
 
-    if (characteristic != null && characteristic.properties.write) {
-      return device.writeCharacteristic(characteristic, value,
-        type: CharacteristicWriteType.withResponse);
-    }
-    return Future(() {});
+    await device.writeCharacteristic(characteristic, value,
+      type: CharacteristicWriteType.withResponse);
   }
 
   /// _getFloatingActionButton provides the keyboard close button when the keyboard
