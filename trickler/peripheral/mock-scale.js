@@ -184,7 +184,7 @@ class MockScale extends MockBinding {
     // Check for a new command every 10 ms.
     setInterval(commander, 10)
     // emit weight every 50 ms.
-    setInterval(this.getCurrentWeight.bind(this), 50)
+    setInterval(this._printWeight.bind(this), 50)
   }
 
   // Add or remove weight from the scale.
