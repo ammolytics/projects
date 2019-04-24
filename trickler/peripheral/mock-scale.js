@@ -159,11 +159,13 @@ class MockScale extends MockBinding {
 
     this._delay = 50
     this._unit = trickler.TricklerUnits.GRAINS
-    this._interval = setInterval(this._grainFn.bind(this), this._delay)
+    this._currentWeight = 0
+    this._tareWeight = 0
 
     // For a given command, the mock should respond accordingly.
     var commands = {}
     commands[trickler.CommandMap.MODE_BTN] = this.modeBtnAction.bind(this)
+    commands[trickler.CommandMap.REZERO_BTN] = this.rezeroBtnAction.bind(this)
 
     // Command runnner
     var commander = () => {
@@ -181,51 +183,45 @@ class MockScale extends MockBinding {
 
     // Check for a new command every 10 ms.
     setInterval(commander, 10)
+    // emit weight every 50 ms.
+    setInterval(this.getCurrentWeight.bind(this), 50)
+  }
+
+  // Add or remove weight from the scale.
+  changeWeight(weight) {
+    this._currentWeight = weight
+  }
+
+  getCurrentWeight() {
+    return this._currentWeight - this._tareWeight
+  }
+
+  rezeroBtnAction() {
+    console.log('Rezeroing the scale')
+    this._tareWeight = this._currentWeight 
   }
 
   // Act like the mode button was pressed, change units.
   modeBtnAction() {
-    console.log('running mode btn')
-    clearInterval(this._interval)
-    switch (this._unit) {
+    console.log('Toggling scale mode/unit')
+    this._unit = trickler.TricklerUnits.GRAINS === this._unit ? trickler.TricklerUnits.GRAMS : trickler.TricklerUnits.GRAINS
+  }
+
+  _printWeight() {
+    var sign = Math.sign(this.getCurrentWeight())
+
+    switch(this._unit) {
       case trickler.TricklerUnits.GRAINS:
-        this._unit = trickler.TricklerUnits.GRAMS
-        this._interval = setInterval(this._gramFn.bind(this), this._delay)
+        var unit = 'GN'
+        var weight = formatGrains(sign * this.getCurrentWeight())
         break
       case trickler.TricklerUnits.GRAMS:
-        this._unit = trickler.TricklerUnits.GRAINS
-        this._interval = setInterval(this._grainFn.bind(this), this._delay)
+        var unit = ' g'
+        var weight = formatGrams(sign * this.getCurrentWeight())
         break
     }
-  }
 
-  // Return a random reading in grains.
-  _grainFn() {
-    var randomVal = [
-      '000',
-      randomInt(),
-      randomInt(),
-      '.',
-      randomInt(),
-      randomInt(),
-    ].join('')
-    this.emitData(`ST,+${randomVal} GN\r\n`)
-  }
-
-  // Return a random reading in grams.
-  _gramFn() {
-    var randomVal = [
-      '0',
-      randomInt(),
-      randomInt(),
-      randomInt(),
-      '.',
-      randomInt(),
-      randomInt(),
-      randomInt(),
-    ].join('')
-
-    this.emitData(`ST,+${randomVal}  g\r\n`)
+    this.emitData(`ST,${sign}${weight} ${unit}\r\n`)
   }
 }
 
