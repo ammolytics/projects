@@ -75,32 +75,32 @@ class _HomePageState extends State<HomePage> {
   /// _updatePeripheral is responsible for detecting any changes to the currentMeasurement,
   /// and writing them to their respective peripheral characteristics.
 
-  void _updatePeripheral() {
+  void _updatePeripheral() async {
+    BluetoothDevice device = _state.deviceState.device;
+    BluetoothService service = _state.deviceState.service;
     double targetWeight = _state.currentMeasurement.targetWeight;
     bool autoMode = _state.currentMeasurement.isMeasuring;
     String unit = _state.currentMeasurement.unit;
+    dynamic char;
 
-    if (_prevTargetWeight != targetWeight) {
-      _updatePeripheralChar(
-        TARGET_WEIGHT_CHAR_UUID,
-        utf8.encode('$targetWeight')
-      );
+    char = getCharFromUUID(TARGET_WEIGHT_CHAR_UUID, service);
+    if (_prevTargetWeight != targetWeight && char != null) {
+      await device.writeCharacteristic(char, utf8.encode('$targetWeight'),
+        type: CharacteristicWriteType.withResponse);
       _prevTargetWeight = targetWeight;
     }
     
-    if (_prevUnit != unit) {
-      _updatePeripheralChar(
-        UNIT_CHAR_UUID,
-        unit == GRAINS ? [0x00] : [0x01]
-      );
+    char = getCharFromUUID(UNIT_CHAR_UUID, service);
+    if (_prevUnit != unit && char != null) {
+      await device.writeCharacteristic(char, unit == GRAINS ? [0x00] : [0x01],
+        type: CharacteristicWriteType.withResponse);
       _prevUnit = unit;
     }
 
-    if (_prevAutoMode != autoMode) {
-      _updatePeripheralChar(
-        AUTO_MODE_CHAR_UUID,
-        autoMode ? [0x01] : [0x00]
-      );
+    char = getCharFromUUID(AUTO_MODE_CHAR_UUID, service);
+    if (_prevAutoMode != autoMode && char != null) {
+      await device.writeCharacteristic(char, autoMode ? [0x01] : [0x00],
+        type: CharacteristicWriteType.withResponse);
       _prevAutoMode = autoMode;
     }
   }
@@ -114,19 +114,6 @@ class _HomePageState extends State<HomePage> {
     if (!actualDeviceWeight.isNaN && actualDeviceWeight != actualMeasurementWeight) {
       _dispatch(SetActualWeight(actualDeviceWeight));
     }
-  }
-
-  /// _updatePeripheralChar attempts to write to the bluetooth device and update
-  /// the characteristic with the given uuid to reflect the given value.
-
-  void _updatePeripheralChar(String uuid, dynamic value) async {
-    BluetoothDevice device = _state.deviceState.device;
-    BluetoothService service = _state.deviceState.service;
-    dynamic characteristic = service?.characteristics != null ?
-      service.characteristics.where((char) => char.uuid.toString() == uuid).single : null;
-
-    await device.writeCharacteristic(characteristic, value,
-      type: CharacteristicWriteType.withResponse);
   }
 
   /// _getFloatingActionButton provides the keyboard close button when the keyboard

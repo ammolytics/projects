@@ -2,6 +2,7 @@
 /// Released under the MIT license. See LICENSE file in the project root for details.
 
 import 'dart:math';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'globals.dart';
 
 /// capWeight returns a value that is within the range of [0.0 - 100.0) based on the given weight.
@@ -25,4 +26,12 @@ double roundWeight(weight, unit) {
   value *= decimals.toDouble();
   value = value.round() / decimals.toDouble();
   return value;
+}
+
+/// getCharFromUUID returns a characteristic from the given services characteristics, that
+/// contains the given uuid. It will return null if it can't find the characteristic.
+
+dynamic getCharFromUUID(String uuid, BluetoothService service) {
+  return service?.characteristics != null ? service.characteristics
+    .where((char) => char.uuid.toString() == uuid).single : null;
 }
