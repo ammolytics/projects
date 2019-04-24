@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   /// override parameter that will update the textField without the weight being changed.
 
   void _updateTextField({ bool override = false }) {
-    double targetWeight = _state.currentMeasurement.targetWeight;
+    double targetWeight = _state.currentMeasurement.getFormattedWeight();
     String unit = _state.currentMeasurement.unit;
     if (_prevTargetWeight != targetWeight || override) {
       String weightString = targetWeight.toStringAsFixed(unit == GRAINS ? 2 : 3);
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
   void _updatePeripheral() async {
     BluetoothDevice device = _state.deviceState.device;
     BluetoothService service = _state.deviceState.service;
-    double targetWeight = _state.currentMeasurement.targetWeight;
+    double targetWeight = _state.currentMeasurement.getFormattedWeight();
     bool autoMode = _state.currentMeasurement.isMeasuring;
     String unit = _state.currentMeasurement.unit;
     dynamic char;

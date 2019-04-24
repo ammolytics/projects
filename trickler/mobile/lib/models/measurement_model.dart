@@ -30,8 +30,6 @@ class Measurement {
   }
 
   setTargetWeight(weight) {
-    weight = capWeight(weight);
-    weight = roundWeight(weight, this.unit);
     this.targetWeight = weight;
   }
 
@@ -49,5 +47,11 @@ class Measurement {
       this.isComplete = false;
       this.endTime = null;
     }
+  }
+
+  getFormattedWeight() {
+    double weight = capWeight(this.targetWeight);
+    weight = roundWeight(weight, this.unit);
+    return weight;
   }
 }
