@@ -27,9 +27,11 @@ util.inherits(AutoModeCharacteristic, bleno.Characteristic)
 
 
 AutoModeCharacteristic.prototype.sendAutoModeNotification = function(result) {
+  console.log(`this.updateValueCallback: ${this.updateValueCallback}`)
   if (this.updateValueCallback) {
     var data = Buffer.alloc(1)
     data.writeUInt8(result, 0)
+    console.log(`Calling this.updateValueCallback with ${data}`)
     this.updateValueCallback(data)
   }
 }
@@ -70,8 +72,10 @@ AutoModeCharacteristic.prototype.onUnsubscribe = function() {
 AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, withoutResponse, callback) {
   console.log(`autoMode write request`)
   if (offset) {
+    console.log(`Invalid offset: ${offset}`)
     callback(this.RESULT_ATTR_NOT_LONG)
   } else if (data.length !== 1) {
+    console.log(`Invalid data.length: ${data.length}`)
     callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH)
   } else {
     var autoMode = data.readUInt8(0)
