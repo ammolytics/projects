@@ -2,7 +2,8 @@
 
 This mobile app is designed to connect to and operate the Open Trickler. The app is based on the [Flutter framework](https://flutter.dev/), which allows it to be written once then built for both Android and iOS devices.
 
-[![Get it on Google Play](https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=com.ammolytics.opentrickler)
+<a href="https://play.google.com/store/apps/details?id=com.ammolytics.opentrickler"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Get it on Google Play" width="200"></a>
+
 _Google Play and the Google Play logo are trademarks of Google LLC._
 
 ## Instructions
