@@ -11,12 +11,14 @@ import '../models/index.dart';
 part 'measurement_reducers.dart';
 part 'device_reducers.dart';
 
-/// appStateReducer is a wrapper reducer that creates the global
-/// AppState by combining the states of other reducers.
+/// appStateReducer is a wrapper reducer that creates the global AppState by combining the states
+/// of other reducers. It also handles all actions related to the global bluetooth state.
 
 AppState appStateReducer(AppState state, action) {
   return AppState(
     currentMeasurement: currentMeasurementReducer(state.currentMeasurement, action),
     deviceState: deviceStateReducer(state.deviceState, action),
+    bluetoothState: action is SetBluetoothState ? action.bluetoothState : state.bluetoothState,
+    btStateSubscription: action is SetStateSubscription ? action.btStateSubscription : state.btStateSubscription,
   );
 }

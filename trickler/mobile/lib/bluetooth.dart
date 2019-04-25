@@ -20,6 +20,29 @@ abstract class BluetoothApp extends StatelessWidget {
 
   final FlutterBlue flutterBlue = FlutterBlue.instance;
 
+  /// subToBluetoothState reads, and subscribes to the phones bluetooth
+  /// state via flutterBlue, and updates the AppState accordingly.
+
+  subToBluetoothState() {
+    flutterBlue.state.then((s) {
+      store.dispatch(SetBluetoothState(s));
+    });
+    StreamSubscription btStateSubscription = flutterBlue.onStateChanged()
+      .listen((s) {
+        store.dispatch(SetBluetoothState(s));
+      });
+    store.dispatch(SetStateSubscription(btStateSubscription));
+  }
+
+  /// unsubFromBluetoothState cancels and removes the bluetooth state
+  /// subscription. It then sets the bluetooth state to unknown.
+
+  unsubFromBluetoothState() {
+    store.state.btStateSubscription?.cancel();
+    store.dispatch(SetStateSubscription(null));
+    store.dispatch(SetBluetoothState(BluetoothState.unknown));
+  }
+
   /// connectToDevice attempts to connect to a given BluetoothDevice. It is responsible for
   /// updating Connection Status, and Device Connection in the global DeviceState. If connected
   /// to the device it will call _findTricklerService, otherwise it will call disconnect.
