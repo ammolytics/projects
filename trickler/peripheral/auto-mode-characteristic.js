@@ -80,12 +80,15 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
   } else {
     var autoMode = data.readUInt8(0)
     console.log(`request to switch autoMode from ${this.trickler.autoMode} to ${autoMode}`)
+    /**
     if (typeof this._autoModeNotifyRef === 'undefined') {
       this._autoModeNotifyRef = this.sendAutoModeNotification.bind(this)
     }
     this.trickler.once('autoMode', this._autoModeNotifyRef)
+    **/
     this.trickler.autoMode = autoMode
 
+    /**
     switch (autoMode) {
       case trickler.AutoModeStatus.ON:
         this.trickler.on('ready', this._autoModeNotifyRef)
@@ -94,6 +97,7 @@ AutoModeCharacteristic.prototype.onWriteRequest = function(data, offset, without
         this.trickler.removeListener('ready', this._autoModeNotifyRef)
         break
     }
+    **/
     callback(this.RESULT_SUCCESS)
   }
 }
