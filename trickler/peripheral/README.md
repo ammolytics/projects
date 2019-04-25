@@ -1,4 +1,4 @@
-# Open Trickler Controller
+# Ammolytics: Open Trickler Controller
 
 This portion of the Open Trickler is used to control the scale and trickler motor. It's designed to be run on a Raspberry Pi Zero W, but any similar system which supports Bluetooth will likely work as well.
 
