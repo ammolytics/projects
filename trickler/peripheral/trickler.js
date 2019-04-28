@@ -96,12 +96,13 @@ const CommandMap = {
 }
 
 
+// Controls the speed of the motor by pulsing it ON and OFF at specific intervals.
 const PulseSpeeds = {
-  VERY_SLOW: {ON: 15, OFF: 150},
-  SLOW: {ON: 20, OFF: 150},
-  MEDIUM: {ON: 50, OFF: 150},
-  FAST: {ON: 50, OFF: 100},
-  VERY_FAST: {ON: 50, OFF: 50},
+  VERY_SLOW: {ON: 40, OFF: 150},
+  SLOW: {ON: 60, OFF: 100},
+  MEDIUM: {ON: 80, OFF: 100},
+  FAST: {ON: 100, OFF: 50},
+  VERY_FAST: {ON: 120, OFF: 20},
 }
 
 
