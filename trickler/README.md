@@ -11,6 +11,7 @@ The Controller reads from the scale and controls the trickler and was designed t
 ## Hardware
 
 - One [Raspberry Pi Zero W kit](https://www.amazon.com/gp/product/B0748MPQT4/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B0748MPQT4&linkId=382e0c8e4f0c17aa292c6a001346b5aa)
+- One [Adafruit mini proto board](https://www.amazon.com/gp/product/B07115Z42P/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B07115Z42P&linkId=9fee45aeba77c33472321e1de5bf1810) or similar
 - One [16GB MicroSD card](https://www.amazon.com/gp/product/B079H6PDCK/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B079H6PDCK&linkId=892c31a29914fd2abb249ccdaa0acf72)
 - One [Serial to USB cable](https://www.amazon.com/gp/product/B07GNKMHFW/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B07GNKMHFW&linkId=7e56918820cec6487da2e539bb71b658)
 - One [Null modem adapter](https://www.amazon.com/gp/product/B075XHWVSJ/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B075XHWVSJ&linkId=7c662ec9d4021bf3c1374f86ff1b9b0d) (2-pack)
