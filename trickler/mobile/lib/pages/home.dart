@@ -22,11 +22,13 @@ import '../widgets/auto_mode_button.dart';
 class HomePage extends StatefulWidget {
   final Function connectToDevice;
   final Function disconnect;
+  final Function onDispose;
 
   HomePage({
     Key key,
     this.connectToDevice,
     this.disconnect,
+    this.onDispose,
   }) : super(key: key);
 
   final String title = 'Open Trickler';
@@ -199,5 +201,12 @@ class _HomePageState extends State<HomePage> {
         return _getScaffold();
       }
     );
+  }
+
+  @protected
+  @mustCallSuper
+  void dispose() {
+    widget.onDispose();
+    super.dispose();
   }
 }

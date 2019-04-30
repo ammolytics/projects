@@ -126,6 +126,8 @@ class _DevicesPageState extends State<DevicesPage> {
         text = 'Connecting to a Trickler Device...';
       } else if (_isScanning) {
         text = 'Scanning for a Trickler Device...';
+      } else if (_state.bluetoothState != BluetoothState.on) {
+        text = 'Enable bluetooth to connect to Trickler';
       }
       return Text(text,
         style: TextStyle(
@@ -203,7 +205,8 @@ class _DevicesPageState extends State<DevicesPage> {
               ],
             ),
           ),
-          floatingActionButton: _getActionButton(),
+          floatingActionButton: _state.bluetoothState == BluetoothState.on ?
+            _getActionButton() : null,
         );
       },
     );

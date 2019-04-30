@@ -34,6 +34,17 @@ class SetIsMeasuring {
   SetIsMeasuring(this.isMeasuring);
 }
 
+class SetBluetoothState {
+  final BluetoothState bluetoothState;
+  SetBluetoothState(this.bluetoothState);
+}
+
+class SetStateSubscription {
+  final StreamSubscription btStateSubscription;
+  SetStateSubscription(this.btStateSubscription);
+}
+
+
 class ResetDeviceState {
   ResetDeviceState();
 }

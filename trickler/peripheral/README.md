@@ -41,7 +41,8 @@ Get a copy of the Open Trickler code
 git clone https://github.com/ammolytics/projects.git
 ```
 
-Run the Open Trickler setup
+Run the Open Trickler setup script
+
 _**Note:** The `setup.sh` script is intended for the Pi Zero W. If you're using a different board, you'll need to change the version of NodeJS from `armv6l` to match the chipset of your system._
 ```
 cd projects/trickler/peripheral
@@ -63,6 +64,22 @@ Run the command that it returns, which will look something like `sudo env PATH=$
 ```
 pm2 save
 sudo systemctl start pm2-pi
+```
+
+## For Developers
+
+Note: Most of the development was done on a Mac, and the setup scripts reflect that.
+
+First, clone this repository
+
+Next, run the setup script. This will create a virtual environment with the same version of NodeJS that's used on the Pi, and install other dependencies.
+```
+./bin/setup.sh
+```
+
+That's it! If you don't have an A&D scale, I created a very simple mock to fill in some of those gaps. You can a server that uses it with the following command.
+```
+./bin/mock.sh
 ```
 
 

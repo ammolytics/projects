@@ -9,15 +9,21 @@ part of 'index.dart';
 class AppState {
   Measurement currentMeasurement;
   DeviceState deviceState;
+  BluetoothState bluetoothState;
+  StreamSubscription btStateSubscription;
 
   AppState({
     this.currentMeasurement,
     this.deviceState,
+    this.bluetoothState,
+    this.btStateSubscription,
   });
 
   AppState.initialState()
   : currentMeasurement = Measurement(GRAINS, 0.0, 0.0, false, false),
-    deviceState = DeviceState.initialState();
+    deviceState = DeviceState.initialState(),
+    bluetoothState = BluetoothState.unknown,
+    btStateSubscription = null;
 
   /// getStatusColor returns a color that reflects the current connectionStatus
 

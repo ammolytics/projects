@@ -29,13 +29,14 @@ void main() {
 class MyApp extends BluetoothApp {
   final Store<AppState> store;
   MyApp({ Key key, this.store }) : super(key: key);
-  final FlutterBlue flutterBlue = FlutterBlue.instance;
+
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    subToBluetoothState();
     return StoreProvider<AppState>(
       store: store,
       child: MaterialApp(
@@ -47,6 +48,7 @@ class MyApp extends BluetoothApp {
           key: Key('HomePage'),
           connectToDevice: (device) => connectToDevice(device), // These functions are passed down to the Devices Page, allowing it to
           disconnect: () => disconnect(),                       // interact with a bluetooth device while still keeping the process global.
+          onDispose: () => unsubFromBluetoothState(),
         ),
       ),
     );
