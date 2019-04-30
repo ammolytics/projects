@@ -44,6 +44,7 @@ class SetStateSubscription {
   SetStateSubscription(this.btStateSubscription);
 }
 
+
 class ResetDeviceState {
   ResetDeviceState();
 }

@@ -30,6 +30,7 @@ class MyApp extends BluetoothApp {
   final Store<AppState> store;
   MyApp({ Key key, this.store }) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
