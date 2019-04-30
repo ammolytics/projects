@@ -1,11 +1,12 @@
 # Ammolytics Project: Open Trickler
 
+The Open Trickler is described in greater detail [in this article](https://blog.ammolytics.com/2019-04-30/diy-smart-trickler.html).
 
 ## Software
 
 The Mobile app for this project uses the [Flutter framework](https://flutter.dev/). The code can be found in the [`mobile/`](https://github.com/ammolytics/projects/blob/master/trickler/mobile/) directory.
 
-The Controller reads from the scale and controls the trickler and was designed to be run on a Raspberry Pi Zero W. The code can be found in the [`peripheral/`](https://github.com/ammolytics/projects/blob/master/trickler/peripheral/) directory.
+The Controller is a [NodeJS (`v8.x`)](https://nodejs.org/docs/latest-v8.x/api/) application which reads from the scale's serial port and controls the trickler. It was designed to be run on a Raspberry Pi Zero W. The code can be found in the [`peripheral/`](https://github.com/ammolytics/projects/blob/master/trickler/peripheral/) directory.
 
 
 ## Hardware
