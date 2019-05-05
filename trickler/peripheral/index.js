@@ -35,15 +35,12 @@ SerialPort.list().then(
     if (p.comName.indexOf('ttyUSB') !== -1) {
       devPath = p.comName
       console.log(`Connecting to ${devPath}...`)
-      // TODO: This is a hack. Wait 5s to connect to give USB time to be ready.
-      setTimeout(() => {
-        const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
-          if (err) {
-            console.log(`SERIAL PORT ERROR: ${err.message}`)
-          }
-        })
-        runService(port)
-      }, 5000)
+      const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
+        if (err) {
+          console.log(`SERIAL PORT ERROR: ${err.message}`)
+        }
+      })
+      runService(port)
     }
   }),
   err => console.error(err)
@@ -66,6 +63,13 @@ function runService (port) {
         if (err) {
           console.log(err)
         }
+        // TODO: This is a hack. Make sure things are working after 2s, otherwise reboot.
+        setTimeout(() => {
+          // If weight is NaN, consider it a failure and restart.
+          if (TRICKLER.weight === NaN) {
+            console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}`)
+          }
+        }, 2000)
       })
     } else {
       bleno.stopAdvertising()
@@ -101,6 +105,9 @@ function runService (port) {
   })
 
   // Let PM2 know the service is ready.
-  process.send('ready')
-
+  try {
+    process.send('ready')
+  } catch (err) {
+    console.error('Could not send ready signal to PM2')
+  }
 }
