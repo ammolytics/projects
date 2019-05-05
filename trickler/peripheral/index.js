@@ -10,6 +10,8 @@ const trickler = require('./trickler')
 const DeviceInfoService = require('./device-info-service')
 const TricklerService = require('./trickler-service')
 
+console.log('===== STARTING UP =====')
+
 // The last argument passed in should be the device path (e.g. /dev/ttyUSB0)
 const devPath = process.argv[process.argv.length - 1]
 const BAUD_RATE = 19200
