@@ -142,7 +142,7 @@ class Trickler extends events.EventEmitter {
 
     // Log any serial port errors.
     port.on('error', err => {
-      console.log(`Serial Port Error: ${err.message}`)
+      console.error(`Serial Port Error: ${err.message}`)
     })
 
     // Listen to the serial port data stream.
@@ -448,23 +448,23 @@ class Trickler extends events.EventEmitter {
   }
 
   getModelNumber () {
-    console.log('Requesting model number...')
-    this.port.write(CommandMap.MODEL_NUMBER)
+    console.log('WRITE: Requesting model number...')
+    this.port.write(CommandMap.MODEL_NUMBER, 'ascii', err => { if (err) { console.error(err) } })
   }
 
   getSerialNumber () {
-    console.log('Requesting serial number...')
-    this.port.write(CommandMap.SERIAL_NUMBER)
+    console.log('WRITE: Requesting serial number...')
+    this.port.write(CommandMap.SERIAL_NUMBER, 'ascii', err => { if (err) { console.error(err) } })
   }
 
   pressMode () {
-    console.log('Pressing Mode button to change unit...')
-    this.port.write(CommandMap.MODE_BTN)
+    console.log('WRITE: Pressing Mode button to change unit...')
+    this.port.write(CommandMap.MODE_BTN, 'ascii', err => { if (err) { console.error(err) } })
   }
 
   reZero () {
-    console.log('Pressing ReZero button...')
-    this.port.write(CommandMap.REZERO_BTN)
+    console.log('WRITE: Pressing ReZero button...')
+    this.port.write(CommandMap.REZERO_BTN, 'ascii', err => { if (err) { console.error(err) } })
   }
 }
 
