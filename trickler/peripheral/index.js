@@ -13,8 +13,9 @@ const TricklerService = require('./trickler-service')
 console.log('===== STARTING UP =====')
 
 // The last argument passed in should be the device path (e.g. /dev/ttyUSB0)
-const devPath = process.argv[process.argv.length - 1]
+let devPath = process.argv[process.argv.length - 1]
 const BAUD_RATE = 19200
+const PERIPHERAL_NAME = 'Trickler'
 
 console.log(`Device: ${devPath}`)
 
@@ -27,16 +28,25 @@ if (process.env.MOCK) {
   MockScale.createPort(devPath, { echo: true, record: true })
 }
 
-const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
-  if (err) {
-    console.log(`SERIAL PORT ERROR: ${err.message}`)
-  }
-})
-const PERIPHERAL_NAME = 'Trickler'
-const TRICKLER = new trickler.Trickler(port)
+SerialPort.list().then(
+  ports => ports.forEach(p => {
+    // TODO: Add checks to ensure this is the right USB device. Don't assume just one.
+    if (p.comName.indexOf('ttyUSB') !== -1) {
+      devPath = p.comName
+      const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
+        if (err) {
+          console.log(`SERIAL PORT ERROR: ${err.message}`)
+        }
+      })
 
-var deviceInfoService = new DeviceInfoService(TRICKLER)
-var service = new TricklerService(TRICKLER)
+      const TRICKLER = new trickler.Trickler(port)
+      var deviceInfoService = new DeviceInfoService(TRICKLER)
+      var service = new TricklerService(TRICKLER)
+    }
+  }),
+  err => console.error(err)
+)
+
 
 //
 // Wait until the BLE radio powers on before attempting to advertise.
