@@ -82,6 +82,28 @@ That's it! If you don't have an A&D scale, I created a very simple mock to fill 
 ./bin/mock.sh
 ```
 
+## Faster Boot Times
+
+The Pi can take around 60 to 90 seconds to boot. I've been able to shave this down to around 30 seconds with the following changes.
+
+### Change boot options
+```
+sudo raspi-config
+```
+
+From the menu:
+- Change `Boot Options > Desktop /  CLI` to `B1 Console` 
+- Change `Boot Options > Wait for Network at Boot` to `No`
+
+After making this changes, select `Finish`. It will ask if you want to reboot, select `Yes`.
+
+
+### Disable unecessary services
+```
+sudo systemctl disable keyboard-setup.service alsa-restore.service systemd-rfkill.service
+sudo systemctl mask alsa-restore.service systemd-rfkill.service
+```
+
 
 ## References
 - [Headless Raspberry Pi Zero W Setup](https://dev.to/vorillaz/headless-raspberry-pi-zero-w-setup-3llj)
