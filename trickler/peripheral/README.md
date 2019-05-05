@@ -84,7 +84,7 @@ That's it! If you don't have an A&D scale, I created a very simple mock to fill 
 
 ## Faster Boot Times
 
-The Pi can take around 60 to 90 seconds to boot. I've been able to shave this down to around 30 seconds with the following changes.
+The Pi can take around 60 to 90 seconds to boot. I've been able to shave this down to around 40 seconds with the following changes.
 
 ### Change boot options
 ```
@@ -100,7 +100,7 @@ After making this changes, select `Finish`. It will ask if you want to reboot, s
 
 ### Disable unecessary services
 ```
-sudo systemctl disable keyboard-setup.service alsa-restore.service systemd-rfkill.service
+sudo systemctl disable keyboard-setup.service alsa-restore.service systemd-rfkill.service apt-daily.service
 sudo systemctl mask alsa-restore.service systemd-rfkill.service
 ```
 
