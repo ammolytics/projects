@@ -65,7 +65,7 @@ function runService (port) {
         }
         // TODO: This is a hack. Make sure things are working after 2s, otherwise reboot.
         setTimeout(() => {
-          console.log(`After delay, trickler weight reads: ${$TRICKLER.weight}`)
+          console.log(`After delay, trickler weight reads: ${TRICKLER.weight}`)
           // If weight is NaN, consider it a failure and restart.
           if (TRICKLER.weight === NaN) {
             console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}`)
