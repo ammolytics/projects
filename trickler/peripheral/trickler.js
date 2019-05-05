@@ -140,6 +140,12 @@ class Trickler extends events.EventEmitter {
     this.port = port
     this.port.pipe(parser)
 
+    // Log any serial port errors.
+    port.on('error', err => {
+      console.log(`Serial Port Error: ${err.message}`)
+    })
+
+    // Listen to the serial port data stream.
     parser.on('data', line => {
       var now = new Date().toISOString()
       var rawStatus = line.substr(0, 2).trim()
