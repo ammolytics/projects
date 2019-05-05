@@ -6,6 +6,8 @@ module.exports = {
     args: '/dev/ttyUSB0',
     instances: 1,
     watch: true,
+    wait_ready: true,
+    listen_timeout: 10000,
     log_date_format: 'YYYY-MM-DD HH:mm Z',
     env: {
       'NODE_ENV': 'development',

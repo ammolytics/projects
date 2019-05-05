@@ -98,4 +98,7 @@ function runService (port) {
     console.log(`Client disconnected: ${clientAddress}`)
   })
 
+  // Let PM2 know the service is ready.
+  process.send('ready')
+
 }
