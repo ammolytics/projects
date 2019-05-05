@@ -63,14 +63,14 @@ function runService (port) {
         if (err) {
           console.log(err)
         }
-        // TODO: This is a hack. Make sure things are working after 2s, otherwise reboot.
+        // TODO: This is a hack. Make sure things are working after 5s, otherwise reboot.
         setTimeout(() => {
           console.log(`After delay, trickler weight reads: ${TRICKLER.weight}`)
           // If weight is NaN, consider it a failure and restart.
-          if (TRICKLER.weight === NaN) {
+          if (TRICKLER.weight === NaN || typeof TRICKLER._weight === 'undefined') {
             console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}`)
           }
-        }, 2000)
+        }, 5000)
       })
     } else {
       bleno.stopAdvertising()
