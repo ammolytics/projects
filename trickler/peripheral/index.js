@@ -35,13 +35,15 @@ SerialPort.list().then(
     if (p.comName.indexOf('ttyUSB') !== -1) {
       devPath = p.comName
       console.log(`Connecting to ${devPath}...`)
-      const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
-        if (err) {
-          console.log(`SERIAL PORT ERROR: ${err.message}`)
-        }
-      })
-
-      runService(port)
+      // TODO: This is a hack. Wait 5s to connect to give USB time to be ready.
+      setTimeout(() => {
+        const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
+          if (err) {
+            console.log(`SERIAL PORT ERROR: ${err.message}`)
+          }
+        })
+        runService(port)
+      }, 5000)
     }
   }),
   err => console.error(err)
