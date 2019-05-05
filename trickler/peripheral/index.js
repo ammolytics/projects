@@ -27,7 +27,7 @@ if (process.env.MOCK) {
   MockScale.createPort(devPath, { echo: true, record: true })
 }
 
-const port = new SerialPort(devPath, { baudRate: BAUD_RATE })
+const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => { console.log(`SERIAL PORT ERROR: ${err.message}`) })
 const PERIPHERAL_NAME = 'Trickler'
 const TRICKLER = new trickler.Trickler(port)
 
