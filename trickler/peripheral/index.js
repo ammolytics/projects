@@ -14,6 +14,8 @@ const TricklerService = require('./trickler-service')
 const devPath = process.argv[process.argv.length - 1]
 const BAUD_RATE = 19200
 
+console.log(`Device: ${devPath}`)
+
 // Create mock binding if env MOCK is set.
 if (process.env.MOCK) {
   console.log('Using Mock interface')
@@ -65,6 +67,10 @@ bleno.on('advertisingStop', function() {
 
 bleno.on('advertisingStartError', function(err) {
   console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
+})
+
+bleno.on('accept', function(clientAddress) {
+  console.log(`Client accepted: ${clientAddress}`)
 })
 
 bleno.on('disconnect', function(clientAddress) {
