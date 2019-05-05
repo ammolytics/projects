@@ -28,11 +28,13 @@ if (process.env.MOCK) {
   MockScale.createPort(devPath, { echo: true, record: true })
 }
 
+console.log('Scanning for USB devices...')
 SerialPort.list().then(
   ports => ports.forEach(p => {
     // TODO: Add checks to ensure this is the right USB device. Don't assume just one.
     if (p.comName.indexOf('ttyUSB') !== -1) {
       devPath = p.comName
+      console.log(`Connecting to ${devPath}...`)
       const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
         if (err) {
           console.log(`SERIAL PORT ERROR: ${err.message}`)
