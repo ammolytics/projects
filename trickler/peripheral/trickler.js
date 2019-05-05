@@ -313,24 +313,22 @@ class Trickler extends events.EventEmitter {
 
   _runFn () {
     this.clearPulse()
-    // Prevent pulseOn from being fired until it's reset below.
-    this._pulseTimeout = -1
-    this.motorOn()
     this._pulseTimeout = setTimeout(this.waitFnListener, this.pulseSpeed.ON)
+    this.motorOn()
   }
 
   _waitFn () {
     this.clearPulse()
-    // Prevent pulseOn from being fired until it's reset below.
-    this._pulseTimeout = -1
-    this.motorOff()
     this._pulseTimeout = setTimeout(this.runFnListener, this.pulseSpeed.OFF)
+    this.motorOff()
   }
 
   // Turn motor on and off at regular intervals.
   pulseOn () {
     // Kick off the cycle.
-    this._runFn()
+    if (this._pulseTimeout === null && this.runningMode === RunningMode.GO) {
+      this._runFn()
+    }
   }
 
   // Turns off the pulse cycle.
@@ -371,22 +369,23 @@ class Trickler extends events.EventEmitter {
           this.pulseOff()
           this.runningMode = RunningMode.NOGO
         } else {
-          if (delta <= 0.2) {
-            console.log('Very slow trickle...')
-            this.pulseSpeed = PulseSpeeds.VERY_SLOW
-          } else if (delta <= 0.4) {
-            console.log('Slow trickle...')
-            this.pulseSpeed = PulseSpeeds.SLOW
-          } else if (delta < 0.8) {
-            console.log('Medium trickle...')
-            this.pulseSpeed = PulseSpeeds.MEDIUM
-          } else {
-            console.log('Fast trickle...')
-            this.pulseSpeed = PulseSpeeds.FAST
-          }
+          // Only run or adjust trickler speeds in GO mode.
+          if (this.runningMode === RunningMode.GO) {
+            if (delta <= 0.2) {
+              console.log('Very slow trickle...')
+              this.pulseSpeed = PulseSpeeds.VERY_SLOW
+            } else if (delta <= 0.4) {
+              console.log('Slow trickle...')
+              this.pulseSpeed = PulseSpeeds.SLOW
+            } else if (delta < 0.8) {
+              console.log('Medium trickle...')
+              this.pulseSpeed = PulseSpeeds.MEDIUM
+            } else {
+              console.log('Fast trickle...')
+              this.pulseSpeed = PulseSpeeds.FAST
+            }
 
-          // If the pulse control is off turn it on.
-          if (this._pulseTimeout === null) {
+            // If the pulse control is off turn it on.
             this.pulseOn()
           }
         }
