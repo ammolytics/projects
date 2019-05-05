@@ -41,57 +41,61 @@ SerialPort.list().then(
         }
       })
 
-      const TRICKLER = new trickler.Trickler(port)
-      var deviceInfoService = new DeviceInfoService(TRICKLER)
-      var service = new TricklerService(TRICKLER)
+      runService(port)
     }
   }),
   err => console.error(err)
 )
 
 
-//
-// Wait until the BLE radio powers on before attempting to advertise.
-// If you don't have a BLE radio, then it will never power on!
-//
-bleno.on('stateChange', function(state) {
-  console.log(`on -> stateChange: ${state}`)
-  if (state === 'poweredOn') {
-    bleno.startAdvertising(PERIPHERAL_NAME, [service.uuid], function(err) {
-      if (err) {
-        console.log(err)
-      }
-    })
-  } else {
-    bleno.stopAdvertising()
-  }
-})
+function runService (port) {
+  const TRICKLER = new trickler.Trickler(port)
+  var deviceInfoService = new DeviceInfoService(TRICKLER)
+  var service = new TricklerService(TRICKLER)
+
+  //
+  // Wait until the BLE radio powers on before attempting to advertise.
+  // If you don't have a BLE radio, then it will never power on!
+  //
+  bleno.on('stateChange', function(state) {
+    console.log(`on -> stateChange: ${state}`)
+    if (state === 'poweredOn') {
+      bleno.startAdvertising(PERIPHERAL_NAME, [service.uuid], function(err) {
+        if (err) {
+          console.log(err)
+        }
+      })
+    } else {
+      bleno.stopAdvertising()
+    }
+  })
 
 
-bleno.on('advertisingStart', function(err) {
-  console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
-  if (!err) {
-    console.log('advertising...')
-    bleno.setServices([
-      deviceInfoService,
-      service
-    ])
-  }
-})
+  bleno.on('advertisingStart', function(err) {
+    console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
+    if (!err) {
+      console.log('advertising...')
+      bleno.setServices([
+        deviceInfoService,
+        service
+      ])
+    }
+  })
 
-bleno.on('advertisingStop', function() {
-  console.log('on -> advertisingStop')
-})
+  bleno.on('advertisingStop', function() {
+    console.log('on -> advertisingStop')
+  })
 
-bleno.on('advertisingStartError', function(err) {
-  console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
-})
+  bleno.on('advertisingStartError', function(err) {
+    console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
+  })
 
-bleno.on('accept', function(clientAddress) {
-  console.log(`Client accepted: ${clientAddress}`)
-})
+  bleno.on('accept', function(clientAddress) {
+    console.log(`Client accepted: ${clientAddress}`)
+  })
 
-bleno.on('disconnect', function(clientAddress) {
-  console.log(`Client disconnected: ${clientAddress}`)
-})
+  bleno.on('disconnect', function(clientAddress) {
+    console.log(`Client disconnected: ${clientAddress}`)
+  })
 
+}
