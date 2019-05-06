@@ -89,6 +89,11 @@ function runService (port) {
       // If weight is undefined, consider it a failure and restart.
       if (typeof TRICKLER._weight === 'undefined') {
         console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}, stableTime: ${TRICKLER.stableTime()}`)
+        // TODO: Limit the number of restarts w/ environment variable.
+        console.log('FORCED RESTART')
+        exec('pm2 restart opentrickler', (err, stdout, stderr) => {
+          console.log('goodbye')
+        })
       }
     }
   })
