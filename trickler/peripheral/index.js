@@ -2,7 +2,6 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
-const { exec } = require('child_process')
 const util = require('util')
 const bleno = require('bleno')
 const SerialPort = require('serialport')
@@ -93,11 +92,6 @@ function runService (port) {
         console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}, stableTime: ${TRICKLER.stableTime()}`)
         // TODO: Limit the number of restarts w/ environment variable.
         console.log('FORCED RESTART')
-        /**
-        exec('pm2 restart opentrickler', (err, stdout, stderr) => {
-          console.log('goodbye')
-        })
-        */
         var path = port.path
         port.close(() => {
           createSerialPort(path)
