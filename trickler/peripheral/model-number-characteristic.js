@@ -2,7 +2,6 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
-const util = require('util')
 const bleno = require('bleno')
 
 /**
@@ -12,39 +11,39 @@ Requesting model number...
 */
 
 
-function ModelNumberCharacteristic(trickler) {
-  bleno.Characteristic.call(this, {
-    uuid: '2a24',
-    properties: ['read'],
-    descriptors: [
-      new bleno.Descriptor({
-        uuid: '2901',
-        value: 'Scale model number'
-      })
-    ]
-  })
+class ModelNumberCharacteristic extends bleno.Characteristic {
 
-  this.trickler = trickler
-}
+  constructor(trickler) {
+    super({
+      uuid: '2a24',
+      properties: ['read'],
+      descriptors: [
+        new bleno.Descriptor({
+          uuid: '2901',
+          value: 'Scale model number'
+        })
+      ]
+    })
+
+    this.trickler = trickler
+  }
 
 
-util.inherits(ModelNumberCharacteristic, bleno.Characteristic)
-
-
-ModelNumberCharacteristic.prototype.onReadRequest = function(offset, callback) {
-  console.log(`model number read request`)
-  if (offset) {
-    callback(this.RESULT_ATTR_NOT_LONG, null)
-  } else {
-    if (typeof this.trickler.modelNumber === 'undefined') {
-      this.trickler.once('modelNumber', modelNumber => {
-        var data = Buffer.from(modelNumber)
-        callback(this.RESULT_SUCCESS, data)
-      })
-      this.trickler.getModelNumber()
+  onReadRequest (offset, callback) {
+    console.log(`model number read request`)
+    if (offset) {
+      callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      var data = Buffer.from(this.trickler.modelNumber)
-      callback(this.RESULT_SUCCESS, data)
+      if (typeof this.trickler.modelNumber === 'undefined') {
+        this.trickler.once('modelNumber', modelNumber => {
+          var data = Buffer.from(modelNumber)
+          callback(this.RESULT_SUCCESS, data)
+        })
+        this.trickler.getModelNumber()
+      } else {
+        var data = Buffer.from(this.trickler.modelNumber)
+        callback(this.RESULT_SUCCESS, data)
+      }
     }
   }
 }
