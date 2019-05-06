@@ -2,6 +2,7 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
+const { exec } = require('child_process')
 const util = require('util')
 const bleno = require('bleno')
 const SerialPort = require('serialport')
@@ -28,28 +29,43 @@ if (process.env.MOCK) {
   MockScale.createPort(devPath, { echo: true, record: true })
 }
 
-// Wait a bit for USB to become available.
-console.log('Waiting for USB...')
-setTimeout(() => {
-  console.log('Scanning for USB devices...')
-  SerialPort.list().then(
-    ports => ports.forEach(p => {
-      console.log(`device: ${p}`)
-      // TODO: Add checks to ensure this is the right USB device. Don't assume just one.
-      if (p.comName.indexOf('ttyUSB') !== -1) {
-        devPath = p.comName
-        console.log(`Connecting to ${devPath}...`)
-        const port = new SerialPort(devPath, { baudRate: BAUD_RATE }, err => {
-          if (err) {
-            console.log(`SERIAL PORT ERROR: ${err.message}`)
-          }
-        })
-        runService(port)
+console.log('Scanning for USB devices...')
+SerialPort.list().then(
+  ports => ports.forEach(p => {
+    console.log(`device: ${p.comName}`)
+    // TODO: Add checks to ensure this is the right USB device. Don't assume just one.
+    if (p.comName.indexOf('ttyUSB') !== -1) {
+      createSerialPort(p.comName)
+    }
+  }),
+  err => console.error(err)
+)
+
+function createSerialPort(devicePath) {
+  if (!process.env.MOCK) {
+    // Use udev to investigate status of USB dev.
+    exec('udevadm info -a -n ${devicePath}', (err, stdout, stderr) => {
+      if (err) {
+        console.error(`exec error: ${err}`)
+      } else {
+        console.log(`stdout: ${stdout}`)
+        console.log(`stderr: ${stderr}`)
       }
-    }),
-    err => console.error(err)
-  )
-}, 8000)
+    })
+  }
+
+  // Wait a bit for USB to become available.
+  setTimeout(() => {
+    console.log(`Connecting to ${devicePath}...`)
+    const port = new SerialPort(devicePath, { baudRate: BAUD_RATE }, err => {
+      if (err) {
+        console.log(`SERIAL PORT ERROR: ${err.message}`)
+      }
+    })
+
+    runService(port)
+  }, 10000)
+}
 
 
 function runService (port) {
@@ -68,14 +84,6 @@ function runService (port) {
         if (err) {
           console.log(err)
         }
-        // TODO: This is a hack. Make sure things are working after 5s, otherwise reboot.
-        setTimeout(() => {
-          console.log(`After delay, trickler weight reads: ${TRICKLER.weight}`)
-          // If weight is NaN, consider it a failure and restart.
-          if (TRICKLER.weight === NaN || typeof TRICKLER._weight === 'undefined') {
-            console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}`)
-          }
-        }, 5000)
       })
     } else {
       bleno.stopAdvertising()
@@ -91,6 +99,15 @@ function runService (port) {
         deviceInfoService,
         service
       ])
+
+      // TODO: This is a hack. Make sure things are working after 5s, otherwise reboot.
+      setTimeout(() => {
+        console.log(`After delay, trickler weight reads: ${TRICKLER.weight}`)
+        // If weight is undefined, consider it a failure and restart.
+        if (typeof TRICKLER._weight === 'undefined') {
+          console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}`)
+        }
+      }, 5000)
     }
   })
 
