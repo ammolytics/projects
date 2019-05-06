@@ -54,7 +54,9 @@ function createSerialPort(devicePath) {
 
 
 function runService (port) {
-  const TRICKLER = new trickler.Trickler(port)
+  console.log('PORT')
+  console.log(port)
+  var TRICKLER = new trickler.Trickler(port)
   var deviceInfoService = new DeviceInfoService(TRICKLER)
   var service = new TricklerService(TRICKLER)
 
@@ -91,8 +93,14 @@ function runService (port) {
         console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}, stableTime: ${TRICKLER.stableTime()}`)
         // TODO: Limit the number of restarts w/ environment variable.
         console.log('FORCED RESTART')
+        /**
         exec('pm2 restart opentrickler', (err, stdout, stderr) => {
           console.log('goodbye')
+        })
+        */
+        var path = port.path
+        port.close(() => {
+          createSerialPort(path)
         })
       }
     }
@@ -113,11 +121,4 @@ function runService (port) {
   bleno.on('disconnect', function(clientAddress) {
     console.log(`Client disconnected: ${clientAddress}`)
   })
-
-  // Let PM2 know the service is ready.
-  try {
-    process.send('ready')
-  } catch (err) {
-    console.error('Could not send ready signal to PM2')
-  }
 }
