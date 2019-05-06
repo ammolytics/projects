@@ -54,17 +54,14 @@ function createSerialPort(devicePath) {
     })
   }
 
-  // Wait a bit for USB to become available.
-  setTimeout(() => {
-    console.log(`Connecting to ${devicePath}...`)
-    const port = new SerialPort(devicePath, { baudRate: BAUD_RATE }, err => {
-      if (err) {
-        console.log(`SERIAL PORT ERROR: ${err.message}`)
-      }
-    })
+  console.log(`Connecting to ${devicePath}...`)
+  const port = new SerialPort(devicePath, { baudRate: BAUD_RATE }, err => {
+    if (err) {
+      console.log(`SERIAL PORT ERROR: ${err.message}`)
+    }
+  })
 
-    runService(port)
-  }, 10000)
+  runService(port)
 }
 
 
@@ -100,14 +97,11 @@ function runService (port) {
         service
       ])
 
-      // TODO: This is a hack. Make sure things are working after 5s, otherwise reboot.
-      setTimeout(() => {
-        console.log(`After delay, trickler weight reads: ${TRICKLER.weight}`)
-        // If weight is undefined, consider it a failure and restart.
-        if (typeof TRICKLER._weight === 'undefined') {
-          console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}`)
-        }
-      }, 5000)
+      console.log(`Trickler weight reads: ${TRICKLER.weight}, stableTime: ${TRICKLER.stableTime()}`)
+      // If weight is undefined, consider it a failure and restart.
+      if (typeof TRICKLER._weight === 'undefined') {
+        console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}, stableTime: ${TRICKLER.stableTime()}`)
+      }
     }
   })
 
