@@ -42,18 +42,6 @@ SerialPort.list().then(
 )
 
 function createSerialPort(devicePath) {
-  if (!process.env.MOCK) {
-    // Use udev to investigate status of USB dev.
-    exec(`udevadm info -a -n ${devicePath}`, (err, stdout, stderr) => {
-      if (err) {
-        console.error(`exec error: ${err}`)
-      } else {
-        console.log(`stdout: ${stdout}`)
-        console.log(`stderr: ${stderr}`)
-      }
-    })
-  }
-
   console.log(`Connecting to ${devicePath}...`)
   const port = new SerialPort(devicePath, { baudRate: BAUD_RATE }, err => {
     if (err) {
