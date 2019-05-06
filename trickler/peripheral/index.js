@@ -34,6 +34,7 @@ setTimeout(() => {
   console.log('Scanning for USB devices...')
   SerialPort.list().then(
     ports => ports.forEach(p => {
+      console.log(`device: ${p}`)
       // TODO: Add checks to ensure this is the right USB device. Don't assume just one.
       if (p.comName.indexOf('ttyUSB') !== -1) {
         devPath = p.comName
