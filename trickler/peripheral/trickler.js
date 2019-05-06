@@ -25,6 +25,7 @@ const TricklerStatus = {
   ERROR: 3,
   MODEL_NUMBER: 4,
   SERIAL_NUMBER: 5,
+  ACKNOWLEDGE: 6,
 }
 
 const TricklerWeightStatus = {
@@ -160,7 +161,7 @@ class Trickler extends events.EventEmitter {
       switch (values.status) {
         case undefined:
           // Unit not ready yet.
-          console.log(`Unknown command: ${line}`)
+          console.log(`UNKNOWN COMMAND: ${line}`)
           break
         case TricklerStatus.ACKNOWLEDGE:
           console.log('Command acknowledged')
@@ -168,7 +169,7 @@ class Trickler extends events.EventEmitter {
         case TricklerStatus.ERROR:
           var errCode = line.substr(3, 3)
           var errMsg = ErrorCodeMap[errCode]
-          console.error(`Error! code: ${errCode}, message: ${errMsg}`)
+          console.error(`Error code: ${errCode}, message: ${errMsg}, raw: ${line}`)
           break
         case TricklerStatus.MODEL_NUMBER:
           this.modelNumber = line.substr(3).trim()
@@ -176,7 +177,8 @@ class Trickler extends events.EventEmitter {
         case TricklerStatus.SERIAL_NUMBER:
           this.serialNumber = line.substr(3).trim()
           break
-        default:
+        case TricklerStatus.STABLE:
+        case TricklerStatus.UNSTABLE:
           var rawWeight = line.substr(3, 9).trim()
           var rawUnit = line.substr(12, 3).trim()
           values.weight = rawWeight
@@ -185,6 +187,9 @@ class Trickler extends events.EventEmitter {
           this.status = values.status
           this.unit = values.unit
           this.weight = values.weight
+          break
+        default:
+          console.log(`UNHANDLED MESSAGE: ${line}`)
           break
       }
     })
