@@ -76,7 +76,7 @@ class Scale extends events.EventEmitter {
   constructor (opts) {
     super()
     opts = (typeof opts === 'object') ? opts : {}
-    this.BAUD = opts.baud || 19200
+    this.BAUD = Number(opts.baud) || 19200
     this.DEV_PATH = opts.device || '/dev/ttyUSB0'
     this.encoding = 'ascii'
     this.delimiter = '\r\n'

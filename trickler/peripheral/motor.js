@@ -23,7 +23,7 @@ class MotorControl extends events.EventEmitter {
   constructor (opts) {
     super()
     opts = (typeof opts === 'object') ? opts : {}
-    this.PIN = opts.pin || 15
+    this.PIN = Number(opts.pin) || 15
     this._timeout = null
     this._interval = null
     this.speed = opts.speed || SPEEDS.VERY_SLOW
