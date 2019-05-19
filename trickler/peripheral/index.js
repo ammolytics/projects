@@ -2,117 +2,101 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
-const util = require('util')
 const bleno = require('bleno')
-const SerialPort = require('serialport')
 
+const motors = require('./motor')
+const scales = require('./and-fxfz')
 const trickler = require('./trickler')
 const DeviceInfoService = require('./device-info-service')
 const TricklerService = require('./trickler-service')
 
 console.log('===== STARTING UP =====')
 
-// The last argument passed in should be the device path (e.g. /dev/ttyUSB0)
-let devPath = process.argv[process.argv.length - 1]
-const BAUD_RATE = 19200
-const PERIPHERAL_NAME = 'Trickler'
+const MOTOR = new motors.MotorControl({
+  pin: process.env.MOTOR_PIN,
+})
+const SCALE = new scales.Scale({
+  baud: process.env.SCALE_BAUD_RATE,
+  device: process.env.SCALE_DEVICE_PATH,
+})
+const TRICKLER = new trickler.Trickler({
+  motor: MOTOR,
+  scale: SCALE,
+})
+const INFO_SERVICE = new DeviceInfoService(TRICKLER)
+const TRICKLER_SERVICE = new TricklerService(TRICKLER)
 
-console.log(`Device: ${devPath}`)
-
-// Create mock binding if env MOCK is set.
-if (process.env.MOCK) {
-  console.log('Using Mock interface')
-  const MockScale = require('./mock-scale')
-  SerialPort.Binding = MockScale
-  // Create a port and enable the echo and recording.
-  MockScale.createPort(devPath, { echo: true, record: true })
-}
-
-console.log('Scanning for USB devices...')
-SerialPort.list().then(
-  ports => ports.forEach(p => {
-    console.log(`device: ${p.comName}`)
-    // TODO: Add checks to ensure this is the right USB device. Don't assume just one.
-    if (p.comName.indexOf('ttyUSB') !== -1) {
-      createSerialPort(p.comName)
-    }
-  }),
-  err => console.error(err)
-)
-
-function createSerialPort(devicePath) {
-  console.log(`Connecting to ${devicePath}...`)
-  const port = new SerialPort(devicePath, { baudRate: BAUD_RATE }, err => {
-    if (err) {
-      console.log(`SERIAL PORT ERROR: ${err.message}`)
-    }
-  })
-
-  runService(port)
+const errHandler = (err) => {
+  if (err) {
+    console.error(err)
+  }
 }
 
 
-function runService (port) {
-  console.log('PORT')
-  console.log(port)
-  var TRICKLER = new trickler.Trickler(port)
-  var deviceInfoService = new DeviceInfoService(TRICKLER)
-  var service = new TricklerService(TRICKLER)
-
-  //
-  // Wait until the BLE radio powers on before attempting to advertise.
-  // If you don't have a BLE radio, then it will never power on!
-  //
-  bleno.on('stateChange', function(state) {
-    console.log(`on -> stateChange: ${state}`)
-    if (state === 'poweredOn') {
-      bleno.startAdvertising(PERIPHERAL_NAME, [service.uuid], function(err) {
-        if (err) {
-          console.log(err)
-        }
+bleno.on('stateChange', function(state) {
+  console.log(`on -> stateChange: ${state}`)
+  switch (state) {
+    case 'poweredOn':
+      TRICKLER.open(() => {
+        bleno.startAdvertising(process.env.DEVICE_NAME, [TRICKLER_SERVICE.uuid], errHandler)
       })
-    } else {
+      break
+    case 'unknown':
+    case 'resetting':
+    case 'unsupported':
+    case 'unauthorized':
+    case 'poweredOff':
+    default:
       bleno.stopAdvertising()
-    }
+      break
+  }
+})
+
+bleno.on('advertisingStart', function(err) {
+  console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
+  if (err) {
+    // Error handled by advertisingStartError
+    return
+  }
+
+  console.log('Opening trickler...')
+  TRICKLER.open(() => {
+    console.log('advertising services...')
+    bleno.setServices([
+      INFO_SERVICE,
+      TRICKLER_SERVICE,
+    ])
+    console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
   })
+})
+
+bleno.on('advertisingStop', function() {
+  console.log('on -> advertisingStop')
+  TRICKLER.close()
+})
+
+bleno.on('advertisingStartError', function(err) {
+  console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
+})
+
+bleno.on('accept', function(clientAddress) {
+  console.log(`Client accepted: ${clientAddress}`)
+})
+
+bleno.on('disconnect', function(clientAddress) {
+  console.log(`Client disconnected: ${clientAddress}`)
+})
 
 
-  bleno.on('advertisingStart', function(err) {
-    console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
-    if (!err) {
-      console.log('advertising...')
-      bleno.setServices([
-        deviceInfoService,
-        service
-      ])
-
-      console.log(`Trickler weight reads: ${TRICKLER.weight}, stableTime: ${TRICKLER.stableTime()}`)
-      // If weight is undefined, consider it a failure and restart.
-      if (typeof TRICKLER._weight === 'undefined') {
-        console.error(`Probably failure.  weight: ${TRICKLER.weight}, unit: ${TRICKLER.unit}, stableTime: ${TRICKLER.stableTime()}`)
-        // TODO: Limit the number of restarts w/ environment variable.
-        console.log('FORCED RESTART')
-        var path = port.path
-        port.close(() => {
-          createSerialPort(path)
-        })
-      }
-    }
-  })
-
-  bleno.on('advertisingStop', function() {
-    console.log('on -> advertisingStop')
-  })
-
-  bleno.on('advertisingStartError', function(err) {
-    console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
-  })
-
-  bleno.on('accept', function(clientAddress) {
-    console.log(`Client accepted: ${clientAddress}`)
-  })
-
-  bleno.on('disconnect', function(clientAddress) {
-    console.log(`Client disconnected: ${clientAddress}`)
+/**
+ * Graceful shutdown
+ */
+const shutdown = () => {
+  // Close the trickler, scale, and motor.
+  TRICKLER.close(() => {
+    process.exit(0)
   })
 }
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)

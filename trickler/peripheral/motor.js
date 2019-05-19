@@ -26,25 +26,37 @@ class MotorControl extends events.EventEmitter {
     this.PIN = opts.pin || 15
     this._timeout = null
     this._interval = null
-    this.speed = SPEEDS.VERY_SLOW
+    this.speed = opts.speed || SPEEDS.VERY_SLOW
     this._mode = false
     this.timer = null
 
     this.runner = this._runner.bind(this)
 
-    rpio.init({
+    // Setup GPIO for motor control
+    var rpioOpts = {
       mapping: 'physical',
-    })
+    }
+    if (process.env.MOCK) {
+      rpioOpts.mock = 'raspi-zero-w'
+    }
+    rpio.init(rpioOpts)
   }
 
-  open () {
+  open (cb) {
     rpio.open(this.PIN, rpio.OUTPUT, rpio.LOW)
     this.emit('open')
+    if (cb) {
+      cb()
+    }
   }
 
-  close () {
+  close (cb) {
+    this.stop()
     rpio.close(this.PIN, rpio.PIN_RESET)
     this.emit('close')
+    if (cb) {
+      cb()
+    }
   }
 
   get speed() {
