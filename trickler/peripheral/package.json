@@ -14,5 +14,8 @@
     "mathjs": "^5.8.0",
     "rpio": "^1.0.13",
     "serialport": "^7.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0"
   }
 }

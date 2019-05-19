@@ -13,6 +13,13 @@ const Readline = require('@serialport/parser-readline')
   */
 const MOTOR_PIN = 15
 
+/**
+  * Raspberry Pi: physical pin 12, BCM pin 18
+  * https://pinout.xyz/pinout/pin12_gpio18
+  */
+// NOTE(eric): Not yet implemented.
+const PWM_MOTOR_PIN = 12
+
 const TricklerUnits = {
   GRAINS: 0,
   GRAMS: 1,
@@ -119,10 +126,18 @@ class Trickler extends events.EventEmitter {
    super()
 
     // Setup GPIO for motor control
-    if (process.env.MOCK) {
-      rpio.init({mock: 'raspi-3'})
+    var rpioOpts = {
+      // TODO(eric): Implement PWM motor support.
+      // Hardware PWM requires gpiomem=false.
+      //gpiomem: false,
     }
+    if (process.env.MOCK) {
+      rpioOpts.mock = 'raspi-zero-w'
+    }
+    rpio.init(rpioOpts)
     rpio.open(MOTOR_PIN, rpio.OUTPUT, rpio.LOW)
+    // TODO(eric): Implement PWM motor support.
+    //rpio.open(PWM_MOTOR_PIN, rpio.PWM)
 
     this.weightUpdateListener = this.onWeightUpdate.bind(this)
     this.waitFnListener = this._waitFn.bind(this)
