@@ -228,7 +228,7 @@ class Scale extends events.EventEmitter {
       case STATUS.STABLE:
       case STATUS.UNSTABLE:
         var rawWeight = line.substr(3, 9)
-        var rawUnit = line.substr(12, 3)
+        var rawUnit = line.substr(12, 3).trim()
         this.weight = rawWeight
         this.unit = UNIT_MAP[rawUnit]
         this.stable = STATUS_MAP[statusStr] === STATUS.STABLE
