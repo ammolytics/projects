@@ -47,6 +47,7 @@ class Trickler extends events.EventEmitter {
     this.scale.open(() => {
       this.motor.open(cb)
     })
+    this.emit('open', true)
   }
 
   close (cb) {
@@ -56,12 +57,15 @@ class Trickler extends events.EventEmitter {
     this.motor.close(() => {
       this.scale.close(cb)
     })
+    this.emit('close', true)
   }
 
   start () {
+    this.emit('start', true)
   }
 
   stop () {
+    this.emit('stop', true)
   }
 
   get autoMode() {

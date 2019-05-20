@@ -81,11 +81,11 @@ class Scale extends events.EventEmitter {
     this.encoding = 'ascii'
     this.delimiter = '\r\n'
 
-    this._weight = 0.0
-    this._unit = ''
+    this._weight = null
+    this._unit = null
     this._serial = ''
     this._model = ''
-    this._status = STATUS.UNSTABLE
+    this._status = null
     this.lastStable = new Date()
 
     this.parser = new Readline({
