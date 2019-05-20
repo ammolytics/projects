@@ -28,7 +28,7 @@ class WeightCharacteristic extends bleno.Characteristic {
     if (offset) {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      var data = Buffer.from(Number(this.trickler.weight).toString())
+      var data = Buffer.from(Number(this.trickler.scale.weight).toString())
       callback(this.RESULT_SUCCESS, data)
     }
   }
@@ -53,7 +53,7 @@ class WeightCharacteristic extends bleno.Characteristic {
     this.updateValueCallback = updateValueCallback
     console.log(`Subscribed to weight characteristic.`)
 
-    this.trickler.on('weight', this.listener)
+    this.trickler.scale.on('weight', this.listener)
   }
 
 
@@ -62,7 +62,7 @@ class WeightCharacteristic extends bleno.Characteristic {
     this.updateValueCallback = null
     console.log('Unsubscribed from weight characteristic')
 
-    this.trickler.removeListener('weight', this.listener)
+    this.trickler.scale.removeListener('weight', this.listener)
   }
 }
 

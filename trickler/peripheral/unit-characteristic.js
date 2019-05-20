@@ -30,7 +30,7 @@ class UnitCharacteristic extends bleno.Characteristic {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
       var data = Buffer.alloc(1)
-      data.writeUInt8(this.trickler.unit, 0)
+      data.writeUInt8(this.trickler.scale.unit, 0)
       callback(this.RESULT_SUCCESS, data)
     }
   }
@@ -50,7 +50,7 @@ class UnitCharacteristic extends bleno.Characteristic {
     this.maxValueSize = maxValueSize
     this.updateValueCallback = updateValueCallback
 
-    this.trickler.on('unit', this.listener)
+    this.trickler.scale.on('unit', this.listener)
   }
 
 
@@ -59,7 +59,7 @@ class UnitCharacteristic extends bleno.Characteristic {
     this.maxValueSize = null
     this.updateValueCallback = null
 
-    this.trickler.removeListener('unit', this.listener)
+    this.trickler.scale.removeListener('unit', this.listener)
   }
 
 
@@ -71,20 +71,20 @@ class UnitCharacteristic extends bleno.Characteristic {
       callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH)
     } else {
       var unit = data.readUInt8(0)
-      console.log(`request to switch unit from ${this.trickler.unit} to ${unit}`)
+      console.log(`request to switch unit from ${this.trickler.scale.unit} to ${unit}`)
 
       switch(unit) {
         case Trickler.TricklerUnits.GRAINS:
         case Trickler.TricklerUnits.GRAMS:
-          if (this.trickler.unit === unit) {
+          if (this.trickler.scale.unit === unit) {
             // Nothing to do.
             console.log('Unit already set')
             callback(this.RESULT_SUCCESS)
           } else {
-            this.trickler.once('unit', result => {
+            this.trickler.scale.once('unit', result => {
               callback(this.RESULT_SUCCESS)
             })
-            this.trickler.pressMode()
+            this.trickler.scale.pressMode()
           }
           break
         default:

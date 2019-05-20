@@ -82,10 +82,10 @@ class Scale extends events.EventEmitter {
     this.delimiter = '\r\n'
 
     this._weight = 0.0
-    this._stable = false
     this._unit = ''
     this._serial = ''
     this._model = ''
+    this._status = STATUS_MAP.UNSTABLE
     this.lastStable = new Date()
 
     this.parser = new Readline({
@@ -120,7 +120,7 @@ class Scale extends events.EventEmitter {
       // Listen to weight, unit, and stable to determine when ready.
       this.once('weight', () => { this.isReady() })
       this.once('unit', () => { this.isReady() })
-      this.once('stable', () => { this.isReady() })
+      this.once('status', () => { this.isReady() })
     })
     this.port.on('close', () => {
       console.log(`Serial port close`)
@@ -169,16 +169,8 @@ class Scale extends events.EventEmitter {
     return this._weight
   }
 
-  set stable (value) {
-    if (this._stable !== value) {
-      this._stable = value
-      this.emit('stable', this._stable)
-      this.lastStable = new Date()
-    }
-  }
-
   get stable () {
-    return this._stable
+    return this.status === STATUS.STABLE
   }
 
   get stableTime () {
@@ -186,6 +178,18 @@ class Scale extends events.EventEmitter {
       return 0
     }
     return new Date() - this.lastStable
+  }
+
+  get status () {
+    return this._status
+  }
+
+  set status (value) {
+    if (this._status !== value) {
+      this._status = value
+      this.lastStable = this.stable ? new Date() : this.lastStable
+      this.emit('status', this._status)
+    }
   }
 
   set unit (value) {
@@ -249,7 +253,7 @@ class Scale extends events.EventEmitter {
         var rawUnit = line.substr(12, 3).trim()
         this.weight = rawWeight
         this.unit = UNIT_MAP[rawUnit]
-        this.stable = STATUS_MAP[statusStr] === STATUS.STABLE
+        this.status = STATUS_MAP[statusStr]
         break
       default:
         console.log(`UNHANDLED MESSAGE: ${line}`)

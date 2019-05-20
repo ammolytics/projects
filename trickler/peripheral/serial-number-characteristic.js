@@ -31,14 +31,14 @@ class SerialNumberCharacteristic extends bleno.Characteristic {
     if (offset) {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      if (typeof this.trickler.serialNumber === 'undefined') {
-        this.trickler.once('serialNumber', serialNumber => {
-          var data = Buffer.from(serialNumber)
+      if (typeof this.trickler.scale.serial === 'undefined') {
+        this.trickler.scale.once('serial', serial => {
+          var data = Buffer.from(serial)
           callback(this.RESULT_SUCCESS, data)
         })
-        this.trickler.getSerialNumber()
+        this.trickler.scale.getSerialNumber()
       } else {
-        var data = Buffer.from(this.trickler.serialNumber)
+        var data = Buffer.from(this.trickler.scale.serial)
         callback(this.RESULT_SUCCESS, data)
       }
     }

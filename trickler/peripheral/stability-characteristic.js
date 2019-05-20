@@ -30,7 +30,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
       var data = Buffer.alloc(1)
-      data.writeUInt8(this.trickler.status, 0)
+      data.writeUInt8(this.trickler.scale.status, 0)
       callback(this.RESULT_SUCCESS, data)
     }
   }
@@ -50,7 +50,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
     this.maxValueSize = maxValueSize
     this.updateValueCallback = updateValueCallback
 
-    this.trickler.on('status', this.listener)
+    this.trickler.scale.on('status', this.listener)
   }
 
 
@@ -59,7 +59,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
     this.maxValueSize = null
     this.updateValueCallback = null
 
-    this.trickler.removeListener('status', this.listener)
+    this.trickler.scale.removeListener('status', this.listener)
   }
 }
 

@@ -34,14 +34,14 @@ class ModelNumberCharacteristic extends bleno.Characteristic {
     if (offset) {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      if (typeof this.trickler.modelNumber === 'undefined') {
-        this.trickler.once('modelNumber', modelNumber => {
-          var data = Buffer.from(modelNumber)
+      if (typeof this.trickler.scale.model === 'undefined') {
+        this.trickler.scale.once('model', model => {
+          var data = Buffer.from(model)
           callback(this.RESULT_SUCCESS, data)
         })
-        this.trickler.getModelNumber()
+        this.trickler.scale.getModelNumber()
       } else {
-        var data = Buffer.from(this.trickler.modelNumber)
+        var data = Buffer.from(this.trickler.scale.model)
         callback(this.RESULT_SUCCESS, data)
       }
     }
