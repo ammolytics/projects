@@ -86,6 +86,7 @@ class Scale extends events.EventEmitter {
     this._unit = ''
     this._serial = ''
     this._model = ''
+    this.lastStable = new Date()
 
     this.parser = new Readline({
       delimiter: this.delimiter,
