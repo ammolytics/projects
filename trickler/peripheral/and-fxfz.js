@@ -154,7 +154,7 @@ class Scale extends events.EventEmitter {
       // Emit the ready signal.
       this.emit('ready', true)
     }
-    console.log(`weight: ${this.weight}, unit: ${this.unit}, stable: ${this.stable}, stableTime: ${this.stableTime}`)
+    console.log(`weight: ${this.weight}, unit: ${this.unit}, status: ${this.status}, stable: ${this.stable}, stableTime: ${this.stableTime}`)
   }
 
   set weight (value) {
