@@ -23,8 +23,6 @@ const TRICKLER = new trickler.Trickler({
   motor: MOTOR,
   scale: SCALE,
 })
-const INFO_SERVICE = new DeviceInfoService(TRICKLER)
-const TRICKLER_SERVICE = new TricklerService(TRICKLER)
 
 const errHandler = (err) => {
   if (err) {
@@ -33,13 +31,11 @@ const errHandler = (err) => {
 }
 
 
-bleno.on('stateChange', function(state) {
+bleno.on('stateChange', state => {
   console.log(`on -> stateChange: ${state}`)
   switch (state) {
     case 'poweredOn':
-      TRICKLER.open(() => {
-        bleno.startAdvertising(process.env.DEVICE_NAME, [TRICKLER_SERVICE.uuid], errHandler)
-      })
+      bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
       break
     case 'unknown':
     case 'resetting':
@@ -52,39 +48,41 @@ bleno.on('stateChange', function(state) {
   }
 })
 
-bleno.on('advertisingStart', function(err) {
+bleno.on('advertisingStart', err => {
   console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
   if (err) {
     // Error handled by advertisingStartError
     return
   }
 
-  console.log('Opening trickler...')
-  TRICKLER.open()
   console.log('advertising services...')
   TRICKLER.once('ready', () => {
+    const INFO_SERVICE = new DeviceInfoService(TRICKLER)
+    const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
     bleno.setServices([
       INFO_SERVICE,
       TRICKLER_SERVICE,
     ])
     console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
   })
+  console.log('Opening trickler...')
+  TRICKLER.open()
 })
 
-bleno.on('advertisingStop', function() {
+bleno.on('advertisingStop', () => {
   console.log('on -> advertisingStop')
   TRICKLER.close()
 })
 
-bleno.on('advertisingStartError', function(err) {
+bleno.on('advertisingStartError', err => {
   console.log('on -> advertisingStartError: ' + (err ? 'error ' + err : 'success'))
 })
 
-bleno.on('accept', function(clientAddress) {
+bleno.on('accept', clientAddress => {
   console.log(`Client accepted: ${clientAddress}`)
 })
 
-bleno.on('disconnect', function(clientAddress) {
+bleno.on('disconnect', clientAddress => {
   console.log(`Client disconnected: ${clientAddress}`)
 })
 

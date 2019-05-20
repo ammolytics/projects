@@ -285,3 +285,5 @@ class Scale extends events.EventEmitter {
 
 
 module.exports.Scale = Scale
+module.exports.UNITS = UNITS
+module.exports.STATUS = STATUS
