@@ -37,6 +37,7 @@ class Trickler extends events.EventEmitter {
 
     // Listen for the scale's ready event.
     this.scale.once('ready', ready => {
+      console.log(`Trickler is ready! ${ready}`)
       this.emit('ready', ready)
     })
   }

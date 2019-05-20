@@ -152,6 +152,7 @@ class Scale extends events.EventEmitter {
         this.stable === true &&
         this.stableTime > 0) {
       // Emit the ready signal.
+      console.log('Scale is ready!')
       this.emit('ready', true)
     }
     console.log(`weight: ${this.weight}, unit: ${this.unit}, status: ${this.status}, stable: ${this.stable}, stableTime: ${this.stableTime}`)
