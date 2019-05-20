@@ -115,6 +115,11 @@ class Scale extends events.EventEmitter {
     this.port.on('open', () => {
       console.log(`Serial port open`)
       this.emit('open')
+
+      // Listen to weight, unit, and stable to determine when ready.
+      this.once('weight', () => { this.isReady() })
+      this.once('unit', () => { this.isReady() })
+      this.once('stable', () => { this.isReady() })
     })
     this.port.on('close', () => {
       console.log(`Serial port close`)
@@ -140,6 +145,16 @@ class Scale extends events.EventEmitter {
     this.port.close(cb)
   }
 
+  isReady() {
+    if (typeof this.weight === 'number' &&
+        typeof this.unit === 'number' &&
+        this.stable === true &&
+        this.stableTime > 0) {
+      // Emit the ready signal.
+      this.emit('ready', true)
+    }
+  }
+
   set weight (value) {
     value = Number(value)
     if (this._weight !== value) {
@@ -156,9 +171,7 @@ class Scale extends events.EventEmitter {
     if (this._stable !== value) {
       this._stable = value
       this.emit('stable', this._stable)
-      if (this._stable === true) {
-        this.lastStable = new Date()
-      }
+      this.lastStable = new Date()
     }
   }
 
@@ -167,6 +180,9 @@ class Scale extends events.EventEmitter {
   }
 
   get stableTime () {
+    if (this.stable === false) {
+      return 0
+    }
     return new Date() - this.lastStable
   }
 

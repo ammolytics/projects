@@ -34,6 +34,11 @@ class Trickler extends events.EventEmitter {
 
     this.on('autoMode', (autoMode) => {
     })
+
+    // Listen for the scale's ready event.
+    this.scale.once('ready', ready => {
+      this.emit('ready', ready)
+    })
   }
 
   open (cb) {

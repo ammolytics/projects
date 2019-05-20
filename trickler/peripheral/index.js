@@ -60,8 +60,9 @@ bleno.on('advertisingStart', function(err) {
   }
 
   console.log('Opening trickler...')
-  TRICKLER.open(() => {
-    console.log('advertising services...')
+  TRICKLER.open()
+  console.log('advertising services...')
+  TRICKLER.once('ready', () => {
     bleno.setServices([
       INFO_SERVICE,
       TRICKLER_SERVICE,
