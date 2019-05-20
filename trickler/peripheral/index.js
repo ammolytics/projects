@@ -35,7 +35,12 @@ bleno.on('stateChange', state => {
   console.log(`on -> stateChange: ${state}`)
   switch (state) {
     case 'poweredOn':
-      bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
+      TRICKLER.once('ready', () => {
+        bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
+        console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
+      })
+      console.log('Opening trickler...')
+      TRICKLER.open()
       break
     case 'unknown':
     case 'resetting':
@@ -56,17 +61,12 @@ bleno.on('advertisingStart', err => {
   }
 
   console.log('advertising services...')
-  TRICKLER.once('ready', () => {
-    const INFO_SERVICE = new DeviceInfoService(TRICKLER)
-    const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
-    bleno.setServices([
-      INFO_SERVICE,
-      TRICKLER_SERVICE,
-    ])
-    console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
-  })
-  console.log('Opening trickler...')
-  TRICKLER.open()
+  const INFO_SERVICE = new DeviceInfoService(TRICKLER)
+  const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
+  bleno.setServices([
+    INFO_SERVICE,
+    TRICKLER_SERVICE,
+  ])
 })
 
 bleno.on('advertisingStop', () => {
