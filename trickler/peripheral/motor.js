@@ -129,3 +129,4 @@ class MotorControl extends events.EventEmitter {
 
 
 module.exports.MotorControl = MotorControl
+module.exports.SPEEDS = SPEEDS

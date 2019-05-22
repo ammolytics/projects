@@ -128,3 +128,6 @@ class Trickler extends events.EventEmitter {
 
 
 module.exports.Trickler = Trickler
+module.exports.AUTO_MODES = AUTO_MODES
+module.exports.RUNNING_MODES = RUNNING_MODES
+module.exports.MAX_TARGET_WEIGHT = MAX_TARGET_WEIGHT

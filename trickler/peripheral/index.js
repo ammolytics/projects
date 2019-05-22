@@ -24,34 +24,39 @@ const TRICKLER = new trickler.Trickler({
   scale: SCALE,
 })
 
+TRICKLER.once('ready', () => {
+  console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
+  // Kick off bluetooth after trickler reports it's ready.
+  bleno.on('stateChange', state => {
+    console.log(`on -> stateChange: ${state}`)
+    switch (state) {
+      case 'poweredOn':
+        bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
+        break
+      case 'unknown':
+      case 'resetting':
+      case 'unsupported':
+      case 'unauthorized':
+      case 'poweredOff':
+      default:
+        bleno.stopAdvertising()
+        break
+    }
+  })
+})
+
+console.log('Opening trickler...')
+TRICKLER.open()
+
+const INFO_SERVICE = new DeviceInfoService(TRICKLER)
+const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
+
 const errHandler = (err) => {
   if (err) {
     console.error(err)
   }
 }
 
-
-bleno.on('stateChange', state => {
-  console.log(`on -> stateChange: ${state}`)
-  switch (state) {
-    case 'poweredOn':
-      TRICKLER.once('ready', () => {
-        bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
-        console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
-      })
-      console.log('Opening trickler...')
-      TRICKLER.open()
-      break
-    case 'unknown':
-    case 'resetting':
-    case 'unsupported':
-    case 'unauthorized':
-    case 'poweredOff':
-    default:
-      bleno.stopAdvertising()
-      break
-  }
-})
 
 bleno.on('advertisingStart', err => {
   console.log('on -> advertisingStart: ' + (err ? 'error ' + err : 'success'))
@@ -61,8 +66,6 @@ bleno.on('advertisingStart', err => {
   }
 
   console.log('advertising services...')
-  const INFO_SERVICE = new DeviceInfoService(TRICKLER)
-  const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
   bleno.setServices([
     INFO_SERVICE,
     TRICKLER_SERVICE,
