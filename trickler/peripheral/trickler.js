@@ -68,6 +68,11 @@ class Trickler extends events.EventEmitter {
     this.emit('stop', true)
   }
 
+  // Difference between current weight and target weight.
+  weightDelta () {
+    return this.targetWeight - this.scale.weight
+  }
+
   get autoMode() {
     return this._autoMode
   }
