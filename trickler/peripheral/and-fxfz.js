@@ -13,6 +13,13 @@ const UNITS = {
   GRAMS: 1,
 }
 
+const UNIT_PRECISION = {
+  [UNITS.GRAINS]: 0.02,
+  [UNITS.GRAMS]: 0.001,
+  GRAINS: 0.02,
+  GRAMS: 0.001,
+}
+
 const STATUS = {
   STABLE: 0,
   UNSTABLE: 1,
@@ -69,8 +76,6 @@ const COMMAND_MAP = {
   MODE_BTN: 'U\r\n',
 }
 
-
-// TODO: Emit 'ready' when signals received from scale.
 
 class Scale extends events.EventEmitter {
   constructor (opts) {
@@ -286,4 +291,5 @@ class Scale extends events.EventEmitter {
 
 module.exports.Scale = Scale
 module.exports.UNITS = UNITS
+module.exports.UNIT_PRECISION = UNIT_PRECISION
 module.exports.STATUS = STATUS
