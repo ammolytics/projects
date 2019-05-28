@@ -2,7 +2,10 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
+const _ = require('lodash')
 const events = require('events')
+
+const scales = require('./and-fxfz')
 
 
 const AUTO_MODES = {
@@ -29,16 +32,23 @@ class Trickler extends events.EventEmitter {
     this._autoMode = AUTO_MODES.OFF
     this._targetWeight = 0.0
 
-    this.on('runningMode', (runningMode) => {
-    })
-
-    this.on('autoMode', (autoMode) => {
-    })
-
     // Listen for the scale's ready event.
     this.scale.once('ready', ready => {
       console.log(`Trickler is ready! ${ready}`)
       this.emit('ready', ready)
+    })
+
+    this.on('runningMode', runningMode => {
+    })
+
+    this.on('autoMode', autoMode => {
+    })
+
+    this.scale.on('weight', () => {
+      // TODO: Set appropriate motor speed based on weight delta.
+      var weightDelta = this.weightDelta()
+      switch (weightDelta > 0 && weightDelta) {
+      }
     })
   }
 
@@ -71,6 +81,11 @@ class Trickler extends events.EventEmitter {
   // Difference between current weight and target weight.
   weightDelta () {
     return this.targetWeight - this.scale.weight
+  }
+
+  // Difference between current and target weight divided by unit precision.
+  tickDelta () {
+    return this.targetWeightTicks - this.scale.weightTicks
   }
 
   get autoMode() {
@@ -127,6 +142,10 @@ class Trickler extends events.EventEmitter {
       this._targetWeight = value
       this.emit('targetWeight', this._targetWeight)
     }
+  }
+
+  get targetWeightTicks () {
+    return this.targetWeight / scales.UNIT_PRECISION[this.scale.unit]
   }
 
 }

@@ -186,6 +186,11 @@ class Scale extends events.EventEmitter {
     return new Date() - this.lastStable
   }
 
+  // Get the current weight in "ticks", or number of units of precision.
+  get weightTicks () {
+    return this.weight / UNIT_PRECISION[this.unit]
+  }
+
   get status () {
     return this._status
   }
