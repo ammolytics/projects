@@ -10,6 +10,7 @@ const rpio = require('rpio')
 // TODO(eric): Make variable w/ frequency and duty cycle control.
 // Controls the speed of the motor by pulsing it ON (true) and OFF (false) at specific intervals.
 const SPEEDS = {
+  SINGLE_KERNEL: {true: 40, false: 500},
   VERY_SLOW: {true: 40, false: 150},
   SLOW: {true: 60, false: 100},
   MEDIUM: {true: 80, false: 100},

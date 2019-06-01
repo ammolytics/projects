@@ -31,6 +31,7 @@ class Trickler extends events.EventEmitter {
     this._runningMode = RUNNING_MODES.NOGO
     this._autoMode = AUTO_MODES.OFF
     this._targetWeight = 0.0
+    this._weightListener = this.onWeightUpdate.bind(this)
 
     // Listen for the scale's ready event.
     this.scale.once('ready', ready => {
@@ -42,14 +43,36 @@ class Trickler extends events.EventEmitter {
     })
 
     this.on('autoMode', autoMode => {
-    })
-
-    this.scale.on('weight', () => {
-      // TODO: Set appropriate motor speed based on weight delta.
-      var weightDelta = this.weightDelta()
-      switch (weightDelta > 0 && weightDelta) {
+      switch (autoMode) {
+        case AUTO_MODES.ON:
+          this.scale.on('weight', this._weightListener)
+          break
+        case AUTO_MODES.OFF:
+          this.scale.removeListener('weight', this._weightListener)
+          break
       }
     })
+  }
+
+  onWeightUpdate (weight) {
+    // TODO: Set appropriate motor speed based on weight delta.
+    var weightDelta = this.weightDelta()
+    var tickDelta = this.tickDelta()
+
+    switch (Math.sign(tickDelta)) {
+      case 0:
+      case -0:
+        // Exact weight.
+        // TODO: Turn motor off, wait for pan removal.
+        break
+      case -1:
+        // Over (negative delta).
+        // TODO: Turn motor off, wait for pan removal.
+        break
+      case 1:
+        // Under (positive delta).
+        break
+    }
   }
 
   open (cb) {
