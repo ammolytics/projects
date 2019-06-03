@@ -102,22 +102,22 @@ class Trickler extends events.EventEmitter {
     var tickDelta = this.tickDelta()
 
     switch (true) {
-      case (tickDelta <= 4):
+      case (tickDelta <= 2):
         this.motor.speed = SPEEDS.SINGLE_KERNEL
         break
-      case (tickDelta > 4 && tickDelta <= 12):
+      case (tickDelta > 2 && tickDelta <= 8):
         this.motor.speed = SPEEDS.VERY_SLOW
         break
-      case (tickDelta > 12 && tickDelta <= 24):
+      case (tickDelta > 8 && tickDelta <= 16):
         this.motor.speed = SPEEDS.SLOW
         break
-      case (tickDelta > 24 && tickDelta <= 36):
+      case (tickDelta > 16 && tickDelta <= 32):
         this.motor.speed = SPEEDS.MEDIUM
         break
-      case (tickDelta > 36 && tickDelta <= 100):
+      case (tickDelta > 32 && tickDelta <= 48):
         this.motor.speed = SPEEDS.FAST
         break
-      case (tickDelta > 100):
+      case (tickDelta > 48):
         this.motor.speed = SPEEDS.VERY_FAST
         break
     }
