@@ -45,6 +45,7 @@ class Trickler extends events.EventEmitter {
     this.on('autoMode', autoMode => {
       switch (autoMode) {
         case AUTO_MODES.ON:
+          console.log('Auto-mode activated.')
           this.scale.on('weight', this._weightListener)
           this.setMotorSpeed()
           this.startWhenReady()
@@ -64,23 +65,28 @@ class Trickler extends events.EventEmitter {
   }
 
   onWeightUpdate (weight) {
-    switch (Math.sign(this.weightDelta())) {
+    var weightDelta = this.weightDelta()
+    switch (Math.sign(weightDelta)) {
       case 0:
       case -0:
         // Exact weight.
         // Turn motor off, wait for pan removal.
         this.motor.stop()
+        console.log(`EXACT WEIGHT ${weight} delta: ${weightDelta}`)
         break
       case -1:
         // Over (negative delta).
         // Turn motor off, wait for pan removal.
         this.motor.stop()
+        console.log(`OVER WEIGHT ${weight} delta: ${weightDelta}`)
         break
       case 1:
         // Under (positive delta).
+        console.log(`UNDER WEIGHT ${weight} delta: ${weightDelta}`)
         if (weight < 0) {
           // Pan removed.
           this.motor.stop()
+          console.log('PAN REMOVED')
         } else {
           // Set the motor speed based on the current weight.
           this.setMotorSpeed()
@@ -115,6 +121,7 @@ class Trickler extends events.EventEmitter {
         this.motor.speed = SPEEDS.VERY_FAST
         break
     }
+    console.log(`Motor speed set to ${this.motor.speed}`)
   }
 
   // Don't bother with speeds, just turn the motor on and run until weight changes.
