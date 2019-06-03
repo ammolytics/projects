@@ -18,6 +18,8 @@ const SPEEDS = {
   VERY_FAST: {true: 120, false: 20},
 }
 
+const SPEED_VALS = Object.values(SPEEDS)
+
 
 class MotorControl extends events.EventEmitter {
 
@@ -30,6 +32,7 @@ class MotorControl extends events.EventEmitter {
     this.speed = opts.speed || SPEEDS.VERY_SLOW
     this._mode = false
     this.timer = null
+    this.running = false
 
     this.runner = this._runner.bind(this)
 
@@ -57,6 +60,20 @@ class MotorControl extends events.EventEmitter {
     this.emit('close')
     if (cb) {
       cb()
+    }
+  }
+
+  faster () {
+    var currIndex = SPEED_VALS.indexOf(this.speed)
+    if (currIndex < SPEED_VALS.length - 1) {
+      this.speed = SPEED_VALS[currIndex + 1]
+    }
+  }
+
+  slower () {
+    var currIndex = SPEED_VALS.indexOf(this.speed)
+    if (currIndex > 0) {
+      this.speed = SPEED_VALS[currIndex - 1]
     }
   }
 
@@ -112,6 +129,7 @@ class MotorControl extends events.EventEmitter {
   }
 
   start () {
+    this.running = true
     this.timer = new Date()
     this.mode = true
     this._interval = setInterval(this.runner, 1)
@@ -124,7 +142,10 @@ class MotorControl extends events.EventEmitter {
     this.timer = null
     this.mode = false
     this.off()
+    this.running = false
     this.emit('stop')
+    // Reset speed to very slow.
+    this.speed = SPEEDS.VERY_SLOW
   }
 }
 

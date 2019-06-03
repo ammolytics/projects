@@ -2,10 +2,10 @@
  * Copyright (c) Ammolytics and contributors. All rights reserved.
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
-const _ = require('lodash')
 const events = require('events')
 
 const scales = require('./and-fxfz')
+const { SPEEDS } = require('./motor')
 
 
 const AUTO_MODES = {
@@ -55,24 +55,65 @@ class Trickler extends events.EventEmitter {
   }
 
   onWeightUpdate (weight) {
-    // TODO: Set appropriate motor speed based on weight delta.
-    var weightDelta = this.weightDelta()
-    var tickDelta = this.tickDelta()
-
-    switch (Math.sign(tickDelta)) {
+    switch (Math.sign(this.weightDelta())) {
       case 0:
       case -0:
         // Exact weight.
-        // TODO: Turn motor off, wait for pan removal.
+        // Turn motor off, wait for pan removal.
+        this.motor.stop()
         break
       case -1:
         // Over (negative delta).
-        // TODO: Turn motor off, wait for pan removal.
+        // Turn motor off, wait for pan removal.
+        this.motor.stop()
         break
       case 1:
         // Under (positive delta).
+        if (weight < 0) {
+          // Pan removed.
+          this.motor.stop()
+        } else {
+          // Set the motor speed based on the current weight.
+          this.setMotorSpeed()
+          // Start the motor if it isn't running and scale has been stable for over 1s.
+          if (this.motor.running === false && this.scale.stableTime >= 1000) {
+            this.motor.start()
+          }
+        }
         break
     }
+  }
+
+  // Set appropriate motor speed based on weight delta.
+  setMotorSpeed () {
+    var tickDelta = this.tickDelta()
+
+    switch (true) {
+      case (tickDelta <= 4):
+        this.motor.speed = SPEEDS.SINGLE_KERNEL
+        break
+      case (tickDelta > 4 && tickDelta <= 12):
+        this.motor.speed = SPEEDS.VERY_SLOW
+        break
+      case (tickDelta > 12 && tickDelta <= 24):
+        this.motor.speed = SPEEDS.SLOW
+        break
+      case (tickDelta > 24 && tickDelta <= 36):
+        this.motor.speed = SPEEDS.MEDIUM
+        break
+      case (tickDelta > 36 && tickDelta <= 100):
+        this.motor.speed = SPEEDS.FAST
+        break
+      case (tickDelta > 100):
+        this.motor.speed = SPEEDS.VERY_FAST
+        break
+    }
+  }
+
+  // Don't bother with speeds, just turn the motor on and run until weight changes.
+  prime () {
+    this.motor.on()
+    this.scale.once('weight', this.motor.off)
   }
 
   open (cb) {
