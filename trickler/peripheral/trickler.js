@@ -70,6 +70,7 @@ class Trickler extends events.EventEmitter {
   onWeightUpdate (weight) {
     var weightDelta = this.weightDelta()
     this.endTime = new Date()
+    var timeDeltaSec = (this.endTime - this.startTime) / 1000
 
     switch (Math.sign(weightDelta)) {
       case 0:
@@ -78,14 +79,14 @@ class Trickler extends events.EventEmitter {
         // Turn motor off, wait for pan removal.
         this.motor.stop()
         console.log(`EXACT WEIGHT ${weight} delta: ${weightDelta}`)
-        console.log(`Took ${this.endTime - this.startTime} seconds`)
+        console.log(`Took ${timeDeltaSec} seconds`)
         break
       case -1:
         // Over (negative delta).
         // Turn motor off, wait for pan removal.
         this.motor.stop()
         console.log(`OVER WEIGHT ${weight} delta: ${weightDelta}`)
-        console.log(`Took ${this.endTime - this.startTime} seconds`)
+        console.log(`Took ${timeDeltaSec} seconds`)
         break
       case 1:
         // Under (positive delta).
@@ -109,10 +110,10 @@ class Trickler extends events.EventEmitter {
     var tickDelta = this.tickDelta()
 
     switch (true) {
-      case (tickDelta <= 2):
+      case (tickDelta <= 3):
         this.motor.speed = SPEEDS.SINGLE_KERNEL
         break
-      case (tickDelta > 2 && tickDelta <= 8):
+      case (tickDelta > 3 && tickDelta <= 8):
         this.motor.speed = SPEEDS.VERY_SLOW
         break
       case (tickDelta > 8 && tickDelta <= 16):
