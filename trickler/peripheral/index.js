@@ -24,6 +24,12 @@ const TRICKLER = new trickler.Trickler({
   scale: SCALE,
 })
 
+const errHandler = (err) => {
+  if (err) {
+    console.error(err)
+  }
+}
+
 TRICKLER.once('ready', () => {
   console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
   // Kick off bluetooth after trickler reports it's ready.
@@ -44,18 +50,6 @@ TRICKLER.once('ready', () => {
     }
   })
 })
-
-console.log('Opening trickler...')
-TRICKLER.open()
-
-const INFO_SERVICE = new DeviceInfoService(TRICKLER)
-const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
-
-const errHandler = (err) => {
-  if (err) {
-    console.error(err)
-  }
-}
 
 
 bleno.on('advertisingStart', err => {
@@ -88,6 +82,12 @@ bleno.on('accept', clientAddress => {
 bleno.on('disconnect', clientAddress => {
   console.log(`Client disconnected: ${clientAddress}`)
 })
+
+console.log('Opening trickler...')
+TRICKLER.open()
+
+const INFO_SERVICE = new DeviceInfoService(TRICKLER)
+const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
 
 
 /**
