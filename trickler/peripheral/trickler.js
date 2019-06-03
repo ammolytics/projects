@@ -46,12 +46,21 @@ class Trickler extends events.EventEmitter {
       switch (autoMode) {
         case AUTO_MODES.ON:
           this.scale.on('weight', this._weightListener)
+          this.setMotorSpeed()
+          this.startWhenReady()
           break
         case AUTO_MODES.OFF:
           this.scale.removeListener('weight', this._weightListener)
           break
       }
     })
+  }
+
+  startWhenReady () {
+    // Start the motor if it isn't running and scale has been stable for over 1s.
+    if (this.motor.running === false && this.scale.stableTime >= 1000) {
+      this.motor.start()
+    }
   }
 
   onWeightUpdate (weight) {
@@ -76,9 +85,7 @@ class Trickler extends events.EventEmitter {
           // Set the motor speed based on the current weight.
           this.setMotorSpeed()
           // Start the motor if it isn't running and scale has been stable for over 1s.
-          if (this.motor.running === false && this.scale.stableTime >= 1000) {
-            this.motor.start()
-          }
+          this.startWhenReady()
         }
         break
     }
