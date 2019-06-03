@@ -32,6 +32,8 @@ class Trickler extends events.EventEmitter {
     this._autoMode = AUTO_MODES.OFF
     this._targetWeight = 0.0
     this._weightListener = this.onWeightUpdate.bind(this)
+    this.startTime = null
+    this.endTime = null
 
     // Listen for the scale's ready event.
     this.scale.once('ready', ready => {
@@ -61,11 +63,14 @@ class Trickler extends events.EventEmitter {
     // Start the motor if it isn't running and scale has been stable for over 1s.
     if (this.motor.running === false && this.scale.stableTime >= 1000) {
       this.motor.start()
+      this.startTime = new Date()
     }
   }
 
   onWeightUpdate (weight) {
     var weightDelta = this.weightDelta()
+    this.endTime = new Date()
+
     switch (Math.sign(weightDelta)) {
       case 0:
       case -0:
@@ -73,12 +78,14 @@ class Trickler extends events.EventEmitter {
         // Turn motor off, wait for pan removal.
         this.motor.stop()
         console.log(`EXACT WEIGHT ${weight} delta: ${weightDelta}`)
+        console.log(`Took ${this.endTime - this.startTime} seconds`)
         break
       case -1:
         // Over (negative delta).
         // Turn motor off, wait for pan removal.
         this.motor.stop()
         console.log(`OVER WEIGHT ${weight} delta: ${weightDelta}`)
+        console.log(`Took ${this.endTime - this.startTime} seconds`)
         break
       case 1:
         // Under (positive delta).
