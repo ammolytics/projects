@@ -10,9 +10,9 @@ module.exports = {
     env: {
       'NODE_ENV': 'development',
       // 15 for fake PWM.
-      //'MOTOR_PIN': 15,
+      'MOTOR_PIN': 15,
       // 12 for real PWM
-      'MOTOR_PIN': 12,
+      //'MOTOR_PIN': 12,
       'SCALE_BAUD_RATE': 19200,
       'SCALE_DEVICE_PATH': '/dev/ttyUSB0',
       'DEVICE_NAME': 'Trickler',
