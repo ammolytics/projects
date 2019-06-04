@@ -5,8 +5,8 @@ module.exports = {
     cwd: '/home/pi/projects/trickler/peripheral/',
     args: '/dev/ttyUSB0',
     instances: 1,
-    watch: true,
-    log_date_format: 'YYYY-MM-DD HH:mm Z',
+    watch: false,
+    log_date_format: 'YYYY-MM-DD HH:mm:ss.SSS Z',
     env: {
       'NODE_ENV': 'development',
       // 15 for fake PWM.
