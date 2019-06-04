@@ -40,6 +40,11 @@ class Trickler extends events.EventEmitter {
       console.log(`Trickler is ready! ${ready}`)
       this.emit('ready', ready)
     })
+    // See if it's already ready.
+    if (this.scale.ready === true) {
+      console.log(`Trickler is ready!`)
+      this.emit('ready', true)
+    }
 
     this.on('runningMode', runningMode => {
     })

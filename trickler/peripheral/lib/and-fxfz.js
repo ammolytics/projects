@@ -86,6 +86,7 @@ class Scale extends events.EventEmitter {
     this.encoding = 'ascii'
     this.delimiter = '\r\n'
 
+    this._ready = false
     this._weight = null
     this._unit = null
     this._serial = ''
@@ -156,11 +157,22 @@ class Scale extends events.EventEmitter {
         typeof this.unit === 'number' &&
         this.stable === true &&
         this.stableTime > 0) {
-      // Emit the ready signal.
       console.log('Scale is ready!')
-      this.emit('ready', true)
+      this.ready = true
     }
     console.log(`weight: ${this.weight}, unit: ${this.unit}, status: ${this.status}, stable: ${this.stable}, stableTime: ${this.stableTime}`)
+  }
+
+  get ready () {
+    return this._ready
+  }
+
+  set ready (value) {
+    if (typeof value === 'boolean' && this._ready !== value) {
+      this._ready = value
+      // Emit the ready signal.
+      this.emit('ready', value)
+    }
   }
 
   set weight (value) {
