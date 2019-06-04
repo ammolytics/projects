@@ -86,7 +86,6 @@ class Trickler extends events.EventEmitter {
   }
 
   shouldGo () {
-    console.log('NOGO set. Checking if ready...')
     if (this.autoMode === AUTO_MODES.ON &&
         this.scale.weight >= 0 &&
         this.scale.stableTime >= 1000 &&
