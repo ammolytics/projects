@@ -33,6 +33,7 @@ class Trickler extends events.EventEmitter {
     this._runningMode = RUNNING_MODES.NOGO
     this._targetWeight = 0.0
     this._weightListener = this.onWeightUpdate.bind(this)
+    this._shouldGoBound = this.shouldGo.bind(this)
     this.startTime = null
     this.endTime = null
 
@@ -58,16 +59,7 @@ class Trickler extends events.EventEmitter {
           // Set interval to check for ready state and set GO mode.
           if (this._interval === null) {
             console.log('NOGO set. Starting checker...')
-            this._interval = setInterval(() => {
-              console.log('NOGO set. Checking if ready...')
-              if (this.autoMode === AUTO_MODES.ON &&
-                  this.scale.weight >= 0 &&
-                  this.scale.stableTime >= 1000) {
-                // Set GO mode.
-                this.runningMode = RUNNING_MODES.GO
-                console.log('Ready! Set GO mode.')
-              }
-            }, 50)
+            this._interval = setInterval(this._shouldGoBound, 50)
           }
           break
       }
@@ -79,13 +71,29 @@ class Trickler extends events.EventEmitter {
           console.log('Auto-mode activated.')
           this.scale.on('weight', this._weightListener)
           this.setMotorSpeed()
-          this.startWhenReady()
+          if (this._interval === null) {
+            console.log('NOGO set. Starting checker...')
+            this._interval = setInterval(this._shouldGoBound, 50)
+          }
+          //this.startWhenReady()
           break
         case AUTO_MODES.OFF:
+          this.runningMode = RUNNING_MODES.NOGO
           this.scale.removeListener('weight', this._weightListener)
           break
       }
     })
+  }
+
+  shouldGo () {
+    console.log('NOGO set. Checking if ready...')
+    if (this.autoMode === AUTO_MODES.ON &&
+        this.scale.weight >= 0 &&
+        this.scale.stableTime >= 1000) {
+      // Set GO mode.
+      this.runningMode = RUNNING_MODES.GO
+      console.log('Ready! Set GO mode.')
+    }
   }
 
   startWhenReady () {
