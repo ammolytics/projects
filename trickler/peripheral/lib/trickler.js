@@ -28,8 +28,9 @@ class Trickler extends events.EventEmitter {
 
     this.scale = opts.scale
     this.motor = opts.motor
-    this._runningMode = RUNNING_MODES.NOGO
+    this._interval = null
     this._autoMode = AUTO_MODES.OFF
+    this._runningMode = RUNNING_MODES.NOGO
     this._targetWeight = 0.0
     this._weightListener = this.onWeightUpdate.bind(this)
     this.startTime = null
@@ -47,6 +48,29 @@ class Trickler extends events.EventEmitter {
     }
 
     this.on('runningMode', runningMode => {
+      switch (runningMode) {
+        case RUNNING_MODES.GO:
+          clearInterval(this._interval)
+          this._interval = null
+          this.startWhenReady()
+          break
+        case RUNNING_MODES.NOGO:
+          // Set interval to check for ready state and set GO mode.
+          if (this._interval === null) {
+            console.log('NOGO set. Starting checker...')
+            this._interval = setInterval(() => {
+              console.log('NOGO set. Checking if ready...')
+              if (this.autoMode === AUTO_MODES.ON &&
+                  this.scale.weight >= 0 &&
+                  this.scale.stableTime >= 1000) {
+                // Set GO mode.
+                this.runningMode = RUNNING_MODES.GO
+                console.log('Ready! Set GO mode.')
+              }
+            }, 50)
+          }
+          break
+      }
     })
 
     this.on('autoMode', autoMode => {
@@ -66,7 +90,8 @@ class Trickler extends events.EventEmitter {
 
   startWhenReady () {
     // Start the motor if it isn't running and scale has been stable for over 1s.
-    if (this.motor.running === false && this.scale.stableTime >= 1000) {
+    if (this.runningMode === RUNNING_MODES.GO && this.motor.running === false && this.scale.stableTime >= 1000) {
+      console.log('Ready! Starting motor.')
       this.motor.start()
       this.startTime = new Date()
     }
@@ -83,6 +108,7 @@ class Trickler extends events.EventEmitter {
         // Exact weight.
         // Turn motor off, wait for pan removal.
         this.motor.stop()
+        this.runningMode = RUNNING_MODES.NOGO
         console.log(`EXACT WEIGHT ${weight} delta: ${weightDelta}`)
         console.log(`Took ${timeDeltaSec} seconds`)
         break
@@ -90,6 +116,7 @@ class Trickler extends events.EventEmitter {
         // Over (negative delta).
         // Turn motor off, wait for pan removal.
         this.motor.stop()
+        this.runningMode = RUNNING_MODES.NOGO
         console.log(`OVER WEIGHT ${weight} delta: ${weightDelta}`)
         console.log(`Took ${timeDeltaSec} seconds`)
         break
@@ -154,8 +181,8 @@ class Trickler extends events.EventEmitter {
   }
 
   close (cb) {
-    this.runningMode = RUNNING_MODES.NOGO
     this.autoMode = AUTO_MODES.OFF
+    this.runningMode = RUNNING_MODES.NOGO
     // Close the motor first to ensure it turns off.
     this.motor.close(() => {
       this.scale.close(cb)
