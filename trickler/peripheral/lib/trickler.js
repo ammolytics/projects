@@ -89,7 +89,8 @@ class Trickler extends events.EventEmitter {
     console.log('NOGO set. Checking if ready...')
     if (this.autoMode === AUTO_MODES.ON &&
         this.scale.weight >= 0 &&
-        this.scale.stableTime >= 1000) {
+        this.scale.stableTime >= 1000 &&
+        this.tickDelta() > 1) {
       // Set GO mode.
       this.runningMode = RUNNING_MODES.GO
       console.log('Ready! Set GO mode.')
