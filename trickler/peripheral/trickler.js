@@ -119,14 +119,14 @@ class Trickler extends events.EventEmitter {
         break
       case (tickDelta > 8 && tickDelta <= 16):
         //this.motor.speed = SPEEDS.SLOW
-        this.motor.speed = SPEEDS.MEDIUM
+        this.motor.speed = SPEEDS.FAST
         break
       case (tickDelta > 16 && tickDelta <= 32):
         //this.motor.speed = SPEEDS.MEDIUM
-        this.motor.speed = SPEEDS.FAST
+        this.motor.speed = SPEEDS.VERY_FAST
         break
       case (tickDelta > 32 && tickDelta <= 48):
-        this.motor.speed = SPEEDS.FAST
+        this.motor.speed = SPEEDS.VERY_FAST
         break
       case (tickDelta > 48):
         this.motor.speed = SPEEDS.VERY_FAST
