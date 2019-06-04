@@ -3,11 +3,11 @@
  * Released under the MIT license. See LICENSE file in the project root for details.
  */
 const bleno = require('bleno')
-const Trickler = require('./trickler')
+const scales = require('./and-fxfz')
 
 
 class UnitCharacteristic extends bleno.Characteristic {
-  constructor(trickler) {
+  constructor(scale) {
     super({
       uuid: '10000003-be5f-4b43-a49f-76f2d65c6e28',
       properties: ['read', 'write', 'notify'],
@@ -19,7 +19,7 @@ class UnitCharacteristic extends bleno.Characteristic {
       ]
     })
 
-    this.trickler = trickler
+    this.scale = scale
     this.listener = this.sendUnitNotification.bind(this)
   }
 
@@ -30,7 +30,7 @@ class UnitCharacteristic extends bleno.Characteristic {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
       var data = Buffer.alloc(1)
-      data.writeUInt8(this.trickler.unit, 0)
+      data.writeUInt8(this.scale.unit, 0)
       callback(this.RESULT_SUCCESS, data)
     }
   }
@@ -50,7 +50,7 @@ class UnitCharacteristic extends bleno.Characteristic {
     this.maxValueSize = maxValueSize
     this.updateValueCallback = updateValueCallback
 
-    this.trickler.on('unit', this.listener)
+    this.scale.on('unit', this.listener)
   }
 
 
@@ -59,7 +59,7 @@ class UnitCharacteristic extends bleno.Characteristic {
     this.maxValueSize = null
     this.updateValueCallback = null
 
-    this.trickler.removeListener('unit', this.listener)
+    this.scale.removeListener('unit', this.listener)
   }
 
 
@@ -71,20 +71,20 @@ class UnitCharacteristic extends bleno.Characteristic {
       callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH)
     } else {
       var unit = data.readUInt8(0)
-      console.log(`request to switch unit from ${this.trickler.unit} to ${unit}`)
+      console.log(`request to switch unit from ${this.scale.unit} to ${unit}`)
 
       switch(unit) {
-        case Trickler.TricklerUnits.GRAINS:
-        case Trickler.TricklerUnits.GRAMS:
-          if (this.trickler.unit === unit) {
+        case scales.UNITS.GRAINS:
+        case scales.UNITS.GRAMS:
+          if (this.scale.unit === unit) {
             // Nothing to do.
             console.log('Unit already set')
             callback(this.RESULT_SUCCESS)
           } else {
-            this.trickler.once('unit', result => {
+            this.scale.once('unit', result => {
               callback(this.RESULT_SUCCESS)
             })
-            this.trickler.pressMode()
+            this.scale.pressMode()
           }
           break
         default:

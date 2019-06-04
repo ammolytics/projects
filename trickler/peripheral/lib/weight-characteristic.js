@@ -6,7 +6,7 @@ const bleno = require('bleno')
 
 
 class WeightCharacteristic extends bleno.Characteristic {
-  constructor(trickler) {
+  constructor(scale) {
     super({
       uuid: '10000001-be5f-4b43-a49f-76f2d65c6e28',
       properties: ['read', 'notify'],
@@ -18,7 +18,7 @@ class WeightCharacteristic extends bleno.Characteristic {
       ]
     })
 
-    this.trickler = trickler
+    this.scale = scale
     this.listener = this.sendWeightNotification.bind(this)
   }
 
@@ -28,7 +28,7 @@ class WeightCharacteristic extends bleno.Characteristic {
     if (offset) {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      var data = Buffer.from(Number(this.trickler.weight).toString())
+      var data = Buffer.from(Number(this.scale.weight).toString())
       callback(this.RESULT_SUCCESS, data)
     }
   }
@@ -53,7 +53,7 @@ class WeightCharacteristic extends bleno.Characteristic {
     this.updateValueCallback = updateValueCallback
     console.log(`Subscribed to weight characteristic.`)
 
-    this.trickler.on('weight', this.listener)
+    this.scale.on('weight', this.listener)
   }
 
 
@@ -62,7 +62,7 @@ class WeightCharacteristic extends bleno.Characteristic {
     this.updateValueCallback = null
     console.log('Unsubscribed from weight characteristic')
 
-    this.trickler.removeListener('weight', this.listener)
+    this.scale.removeListener('weight', this.listener)
   }
 }
 

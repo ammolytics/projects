@@ -7,7 +7,7 @@ const bleno = require('bleno')
 
 class StabilityCharacteristic extends bleno.Characteristic {
 
-  constructor(trickler) {
+  constructor(scale) {
     super({
       uuid: '10000002-be5f-4b43-a49f-76f2d65c6e28',
       properties: ['read', 'notify'],
@@ -19,7 +19,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
       ]
     })
 
-    this.trickler = trickler
+    this.scale = scale
     this.listener = this.sendStatusNotification.bind(this)
   }
 
@@ -30,7 +30,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
       var data = Buffer.alloc(1)
-      data.writeUInt8(this.trickler.status, 0)
+      data.writeUInt8(this.scale.status, 0)
       callback(this.RESULT_SUCCESS, data)
     }
   }
@@ -50,7 +50,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
     this.maxValueSize = maxValueSize
     this.updateValueCallback = updateValueCallback
 
-    this.trickler.on('status', this.listener)
+    this.scale.on('status', this.listener)
   }
 
 
@@ -59,7 +59,7 @@ class StabilityCharacteristic extends bleno.Characteristic {
     this.maxValueSize = null
     this.updateValueCallback = null
 
-    this.trickler.removeListener('status', this.listener)
+    this.scale.removeListener('status', this.listener)
   }
 }
 

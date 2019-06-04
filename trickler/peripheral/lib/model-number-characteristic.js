@@ -5,19 +5,22 @@
 const bleno = require('bleno')
 
 /**
-"nknown command: "SN,15641060
+Requesting model number...
+2019-03-20T16:14:48.177Z: ST, +00000.00, GN, 0, 0
+"nknown command: "TN,   FX-120i
 */
 
-class SerialNumberCharacteristic extends bleno.Characteristic {
 
-  constructor (trickler) {
+class ModelNumberCharacteristic extends bleno.Characteristic {
+
+  constructor(trickler) {
     super({
-      uuid: '2a25',
+      uuid: '2a24',
       properties: ['read'],
       descriptors: [
         new bleno.Descriptor({
           uuid: '2901',
-          value: 'Scale serial number'
+          value: 'Scale model number'
         })
       ]
     })
@@ -27,18 +30,18 @@ class SerialNumberCharacteristic extends bleno.Characteristic {
 
 
   onReadRequest (offset, callback) {
-    console.log(`serial number read request`)
+    console.log(`model number read request`)
     if (offset) {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      if (typeof this.trickler.serialNumber === 'undefined') {
-        this.trickler.once('serialNumber', serialNumber => {
-          var data = Buffer.from(serialNumber)
+      if (typeof this.trickler.scale.model === 'undefined') {
+        this.trickler.scale.once('model', model => {
+          var data = Buffer.from(model)
           callback(this.RESULT_SUCCESS, data)
         })
-        this.trickler.getSerialNumber()
+        this.trickler.scale.getModelNumber()
       } else {
-        var data = Buffer.from(this.trickler.serialNumber)
+        var data = Buffer.from(this.trickler.scale.model)
         callback(this.RESULT_SUCCESS, data)
       }
     }
@@ -46,4 +49,4 @@ class SerialNumberCharacteristic extends bleno.Characteristic {
 }
 
 
-module.exports = SerialNumberCharacteristic
+module.exports = ModelNumberCharacteristic
