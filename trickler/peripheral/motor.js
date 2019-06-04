@@ -103,7 +103,7 @@ class MotorControl extends events.EventEmitter {
 
   set speed(value) {
     if (this._speed !== value) {
-      console.log(`setting speed from ${this._speed} to ${JSON.stringify(value)}`)
+      console.log(`setting speed from ${JSON.stringify(this._speed)} to ${JSON.stringify(value)}`)
       this._speed = value
       this.emit('speed', this._speed)
     }

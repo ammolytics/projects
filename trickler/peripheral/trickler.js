@@ -114,13 +114,16 @@ class Trickler extends events.EventEmitter {
         this.motor.speed = SPEEDS.SINGLE_KERNEL
         break
       case (tickDelta > 3 && tickDelta <= 8):
-        this.motor.speed = SPEEDS.VERY_SLOW
-        break
-      case (tickDelta > 8 && tickDelta <= 16):
+        //this.motor.speed = SPEEDS.VERY_SLOW
         this.motor.speed = SPEEDS.SLOW
         break
-      case (tickDelta > 16 && tickDelta <= 32):
+      case (tickDelta > 8 && tickDelta <= 16):
+        //this.motor.speed = SPEEDS.SLOW
         this.motor.speed = SPEEDS.MEDIUM
+        break
+      case (tickDelta > 16 && tickDelta <= 32):
+        //this.motor.speed = SPEEDS.MEDIUM
+        this.motor.speed = SPEEDS.FAST
         break
       case (tickDelta > 32 && tickDelta <= 48):
         this.motor.speed = SPEEDS.FAST
@@ -129,7 +132,6 @@ class Trickler extends events.EventEmitter {
         this.motor.speed = SPEEDS.VERY_FAST
         break
     }
-    console.log(`Motor speed set to ${this.motor.speed}`)
   }
 
   // Don't bother with speeds, just turn the motor on and run until weight changes.
