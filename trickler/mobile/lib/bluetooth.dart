@@ -11,7 +11,7 @@ import 'actions.dart';
 import 'models/index.dart';
 
 /// BluetoothApp is a class that is meant to be inherited in order
-/// to allow for bluetooth functionallity in a widget. It provides the
+/// to allow for bluetooth functionality in a widget. It provides the
 /// sub-class access to the connectToDevice, and disconnect methods.
 
 abstract class BluetoothApp extends StatelessWidget {

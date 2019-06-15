@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:redux/redux.dart';
 
 import 'bluetooth.dart';
