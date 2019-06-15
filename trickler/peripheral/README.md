@@ -9,7 +9,7 @@ I recommend [enabling SSH and Wifi](https://desertbot.io/blog/setup-pi-zero-w-he
 
 Once booted, connect via SSH
 ```
-ssh pi@raspberrypi@local
+ssh pi@raspberrypi.local
 ```
 
 Initial configuration
