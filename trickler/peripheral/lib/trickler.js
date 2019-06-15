@@ -61,6 +61,7 @@ class Trickler extends events.EventEmitter {
             console.log('NOGO set. Starting checker...')
             this._interval = setInterval(this._shouldGoBound, 50)
           }
+          this.motor.stop()
           break
       }
     })
