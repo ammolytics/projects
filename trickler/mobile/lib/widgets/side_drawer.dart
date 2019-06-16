@@ -75,7 +75,7 @@ class SideDrawer extends StatelessWidget {
           ),
           ListTile(
             title: Text(
-              'About Trickler',
+              'About Open Trickler',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,

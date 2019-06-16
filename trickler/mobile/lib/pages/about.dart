@@ -11,7 +11,7 @@ import '../widgets/header.dart';
 class AboutPage extends StatelessWidget {
   AboutPage({ Key key }) : super(key: key);
 
-  final String title = 'About Trickler';
+  final String title = 'About Open Trickler';
   final String about = """
 This is the Open Trickler Mobile App. This app allows you to connect to your Open Trickler Controller, and make accurate measurements with ease.
 
@@ -19,7 +19,7 @@ Open Trickler is an open source project by Ammolytics.
   """;
 
   /// _launchUrl attempts to open the given url in the users default
-  /// browser. If it is unable to open the url it will thow an error.
+  /// browser. If it is unable to open the url it will throw an error.
 
   void _launchUrl(String url) async {
     if (await canLaunch(url)) {
