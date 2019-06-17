@@ -75,9 +75,9 @@ abstract class BluetoothApp extends StatelessWidget {
     });
   }
 
-  /// _readCharacteristics asynchronously reads given BluetoothCharactersitics one by one in a Future Chain.
-  /// It is responsible for reading, and setting an initial value for the characterisitic. As well as
-  /// subscribing to any notify enabled charactersitics, and saving the updated values to global state. Once
+  /// _readCharacteristics asynchronously reads given BluetoothCharacteristics one by one in a Future Chain.
+  /// It is responsible for reading, and setting an initial value for the characteristic. As well as
+  /// subscribing to any notify enabled characteristics, and saving the updated values to global state. Once
   /// it is finished reading the characteristic at the given index it will call itself with the given
   /// characteristics, and the given index plus one to continue down the chain, until it gets to the end.
 
@@ -85,6 +85,7 @@ abstract class BluetoothApp extends StatelessWidget {
     BluetoothDevice device = store.state.deviceState.device;
     BluetoothCharacteristic char = chars[i];
 
+    /// TODO(performance): Use a defined list of notify-characteristics and loop those instead.
     if (char.properties.read && DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
       device.readCharacteristic(char).then((readChar) async {
         store.dispatch(SetCharacteristic(char.uuid, readChar));

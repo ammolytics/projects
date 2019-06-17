@@ -45,6 +45,7 @@ class MyApp extends BluetoothApp {
         ),
         home: HomePage(
           key: Key('HomePage'),
+          /// TODO(ux): Try connecting to the device on launch and if disconnected.
           connectToDevice: (device) => connectToDevice(device), // These functions are passed down to the Devices Page, allowing it to
           disconnect: () => disconnect(),                       // interact with a bluetooth device while still keeping the process global.
           onDispose: () => unsubFromBluetoothState(),
