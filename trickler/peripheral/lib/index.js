@@ -32,14 +32,6 @@ const errHandler = (err) => {
   }
 }
 
-// Check every 100ms to ensure things are ready to start advertising.
-var readyInterval = setInterval(() => {
-  if (TRICKLER_READY === true && BT_READY === true) {
-    clearInterval(readyInterval)
-    bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
-  }
-}, 100)
-
 
 TRICKLER.once('ready', () => {
   console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
@@ -64,6 +56,16 @@ bleno.on('stateChange', state => {
       break
   }
 })
+
+
+// Check every 100ms to ensure things are ready to start advertising.
+var readyInterval = setInterval(() => {
+  console.log(`Checking if ready... TRICKLER: ${TRICKLER_READY} BT: ${BT_READY}`)
+  if (TRICKLER_READY === true && BT_READY === true) {
+    clearInterval(readyInterval)
+    bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
+  }
+}, 250)
 
 
 bleno.on('advertisingStart', err => {
