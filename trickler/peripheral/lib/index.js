@@ -9,6 +9,8 @@ const scales = require('./and-fxfz')
 const trickler = require('./trickler')
 const DeviceInfoService = require('./device-info-service')
 const TricklerService = require('./trickler-service')
+var BT_READY = false
+var TRICKLER_READY = false
 
 console.log('===== STARTING UP =====')
 
@@ -30,25 +32,37 @@ const errHandler = (err) => {
   }
 }
 
+// Check every 100ms to ensure things are ready to start advertising.
+var readyInterval = setInterval(() => {
+  if (TRICKLER_READY === true && BT_READY === true) {
+    clearInterval(readyInterval)
+    bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
+  }
+}, 100)
+
+
 TRICKLER.once('ready', () => {
   console.log(`Scale weight reads: ${SCALE.weight} ${SCALE.unit}, stableTime: ${TRICKLER.stableTime}`)
-  // Kick off bluetooth after trickler reports it's ready.
-  bleno.on('stateChange', state => {
-    console.log(`on -> stateChange: ${state}`)
-    switch (state) {
-      case 'poweredOn':
-        bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
-        break
-      case 'unknown':
-      case 'resetting':
-      case 'unsupported':
-      case 'unauthorized':
-      case 'poweredOff':
-      default:
-        bleno.stopAdvertising()
-        break
-    }
-  })
+  TRICKLER_READY = true
+})
+
+// Kick off bluetooth after trickler reports it's ready.
+bleno.on('stateChange', state => {
+  console.log(`on -> stateChange: ${state}`)
+  switch (state) {
+    case 'poweredOn':
+      BT_READY = true
+      break
+    case 'unknown':
+    case 'resetting':
+    case 'unsupported':
+    case 'unauthorized':
+    case 'poweredOff':
+    default:
+      BT_READY = false
+      bleno.stopAdvertising()
+      break
+  }
 })
 
 
@@ -96,6 +110,7 @@ const TRICKLER_SERVICE = new TricklerService.Service(TRICKLER)
 const shutdown = () => {
   // Close the trickler, scale, and motor.
   TRICKLER.close(() => {
+    clearInterval(readyInterval)
     process.exit(0)
   })
 }
