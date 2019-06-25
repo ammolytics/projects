@@ -48,10 +48,13 @@ abstract class BluetoothApp extends StatelessWidget {
   /// to the device it will call _findTricklerService, otherwise it will call disconnect.
 
   connectToDevice(BluetoothDevice device) {
+    print('setting connection status');
     store.dispatch(SetConnectionStatus(BluetoothDeviceState.connecting));
+    print('connecting...');
     dynamic deviceConnection = flutterBlue
       .connect(device, timeout: Duration(seconds: 4)) // Attempt to connect for 4 seconds
       .listen((s) {
+        print('dispatching connection status...');
         store.dispatch(SetConnectionStatus(s));
         if (s == BluetoothDeviceState.connected) {
           _findTricklerService();
@@ -67,12 +70,19 @@ abstract class BluetoothApp extends StatelessWidget {
   /// DeviceState. Then it calls _readCharacteristics and passes in the service's charactersitics.
 
   _findTricklerService() {
-    store.state.deviceState.device.discoverServices().then((services) {
-      BluetoothService service = services
-        .where((s) => s.uuid.toString() == TRICKLER_SERVICE_UUID).single;
-      store.dispatch(SetService(service));
-      _readCharacteristics(service?.characteristics, 0);
-    });
+    print('finding trickler service... ${store.state.deviceState.device}');
+    try {
+      store.state.deviceState.device.discoverServices().then((services) {
+        print('checking service...');
+        BluetoothService service = services
+          .where((s) => s.uuid.toString() == TRICKLER_SERVICE_UUID).single;
+        print('dispatching service...');
+        store.dispatch(SetService(service));
+        _readCharacteristics(service?.characteristics, 0);
+      }).catchError((err) { print(err.toString()); });
+    } catch(err) {
+      print(err.toString());
+    }
   }
 
   /// _readCharacteristics asynchronously reads given BluetoothCharacteristics one by one in a Future Chain.
