@@ -20,5 +20,6 @@ AppState appStateReducer(AppState state, action) {
     deviceState: deviceStateReducer(state.deviceState, action),
     bluetoothState: action is SetBluetoothState ? action.bluetoothState : state.bluetoothState,
     btStateSubscription: action is SetStateSubscription ? action.btStateSubscription : state.btStateSubscription,
+    shouldUpdatePeripheral: action is SetShouldUpdatePeripheral ? action.shouldUpdatePeripheral : state.shouldUpdatePeripheral,
   );
 }

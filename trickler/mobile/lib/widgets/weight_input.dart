@@ -39,6 +39,7 @@ class WeightInputState extends State<WeightInput> {
   void _setWeightFromText(String text) {
     double newWeight = text.length > 0 ?
       double.parse(text) : 0.0;
+    widget.dispatch(SetShouldUpdatePeripheral(false));
     widget.dispatch(SetTargetWeight(newWeight));
   }
 
@@ -102,6 +103,9 @@ class WeightInputState extends State<WeightInput> {
         onEditingComplete: () {
           inputFocus.unfocus();
           widget.syncValue();
+        },
+        onSubmitted: (_) {
+          widget.dispatch(SetShouldUpdatePeripheral(true));
         },
         textAlign: TextAlign.center,
         textInputAction: TextInputAction.done,

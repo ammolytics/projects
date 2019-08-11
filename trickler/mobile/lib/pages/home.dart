@@ -82,11 +82,12 @@ class _HomePageState extends State<HomePage> {
     BluetoothService service = _state.deviceState.service;
     double targetWeight = _state.currentMeasurement.getFormattedWeight();
     bool autoMode = _state.currentMeasurement.isMeasuring;
+    bool shouldUpdatePeripheral = _state.shouldUpdatePeripheral;
     String unit = _state.currentMeasurement.unit;
     dynamic char;
 
     char = getCharFromUUID(TARGET_WEIGHT_CHAR_UUID, service);
-    if (_prevTargetWeight != targetWeight && char != null) {
+    if (_prevTargetWeight != targetWeight && char != null && shouldUpdatePeripheral) {
       await device.writeCharacteristic(char, utf8.encode('$targetWeight'),
         type: CharacteristicWriteType.withResponse);
       _prevTargetWeight = targetWeight;
@@ -132,6 +133,7 @@ class _HomePageState extends State<HomePage> {
             heroTag: 'closeKeyboard',
             onPressed: () {
               inputFocus.unfocus();
+              _dispatch(SetShouldUpdatePeripheral(true));
               _updateTextField(override: true);
             },
             tooltip: 'Close Keyboard',

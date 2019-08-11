@@ -25,19 +25,22 @@ class AppState {
   DeviceState deviceState;
   BluetoothState bluetoothState;
   StreamSubscription btStateSubscription;
+  bool shouldUpdatePeripheral;
 
   AppState({
     this.currentMeasurement,
     this.deviceState,
     this.bluetoothState,
     this.btStateSubscription,
+    this.shouldUpdatePeripheral,
   });
 
   AppState.initialState()
   : currentMeasurement = Measurement(GRAINS, 0.0, 0.0, false, false),
     deviceState = DeviceState.initialState(),
     bluetoothState = BluetoothState.unknown,
-    btStateSubscription = null;
+    btStateSubscription = null,
+    shouldUpdatePeripheral = true;
 
   /// getStatusColor returns a color that reflects the current connectionStatus
   getStatusColor() {
