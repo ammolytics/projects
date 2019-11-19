@@ -98,6 +98,7 @@ void setup() {
     DEBUG_PRINTLN("RTC is NOT running!");
   }
   #ifdef DEBUG
+    // Set the RTC date/time when in debug mode.
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   #endif
   DEBUG_PRINTLN("RTC initialized.");
@@ -121,6 +122,12 @@ void setup() {
 
   lis.setRange(ACCEL_RANGE);
   lis.setDataRate(ACCEL_DATARATE);
+  /**
+   * NOTE: For the following to work, the writeRegister8 function must be public in 
+   * Adafruit_LIS3DH/Adafruit_LIS3DH.h
+   *
+   * Force Normal Mode, High Resolution. This sets speed to 1.25kHz.
+   */
   lis.writeRegister8(LIS3DH_REG_CTRL1, 0b10010111);
   lis.writeRegister8(LIS3DH_REG_CTRL4, 0b10100000);
   DEBUG_PRINTLN("LIS3DH initialized.");
