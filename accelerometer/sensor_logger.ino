@@ -1,12 +1,11 @@
 /**
  * Created by Ammolytics
  * License: MIT
- * Version: 2.1.0
+ * Version: 2.2.0
  * URL: https://github.com/ammolytics/projects/
  * Inexpensive firearm accelerometer based on the Adafruit LIS3DH breakout board.
  */
 
-#include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
@@ -14,11 +13,16 @@
 #include "SdFat.h"
 
 
+// Used for hardware & software SPI
+#define LIS3DH_CS 5
+
+// change this to match your SD shield or module;
+// Adafruit SD shields and modules: pin 10
+#define SD_CS 10
+
 // Battery pin
 #define VBATPIN A7
 
-// I2C clock speed
-#define I2C_SPEED 1000000
 // Set range to 2G, 4G, 8G, 16G
 #define ACCEL_RANGE LIS3DH_RANGE_8_G
 // 5khz data rate
@@ -30,7 +34,7 @@
 
 // Enable debug logger.
 // Note: Comment out before running in real-world.
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
   #define DEBUG_PRINT(x)  Serial.print (x)
@@ -41,10 +45,6 @@
 #endif
 
 RTC_PCF8523 rtc;
-
-// change this to match your SD shield or module;
-// Adafruit SD shields and modules: pin 10
-const int chipSelect = 10;
 
 
 // Filename format:  YYYYMMDDHHmm.csv
@@ -58,12 +58,9 @@ unsigned long stop_us;
 unsigned long counter = 0;
 
 
-// software SPI
-//Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS, LIS3DH_MOSI, LIS3DH_MISO, LIS3DH_CLK);
 // hardware SPI
-//Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS);
-// I2C
-Adafruit_LIS3DH lis = Adafruit_LIS3DH();
+Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS);
+
 
 // set up variables using the SD utility library functions:
 // File system object.
@@ -100,6 +97,9 @@ void setup() {
   if (! rtc.initialized()) {
     DEBUG_PRINTLN("RTC is NOT running!");
   }
+  #ifdef DEBUG
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  #endif
   DEBUG_PRINTLN("RTC initialized.");
   begin_us = micros();
   DateTime now = rtc.now();
@@ -114,22 +114,22 @@ void setup() {
    * Initialize the accelerometer.
    */
   DEBUG_PRINTLN("Initializing LIS3DH Sensor...");
-  if (! lis.begin(LIS3DH_DEFAULT_ADDRESS)) {   // change this to 0x19 for alternative i2c address
+  if (! lis.begin()) {
     DEBUG_PRINTLN("Couldnt start");
     while (1);
   }
-  // Set I2C high speedmode
-  Wire.setClock(I2C_SPEED);
+
   lis.setRange(ACCEL_RANGE);
   lis.setDataRate(ACCEL_DATARATE);
+  lis.writeRegister8(LIS3DH_REG_CTRL1, 0b10010111);
+  lis.writeRegister8(LIS3DH_REG_CTRL4, 0b10100000);
   DEBUG_PRINTLN("LIS3DH initialized.");
-
 
   /**
    * Initialize the SD card and log file.
    */
   DEBUG_PRINTLN("Initializing SD card...");
-  if (!sd.begin(chipSelect, SD_SCK_MHZ(50))) {
+  if (!sd.begin(SD_CS, SD_SCK_MHZ(50))) {
     DEBUG_PRINTLN("Card failed, or not present");
     // don't do anything more:
     while (1);
@@ -164,7 +164,7 @@ void loop() {
   log_accel();
   counter++;
 
-  if (counter >= 1000) {
+  if (counter >= 5000) {
     write_sd();
     counter = 0;
   }
@@ -212,17 +212,14 @@ void log_accel() {
     Serial.print(SEP);
     Serial.print(lis.y_g, ACCEL_PRECISION);
     Serial.print(SEP);
-    Serial.print(lis.z_g, ACCEL_PRECISION);
-    Serial.println();
+    Serial.println(lis.z_g, ACCEL_PRECISION);
   #endif
   // Write acceleration to file.
   dataFile.print(lis.x_g, ACCEL_PRECISION);
   dataFile.print(SEP);
   dataFile.print(lis.y_g, ACCEL_PRECISION);
   dataFile.print(SEP);
-  dataFile.print(lis.z_g, ACCEL_PRECISION);
-  // Write newline.
-  dataFile.println();
+  dataFile.println(lis.z_g, ACCEL_PRECISION);
 }
 
 
