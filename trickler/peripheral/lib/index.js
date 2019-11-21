@@ -60,8 +60,9 @@ bleno.on('stateChange', state => {
 
 // Check every 100ms to ensure things are ready to start advertising.
 var readyInterval = setInterval(() => {
-  console.log(`Checking if ready... TRICKLER: ${TRICKLER_READY} BT: ${BT_READY}`)
-  if (TRICKLER_READY === true && BT_READY === true) {
+  console.log(`scale: ${TRICKLER.scale.isReady()}`)
+  console.log(`Checking if ready... TRICKLER: ${TRICKLER_READY} SCALE: ${TRICKLER.scale.ready} BT: ${BT_READY}`)
+  if ((TRICKLER_READY === true || TRICKLER.scale.ready === true) && BT_READY === true) {
     clearInterval(readyInterval)
     bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
   }
