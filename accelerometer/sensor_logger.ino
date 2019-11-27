@@ -129,7 +129,7 @@ void setup() {
    * Force Normal Mode, High Resolution. This sets speed to 1.25kHz.
    */
   lis.writeRegister8(LIS3DH_REG_CTRL1, 0b10010111);
-  lis.writeRegister8(LIS3DH_REG_CTRL4, 0b10100000);
+  lis.writeRegister8(LIS3DH_REG_CTRL4, 0b10101000);
   DEBUG_PRINTLN("LIS3DH initialized.");
 
   /**
