@@ -24,7 +24,7 @@ class DeviceState {
   /// DeviceState.initialState is a method that initalizes a new instance of DeviceState to have default values.
 
   DeviceState.initialState()
-  : device = BluetoothDevice.fromProto(prefix.BluetoothDevice.getDefault()),
+  : device = BluetoothDevice.fromProto(server.BluetoothDevice()),
     deviceConnection = null,
     connectionStatus = BluetoothDeviceState.disconnected,
     service = null,

@@ -57,6 +57,6 @@ class AppState {
     if (icon == null) {
       icon = Icons.bluetooth;
     }
-
+    return icon;
   }
 }

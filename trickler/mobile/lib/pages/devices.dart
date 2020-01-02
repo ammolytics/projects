@@ -46,8 +46,11 @@ class _DevicesPageState extends State<DevicesPage> {
       });
       // Listen for BT Devices for 10 seconds
       _scanSubscription = _flutterBlue.scan(timeout: const Duration(seconds: 10)).listen((scanResult) {
-        print('\n>>> ${scanResult.device.name}, RSSI: ${scanResult.rssi} <<<\n\n');
-        if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
+        if (scanResult.advertisementData.localName.length > 0) {
+          print('\n>>> ${scanResult.device.name}, RSSI: ${scanResult.rssi} <<<\n\n');
+        }
+        // if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
+        if (!foundPeripheral) {
           // Connect before 10 second timeout
           foundPeripheral = true;
           _dispatch(SetDevice(scanResult.device));

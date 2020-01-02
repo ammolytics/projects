@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:flutter_blue/gen/flutterblue.pbserver.dart' as prefix;
+import 'package:flutter_blue/gen/flutterblue.pbserver.dart' as server;
 import '../globals.dart';
 import '../helpers.dart';
 import 'dart:async';
