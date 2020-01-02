@@ -53,7 +53,7 @@ abstract class BluetoothApp extends StatelessWidget {
       .then((_) {
         print('dispatching connection status...');
         store.dispatch(SetConnectionStatus(BluetoothDeviceState.connected));
-        _findTricklerService();
+        _findTricklerService(device);
       }).catchError((err) {
         print('failed to connect...');
         print(err);
@@ -66,10 +66,10 @@ abstract class BluetoothApp extends StatelessWidget {
   /// for finding a service that matches the TRICKLER_SERVICE_UUID, and saving it to the global
   /// DeviceState. Then it calls _readCharacteristics and passes in the service's charactersitics.
 
-  _findTricklerService() {
-    print('finding trickler service... ${store.state.deviceState.device}');
+  _findTricklerService(BluetoothDevice device) {
+    print('finding trickler service... $device');
     try {
-      store.state.deviceState.device.discoverServices().then((services) {
+      device.discoverServices().then((services) {
         print('checking service...');
         BluetoothService service = services
           .where((s) => s.uuid.toString() == TRICKLER_SERVICE_UUID).single;
