@@ -1,44 +1,50 @@
 PODS:
-  - "!ProtoCompiler (3.6.0)":
-    - Protobuf (~> 3.0)
   - Flutter (1.0.0)
   - flutter_blue (0.0.1):
-    - "!ProtoCompiler"
     - Flutter
     - flutter_blue/Protos (= 0.0.1)
   - flutter_blue/Protos (0.0.1):
-    - "!ProtoCompiler"
     - Flutter
     - Protobuf
   - Protobuf (3.6.1)
   - url_launcher (0.0.1):
     - Flutter
+  - url_launcher_macos (0.0.1):
+    - Flutter
+  - url_launcher_web (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `Flutter`)
   - flutter_blue (from `.symlinks/plugins/flutter_blue/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
+  - url_launcher_macos (from `.symlinks/plugins/url_launcher_macos/ios`)
+  - url_launcher_web (from `.symlinks/plugins/url_launcher_web/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - "!ProtoCompiler"
+  https://github.com/CocoaPods/Specs.git:
     - Protobuf
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: Flutter
   flutter_blue:
     :path: ".symlinks/plugins/flutter_blue/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
+  url_launcher_macos:
+    :path: ".symlinks/plugins/url_launcher_macos/ios"
+  url_launcher_web:
+    :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
-  "!ProtoCompiler": c9526df99fafd398a393def617ae18d3774b7232
-  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
-  flutter_blue: e904dfd71c1d90beae7a8c1ab3731f4c1add8d6b
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_blue: be3f2be2f5fda254d174896c0738b2fcb6b1073e
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
-  url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
+  url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
+  url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
+  url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
 
-PODFILE CHECKSUM: 3389836f37640698630b8f0670315d626d5f1469
+PODFILE CHECKSUM: 3dbe063e9c90a5d7c9e4e76e70a821b9e2c1d271
 
-COCOAPODS: 1.7.3
+COCOAPODS: 1.8.4

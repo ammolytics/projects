@@ -15,6 +15,7 @@ import 'pages/home.dart';
 /// a Redux Store, and running an instance of the app with that store.
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   final store = Store<AppState>(appStateReducer, initialState: AppState.initialState());
 
   runApp(MyApp(

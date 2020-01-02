@@ -24,10 +24,7 @@ abstract class BluetoothApp extends StatelessWidget {
   /// state via flutterBlue, and updates the AppState accordingly.
 
   subToBluetoothState() {
-    flutterBlue.state.then((s) {
-      store.dispatch(SetBluetoothState(s));
-    });
-    StreamSubscription btStateSubscription = flutterBlue.onStateChanged()
+    StreamSubscription btStateSubscription = flutterBlue.state
       .listen((s) {
         store.dispatch(SetBluetoothState(s));
       });
@@ -51,17 +48,17 @@ abstract class BluetoothApp extends StatelessWidget {
     print('setting connection status');
     store.dispatch(SetConnectionStatus(BluetoothDeviceState.connecting));
     print('connecting...');
-    dynamic deviceConnection = flutterBlue
-      .connect(device, timeout: Duration(seconds: 4)) // Attempt to connect for 4 seconds
-      .listen((s) {
+    dynamic deviceConnection = device
+      .connect(timeout: Duration(seconds: 4), autoConnect: false) // Attempt to connect for 4 seconds
+      .then((_) {
         print('dispatching connection status...');
-        store.dispatch(SetConnectionStatus(s));
-        if (s == BluetoothDeviceState.connected) {
-          _findTricklerService();
-        } else {
-          disconnect();
-        }
-      }, onDone: disconnect); // Callback is run on timeout or if connection to device is lost.
+        store.dispatch(SetConnectionStatus(BluetoothDeviceState.connected));
+        _findTricklerService();
+      }).catchError((err) {
+        print('failed to connect...');
+        print(err);
+        store.dispatch(SetConnectionStatus(BluetoothDeviceState.disconnected));
+      });
     store.dispatch(SetDeviceConnection(deviceConnection));
   }
 
@@ -92,17 +89,16 @@ abstract class BluetoothApp extends StatelessWidget {
   /// characteristics, and the given index plus one to continue down the chain, until it gets to the end.
 
   _readCharacteristics(List<BluetoothCharacteristic> chars, int i) { 
-    BluetoothDevice device = store.state.deviceState.device;
     BluetoothCharacteristic char = chars[i];
 
     /// TODO(performance): Use a defined list of notify-characteristics and loop those instead.
     if (char.properties.read && DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
-      device.readCharacteristic(char).then((readChar) async {
+      char.read().then((readChar) async {
         store.dispatch(SetCharacteristic(char.uuid, readChar));
         if (char.properties.notify) {
           // Subscribe to chars with notifications
-          await device.setNotifyValue(char, true);
-          StreamSubscription sub = device.onValueChanged(char).listen((data) {
+          await char.setNotifyValue(true);
+          StreamSubscription sub = char.value.listen((data) {
             store.dispatch(SetCharacteristic(char.uuid, data));
           });
           store.dispatch(AddSubscription(sub)); // Save subscription so we can cancel it on disconnect.

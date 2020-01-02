@@ -78,7 +78,6 @@ class _HomePageState extends State<HomePage> {
   /// and writing them to their respective peripheral characteristics.
 
   void _updatePeripheral() async {
-    BluetoothDevice device = _state.deviceState.device;
     BluetoothService service = _state.deviceState.service;
     double targetWeight = _state.currentMeasurement.getFormattedWeight();
     bool autoMode = _state.currentMeasurement.isMeasuring;
@@ -88,21 +87,21 @@ class _HomePageState extends State<HomePage> {
 
     char = getCharFromUUID(TARGET_WEIGHT_CHAR_UUID, service);
     if (_prevTargetWeight != targetWeight && char != null && shouldUpdatePeripheral) {
-      await device.writeCharacteristic(char, utf8.encode('$targetWeight'),
+      await char.write(utf8.encode('$targetWeight'),
         type: CharacteristicWriteType.withResponse);
       _prevTargetWeight = targetWeight;
     }
     
     char = getCharFromUUID(UNIT_CHAR_UUID, service);
     if (_prevUnit != unit && char != null) {
-      await device.writeCharacteristic(char, unit == GRAINS ? [0x00] : [0x01],
+      await char.write(unit == GRAINS ? [0x00] : [0x01],
         type: CharacteristicWriteType.withResponse);
       _prevUnit = unit;
     }
 
     char = getCharFromUUID(AUTO_MODE_CHAR_UUID, service);
     if (_prevAutoMode != autoMode && char != null) {
-      await device.writeCharacteristic(char, autoMode ? [0x01] : [0x00],
+      await char.write(autoMode ? [0x01] : [0x00],
         type: CharacteristicWriteType.withResponse);
       _prevAutoMode = autoMode;
     }
