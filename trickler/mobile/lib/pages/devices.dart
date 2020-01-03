@@ -49,8 +49,7 @@ class _DevicesPageState extends State<DevicesPage> {
         if (scanResult.advertisementData.localName.length > 0) {
           print('\n>>> ${scanResult.device.name}, RSSI: ${scanResult.rssi} <<<\n\n');
         }
-        // if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
-        if (!foundPeripheral) {
+        if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
           // Connect before 10 second timeout
           foundPeripheral = true;
           _dispatch(SetDevice(scanResult.device));
