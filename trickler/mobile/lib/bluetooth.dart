@@ -44,7 +44,7 @@ abstract class BluetoothApp extends StatelessWidget {
   /// updating Connection Status, and Device Connection in the global DeviceState. If connected
   /// to the device it will call _findTricklerService, otherwise it will call disconnect.
 
-  connectToDevice(BluetoothDevice device) async* {
+  connectToDevice(BluetoothDevice device) async {
     print('setting connection status');
     store.dispatch(SetConnectionStatus(BluetoothDeviceState.connecting));
     print('connecting...');
@@ -65,7 +65,7 @@ abstract class BluetoothApp extends StatelessWidget {
   /// for finding a service that matches the TRICKLER_SERVICE_UUID, and saving it to the global
   /// DeviceState. Then it calls _readCharacteristics and passes in the service's charactersitics.
 
-  _findTricklerService() async* {
+  _findTricklerService() async {
     print('finding trickler service... ${store.state.deviceState.device.name}');
     try {
       List<BluetoothService> services = await store.state.deviceState.device.discoverServices();
@@ -84,7 +84,7 @@ abstract class BluetoothApp extends StatelessWidget {
   /// It is responsible for reading, and setting an initial value for the characteristic. As well as
   /// subscribing to any notify enabled characteristics, and saving the updated values to global state.
 
-  _readCharacteristics(List<BluetoothCharacteristic> chars) async* {
+  _readCharacteristics(List<BluetoothCharacteristic> chars) async {
     for (BluetoothCharacteristic char in chars) {
       /// TODO(performance): Use a defined list of notify-characteristics and loop those instead.
       if (char.properties.read && DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
