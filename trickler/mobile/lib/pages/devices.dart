@@ -27,7 +27,7 @@ class DevicesPage extends StatefulWidget {
 class _DevicesPageState extends State<DevicesPage> {
   AppState _state;
   Function _dispatch;
-  String _btDeviceName = 'opentrickler';
+  String _btDeviceName = 'Trickler';
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
 
