@@ -87,22 +87,19 @@ class _HomePageState extends State<HomePage> {
 
     char = getCharFromUUID(TARGET_WEIGHT_CHAR_UUID, service);
     if (_prevTargetWeight != targetWeight && char != null && shouldUpdatePeripheral) {
-      await char.write(utf8.encode('$targetWeight'),
-        type: CharacteristicWriteType.withResponse);
+      await char.write(utf8.encode('$targetWeight'), withoutResponse: false);
       _prevTargetWeight = targetWeight;
     }
     
     char = getCharFromUUID(UNIT_CHAR_UUID, service);
     if (_prevUnit != unit && char != null) {
-      await char.write(unit == GRAINS ? [0x00] : [0x01],
-        type: CharacteristicWriteType.withResponse);
+      await char.write(unit == GRAINS ? [0x00] : [0x01], withoutResponse: false);
       _prevUnit = unit;
     }
 
     char = getCharFromUUID(AUTO_MODE_CHAR_UUID, service);
     if (_prevAutoMode != autoMode && char != null) {
-      await char.write(autoMode ? [0x01] : [0x00],
-        type: CharacteristicWriteType.withResponse);
+      await char.write(autoMode ? [0x01] : [0x00], withoutResponse: false);
       _prevAutoMode = autoMode;
     }
   }
