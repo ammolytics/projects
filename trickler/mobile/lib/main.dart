@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:redux/redux.dart';
 
 import 'bluetooth.dart';
@@ -16,6 +15,7 @@ import 'pages/home.dart';
 /// a Redux Store, and running an instance of the app with that store.
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   final store = Store<AppState>(appStateReducer, initialState: AppState.initialState());
 
   runApp(MyApp(
@@ -46,6 +46,7 @@ class MyApp extends BluetoothApp {
         ),
         home: HomePage(
           key: Key('HomePage'),
+          /// TODO(ux): Try connecting to the device on launch and if disconnected.
           connectToDevice: (device) => connectToDevice(device), // These functions are passed down to the Devices Page, allowing it to
           disconnect: () => disconnect(),                       // interact with a bluetooth device while still keeping the process global.
           onDispose: () => unsubFromBluetoothState(),

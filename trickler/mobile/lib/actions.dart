@@ -44,6 +44,11 @@ class SetStateSubscription {
   SetStateSubscription(this.btStateSubscription);
 }
 
+class SetShouldUpdatePeripheral {
+  final bool shouldUpdatePeripheral;
+  SetShouldUpdatePeripheral(this.shouldUpdatePeripheral);
+}
+
 
 class ResetDeviceState {
   ResetDeviceState();

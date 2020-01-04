@@ -36,7 +36,7 @@ class _DevicesPageState extends State<DevicesPage> {
 
   /// _scanDevices is responsible for scanning for near by bluetooth devices, and checking to
   /// see if the device is Trickler. If it finds trickler it will connect to the device and
-  /// call _stopScan. If it is unable to find Trickler within 5 seconds it will call _stopScan.
+  /// call _stopScan. If it is unable to find Trickler within 10 seconds it will call _stopScan.
 
   void _scanDevices() {
     try {
@@ -44,10 +44,13 @@ class _DevicesPageState extends State<DevicesPage> {
       setState(() {
         _isScanning = true;
       });
-      // Listen for BT Devices for 5 seconds
+      // Listen for BT Devices for 10 seconds
       _scanSubscription = _flutterBlue.scan(timeout: const Duration(seconds: 10)).listen((scanResult) {
+        if (scanResult.advertisementData.localName.length > 0) {
+          print('\n>>> ${scanResult.device.name}, RSSI: ${scanResult.rssi} <<<\n\n');
+        }
         if (scanResult.advertisementData.localName == _btDeviceName && !foundPeripheral) {
-          // Connect before 5 second timeout
+          // Connect before 10 second timeout
           foundPeripheral = true;
           _dispatch(SetDevice(scanResult.device));
           widget.connectToDevice(scanResult.device);
@@ -61,7 +64,7 @@ class _DevicesPageState extends State<DevicesPage> {
   }
 
   /// _stopScan cancels the _scanSubscription and sets _scanSubscription
-  /// and _isScanning back to their inital values.
+  /// and _isScanning back to their initial values.
 
   void _stopScan() {
     _scanSubscription?.cancel();
@@ -146,39 +149,50 @@ class _DevicesPageState extends State<DevicesPage> {
   _getActionButton() {
     BluetoothDeviceState status = _state.deviceState.connectionStatus;
     FloatingActionButton button;
-    if (_isScanning) {
-      button = FloatingActionButton(
-        heroTag: 'Scanning',
-        onPressed: () {},
-        tooltip: 'Scanning...',
-        backgroundColor: Colors.grey,
-        child: Icon(Icons.bluetooth_searching),
-      );
-    } else if (status == BluetoothDeviceState.connected) {
-      button = FloatingActionButton(
+
+    var actionButtonMap = {
+      BluetoothDeviceState.connected: FloatingActionButton(
         heroTag: 'Disconnect',
         onPressed: widget.disconnect,
         tooltip: 'Disconnect',
         backgroundColor: Colors.red,
         child: Icon(Icons.bluetooth_disabled),
-      );
-    } else if (status == BluetoothDeviceState.connecting) {
-      button = FloatingActionButton(
+      ),
+
+      BluetoothDeviceState.connecting: FloatingActionButton(
         heroTag: 'Connecting',
         onPressed: () {},
         tooltip: 'Connecting...',
         backgroundColor: Colors.grey,
         child: Icon(Icons.bluetooth_connected),
-      );
-    } else {
-      button = FloatingActionButton(
+      ),
+
+      'scanning': FloatingActionButton(
+        heroTag: 'Scanning',
+        onPressed: () {},
+        tooltip: 'Scanning...',
+        backgroundColor: Colors.grey,
+        child: Icon(Icons.bluetooth_searching),
+      ),
+
+      'default': FloatingActionButton(
         heroTag: 'ScanBTDevices',
         onPressed: _scanDevices,
         tooltip: 'Scan for Devices',
         backgroundColor: Colors.green,
         child: Icon(Icons.bluetooth_searching),
-      );
+      ),
+    };
+
+    if (_isScanning) {
+      button = actionButtonMap['scanning'];
+    } else {
+      button = actionButtonMap[status];
     }
+    if (button == null) {
+      button = actionButtonMap['default'];
+    }
+
     return button;
   }
 

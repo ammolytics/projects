@@ -39,6 +39,7 @@ class WeightInputState extends State<WeightInput> {
   void _setWeightFromText(String text) {
     double newWeight = text.length > 0 ?
       double.parse(text) : 0.0;
+    widget.dispatch(SetShouldUpdatePeripheral(false));
     widget.dispatch(SetTargetWeight(newWeight));
   }
 
@@ -94,11 +95,17 @@ class WeightInputState extends State<WeightInput> {
           signed: false
         ),
         controller: controller,
+        /// TODO(cleanup): Is this necessary?
         focusNode: _getFocusNodeWithListener(),
+        /// TODO(ux): This causes issues because it sends partial values. Use onSubmit instead.
         onChanged: _setWeightFromText,
+        /// TODO(ux): Use onSubmitted instead?
         onEditingComplete: () {
           inputFocus.unfocus();
           widget.syncValue();
+        },
+        onSubmitted: (_) {
+          widget.dispatch(SetShouldUpdatePeripheral(true));
         },
         textAlign: TextAlign.center,
         textInputAction: TextInputAction.done,
@@ -106,6 +113,7 @@ class WeightInputState extends State<WeightInput> {
           fontSize: 30,
           fontWeight: FontWeight.bold,
         ),
+        /// TODO(ux): Use inputFormatters to format and validate.
         decoration: ToggleUnitButton(
           hintText: _getAbbrFromUnit(['0.00', '0.000']),
           unitAbbr: _getAbbrFromUnit(['gr', 'g']),

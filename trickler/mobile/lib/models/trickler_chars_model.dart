@@ -43,19 +43,21 @@ class TricklerChars {
       case AUTO_MODE_CHAR_UUID:
         this.autoMode = value[0] != 0;
         break;
+
       case WEIGHT_CHAR_UUID:
         this.actualWeight = double.parse(utf8.decode(value));
         break;
+
       case TARGET_WEIGHT_CHAR_UUID:
         this.targetWeight = double.parse(utf8.decode(value));
         break;
+
       case STABLE_CHAR_UUID:
         this.stability = STABILITY_LIST[value[0]];
         break;
+
       case UNIT_CHAR_UUID:
         this.unit = UNIT_LIST[value[0]];
-        break;
-      default:
         break;
     }
   }
