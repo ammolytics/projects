@@ -44,7 +44,15 @@ class FindDevices extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Text('Find Devices...'),
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+          child: Text('Available Devices',
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold
+            )
+          ),
+        ),
       ],
     );
   }
