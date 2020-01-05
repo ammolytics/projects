@@ -29,8 +29,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
-  int _navIndex = 0;
+  int _navIndex = 1;
   final List<Widget> _tabs = [
     SettingsTab(),
     DevicesTab(),
@@ -38,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
     HistoryTab()
   ];
 
-  void handleNav(int i) {
+  void _handleNav(int i) {
     setState(() {
       _navIndex = i;
     });
@@ -54,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _navIndex,
-        onTap: this.handleNav,
+        onTap: _handleNav,
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.settings),
