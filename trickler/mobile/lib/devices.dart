@@ -105,14 +105,6 @@ class _FindDevicesState extends State<FindDevices> {
         itemBuilder: _buildResults,
       ),
     );
-    
-    // Column(
-    //   mainAxisAlignment: MainAxisAlignment.start,
-    //   children: <Widget>[
-        
-        
-    //   ],
-    // );
   }
 }
 
