@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class PairedDevices extends StatefulWidget {
   final Function setIndex;
@@ -49,17 +50,10 @@ class FindDevices extends StatefulWidget {
 class _FindDevicesState extends State<FindDevices> {
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   List<ScanResult> _scanResults = [];
+  RefreshController _refreshController = RefreshController(initialRefresh: true);
 
-  void initState() {
-    super.initState();
-    _scanDevices();
-  }
-
-  void _scanDevices() {
-    print('Start Scanning...');
-    _flutterBlue.startScan(timeout: Duration(seconds: 4));
-
-    _flutterBlue.scanResults.listen((scanResults) {
+  Future _scanDevices() async {
+    var sub = _flutterBlue.scanResults.listen((scanResults) {
         scanResults.forEach((sr) {
           if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) {
             print('Found: ${sr.device.name}, rssi: ${sr.rssi}');
@@ -70,33 +64,55 @@ class _FindDevicesState extends State<FindDevices> {
         });
     });
 
+    print('Start Scanning...');
+    await _flutterBlue.startScan(timeout: Duration(seconds: 4));
+    print('Stop Scanning...');
     _flutterBlue.stopScan();
+    sub.cancel();
+    return;
   }
 
-  List<Widget> _getResults() {
-    List<Widget> results = [];
-    _scanResults.forEach((sr) {
-      results.add(Text(sr.device.name));
-    });
-    return results;
+  void _onRefresh() async {
+    print('Refreshing...');
+    await _scanDevices();
+    _refreshController.refreshCompleted();
+  }
+
+  Widget _buildResults(BuildContext ctxt, int i) {
+    ScanResult sr = _scanResults[i];
+    return Card(
+      child: Text(sr.device.name),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-          child: Text('Available Devices',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold
-            )
-          ),
-        ),
-      ] + _getResults(),
+    return SmartRefresher(
+      enablePullDown: true,
+      controller: _refreshController,
+      onRefresh: _onRefresh,
+      child: ListView.builder(
+        itemCount: _scanResults.length,
+        itemExtent: 50.0,
+        itemBuilder: _buildResults,
+      ),
     );
+    
+    // Column(
+    //   mainAxisAlignment: MainAxisAlignment.start,
+    //   children: <Widget>[
+    //     Padding(
+    //       padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+    //       child: Text('Available Devices',
+    //         style: TextStyle(
+    //           fontSize: 25,
+    //           fontWeight: FontWeight.bold
+    //         )
+    //       ),
+    //     ),
+        
+    //   ],
+    // );
   }
 }
 
