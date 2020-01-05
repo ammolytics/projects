@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 class PairedDevices extends StatefulWidget {
   final Function setIndex;
@@ -38,7 +39,48 @@ class _PairedDevicesState extends State<PairedDevices> {
   }
 }
 
-class FindDevices extends StatelessWidget {
+class FindDevices extends StatefulWidget {
+  FindDevices({Key key}) : super(key: key);
+
+  @override
+  _FindDevicesState createState() => _FindDevicesState();
+}
+
+class _FindDevicesState extends State<FindDevices> {
+  FlutterBlue _flutterBlue = FlutterBlue.instance;
+  List<ScanResult> _scanResults = [];
+
+  void initState() {
+    super.initState();
+    _scanDevices();
+  }
+
+  void _scanDevices() {
+    print('Start Scanning...');
+    _flutterBlue.startScan(timeout: Duration(seconds: 4));
+
+    _flutterBlue.scanResults.listen((scanResults) {
+        scanResults.forEach((sr) {
+          if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) {
+            print('Found: ${sr.device.name}, rssi: ${sr.rssi}');
+            setState(() {
+              _scanResults.add(sr);
+            });
+          }
+        });
+    });
+
+    _flutterBlue.stopScan();
+  }
+
+  List<Widget> _getResults() {
+    List<Widget> results = [];
+    _scanResults.forEach((sr) {
+      results.add(Text(sr.device.name));
+    });
+    return results;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -53,7 +95,7 @@ class FindDevices extends StatelessWidget {
             )
           ),
         ),
-      ],
+      ] + _getResults(),
     );
   }
 }
