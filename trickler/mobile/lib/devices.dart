@@ -79,10 +79,19 @@ class _FindDevicesState extends State<FindDevices> {
   }
 
   Widget _buildResults(BuildContext ctxt, int i) {
-    ScanResult sr = _scanResults[i];
-    return Card(
-      child: Text(sr.device.name),
-    );
+    return i == 0 ?
+      Padding(
+        padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+        child: Text('Available Devices',
+        textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold
+          )
+        ),
+      ) : Card(
+        child: Text(_scanResults[i - 1].device.name),
+      );
   }
 
   @override
@@ -92,8 +101,7 @@ class _FindDevicesState extends State<FindDevices> {
       controller: _refreshController,
       onRefresh: _onRefresh,
       child: ListView.builder(
-        itemCount: _scanResults.length,
-        itemExtent: 50.0,
+        itemCount: _scanResults.length + 1,
         itemBuilder: _buildResults,
       ),
     );
@@ -101,15 +109,7 @@ class _FindDevicesState extends State<FindDevices> {
     // Column(
     //   mainAxisAlignment: MainAxisAlignment.start,
     //   children: <Widget>[
-    //     Padding(
-    //       padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-    //       child: Text('Available Devices',
-    //         style: TextStyle(
-    //           fontSize: 25,
-    //           fontWeight: FontWeight.bold
-    //         )
-    //       ),
-    //     ),
+        
         
     //   ],
     // );
