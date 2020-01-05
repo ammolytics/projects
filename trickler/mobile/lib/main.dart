@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:opentrickler/devices.dart';
+import 'package:opentrickler/history.dart';
+import 'package:opentrickler/settings.dart';
+import 'package:opentrickler/trickle.dart';
 
 void main() => runApp(MyApp());
 
@@ -27,8 +31,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
 
   int _navIndex = 0;
+  final List<Widget> _tabs = [
+    SettingsTab(),
+    DevicesTab(),
+    TrickleTab(),
+    HistoryTab()
+  ];
 
-  handleNav(int i) {
+  void handleNav(int i) {
     setState(() {
       _navIndex = i;
     });
@@ -40,16 +50,7 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: Text('Open Trickler'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Hello World',
-            ),
-          ],
-        ),
-      ),
+      body: _tabs[_navIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _navIndex,
