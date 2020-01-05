@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainScreen(startIndex: 0),
+      home: MainScreen(),
     );
   }
 }
@@ -25,6 +25,14 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+
+  int _navIndex = 0;
+
+  handleNav(int i) {
+    setState(() {
+      _navIndex = i;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +52,8 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: widget.startIndex, // this will be set when a new tab is tapped
+        currentIndex: _navIndex,
+        onTap: this.handleNav,
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.settings),
