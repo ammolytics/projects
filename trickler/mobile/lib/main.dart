@@ -37,10 +37,32 @@ class _MainScreenState extends State<MainScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              'Hello World',
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: widget.startIndex, // this will be set when a new tab is tapped
+        items: [
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.settings),
+            title: new Text('Settings'),
+          ),
+          BottomNavigationBarItem(
+            icon: new Icon(Icons.devices_other),
+            title: new Text('Devices'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assessment),
+            title: Text('Trickle')
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.repeat),
+            title: Text('History')
+          )
+        ],
       ),
     );
   }
