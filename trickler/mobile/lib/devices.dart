@@ -94,7 +94,14 @@ class _FindDevicesState extends State<FindDevices> {
     _refreshController.refreshCompleted();
   }
 
-  Widget _buildResults(BuildContext ctxt, int i) {
+  void _addDevice(BluetoothDevice device, AppState appState, Function callback) {
+    if (appState.devices.indexOf(device) == -1) {
+      appState.devices.add(device);
+      callback();
+    }
+  }
+
+  Widget _buildResults(BuildContext ctxt, int i, AppState appState, Function setIndex) {
     return i == 0 ?
       Padding(
         padding: EdgeInsets.fromLTRB(0, 15, 0, 30),
@@ -105,21 +112,27 @@ class _FindDevicesState extends State<FindDevices> {
             fontWeight: FontWeight.bold
           )
         ),
-      ) : Card(
-        child: Text(_scanResults[i - 1].device.name),
+      ) : GestureDetector(
+        onTap: () => _addDevice(_scanResults[i - 1].device, appState, () => setIndex(0)),
+        child: Card(
+          child: Text(_scanResults[i - 1].device.name),
+        ),
       );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SmartRefresher(
-      enablePullDown: true,
-      controller: _refreshController,
-      onRefresh: _onRefresh,
-      child: ListView.builder(
-        itemCount: _scanResults.length + 1,
-        itemBuilder: _buildResults,
-      ),
+    return Consumer<AppState>(
+      builder: (context, appState, _) =>
+        SmartRefresher(
+          enablePullDown: true,
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          child: ListView.builder(
+            itemCount: _scanResults.length + 1,
+            itemBuilder: (c, i) => _buildResults(c, i, appState, widget.setIndex),
+          ),
+        ),
     );
   }
 }
