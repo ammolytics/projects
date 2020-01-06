@@ -21,7 +21,18 @@ class _PairedDevicesState extends State<PairedDevices> {
   List<Widget> _buildDevices(devices) {
     List<Widget> devWidgets = [];
     devices.forEach((dev) {
-      devWidgets.add(Text(dev.name));
+      devWidgets.add(Padding(
+        padding: EdgeInsets.only(bottom: 10),
+        child: Card(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width - 100,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+              child: Text(dev.name),
+            ),
+          ),
+        ),
+      ));
     });
     return devWidgets;
   }
