@@ -71,7 +71,7 @@ class _FindDevicesState extends State<FindDevices> {
   Future _scanDevices() async {
     var sub = _flutterBlue.scanResults.listen((scanResults) {
         scanResults.forEach((sr) {
-          if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) {
+          if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) { // this check is causing a bug that allows for a device to show up multiple times if it has a different RSSI value the second time
             print('Found: ${sr.device.name}, rssi: ${sr.rssi}');
             setState(() {
               _scanResults.add(sr);
@@ -112,11 +112,32 @@ class _FindDevicesState extends State<FindDevices> {
             fontWeight: FontWeight.bold
           )
         ),
-      ) : GestureDetector(
-        onTap: () => _addDevice(_scanResults[i - 1].device, appState, () => setIndex(0)),
-        child: Card(
-          child: Text(_scanResults[i - 1].device.name),
-        ),
+      ) : Padding(
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        child: GestureDetector(
+          onTap: () => _addDevice(_scanResults[i - 1].device, appState, () => setIndex(0)),
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(_scanResults[i - 1].device.name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                  Text("RSSI: ${_scanResults[i - 1].rssi}, Paired: ${appState.devices.indexOf(_scanResults[i - 1].device) == -1 ? 'FALSE' : 'TRUE'}",
+                    style: TextStyle(
+                      color: Colors.black38,
+                    ),
+                  ),
+                ],
+              )
+            ),
+          ),
+        )
       );
   }
 
