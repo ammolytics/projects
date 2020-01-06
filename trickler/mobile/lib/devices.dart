@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:opentrickler/appstate.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -16,32 +18,46 @@ class _PairedDevicesState extends State<PairedDevices> {
     widget.setIndex(1);
   }
 
+  List<Widget> _buildDevices(devices) {
+    List<Widget> devWidgets = [];
+    devices.forEach((dev) {
+      devWidgets.add(Text(dev.name));
+    });
+    return devWidgets;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-          child: Text('Paired Devices',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold
-            )
-          ),
-        ),
-        RaisedButton(
-          onPressed: _addADevice,
-          padding: EdgeInsets.symmetric(horizontal: 80, vertical: 10),
-          child: Text('Add a Device')
-        ),
-      ],
+    return Consumer<AppState>(
+      builder: (context, appState, _) =>
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 15, 0, 30),
+              child: Text('Paired Devices',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold
+                )
+              ),
+            ),
+          ] + _buildDevices(appState.devices) + [
+            RaisedButton(
+              onPressed: _addADevice,
+              padding: EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+              child: Text('Add a Device')
+            ),
+          ],
+        ),  
     );
   }
 }
 
 class FindDevices extends StatefulWidget {
-  FindDevices({Key key}) : super(key: key);
+  final Function setIndex;
+
+  FindDevices({Key key, this.setIndex});
 
   @override
   _FindDevicesState createState() => _FindDevicesState();
@@ -81,7 +97,7 @@ class _FindDevicesState extends State<FindDevices> {
   Widget _buildResults(BuildContext ctxt, int i) {
     return i == 0 ?
       Padding(
-        padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+        padding: EdgeInsets.fromLTRB(0, 15, 0, 30),
         child: Text('Available Devices',
         textAlign: TextAlign.center,
           style: TextStyle(
@@ -116,18 +132,18 @@ class DevicesTab extends StatefulWidget {
 class _DevicesTabState extends State<DevicesTab> {
   int _screenIndex = 0;
 
-  Widget _getScreen(Function setIndex) {
-    final List<Widget> _screens = [
-      PairedDevices(setIndex: setIndex),
-      FindDevices(),
-    ];
-    return _screens[_screenIndex];
-  }
-
   void _setScreenIndex(int i) {
       setState(() {
         _screenIndex = i;
       });
+  }
+
+  Widget _getScreen(Function setIndex,) {
+    final List<Widget> _screens = [
+      PairedDevices(setIndex: setIndex),
+      FindDevices(setIndex: setIndex),
+    ];
+    return _screens[_screenIndex];
   }
 
   @override

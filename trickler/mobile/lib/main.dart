@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:opentrickler/appstate.dart';
 import 'package:opentrickler/devices.dart';
 import 'package:opentrickler/history.dart';
 import 'package:opentrickler/settings.dart';
@@ -45,33 +47,36 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Open Trickler'),
-      ),
-      body: _tabs[_navIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _navIndex,
-        onTap: _handleNav,
-        items: [
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.settings),
-            title: new Text('Settings'),
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(Icons.devices_other),
-            title: new Text('Devices'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assessment),
-            title: Text('Trickle')
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.repeat),
-            title: Text('History')
-          )
-        ],
+    return ChangeNotifierProvider(
+      create: (_) => AppState(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Open Trickler'),
+        ),
+        body: _tabs[_navIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _navIndex,
+          onTap: _handleNav,
+          items: [
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.settings),
+              title: new Text('Settings'),
+            ),
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.devices_other),
+              title: new Text('Devices'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.assessment),
+              title: Text('Trickle')
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.repeat),
+              title: Text('History')
+            )
+          ],
+        ),
       ),
     );
   }
