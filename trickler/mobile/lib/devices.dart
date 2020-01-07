@@ -157,10 +157,10 @@ class _FindDevicesState extends State<FindDevices> {
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   List<ScanResult> _scanResults = [];
   RefreshController _refreshController = RefreshController(initialRefresh: true);
+  var _sub;
 
   Future _scanDevices() async {
-    // Cancel "sub" on dispose as well
-    var sub = _flutterBlue.scanResults.listen((scanResults) {
+    _sub = _flutterBlue.scanResults.listen((scanResults) {
         scanResults.forEach((sr) {
           if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) { // this check is causing a bug that allows for a device to show up multiple times if it has a different RSSI value the second time
             print('Found: ${sr.device.name}, rssi: ${sr.rssi}');
@@ -175,7 +175,8 @@ class _FindDevicesState extends State<FindDevices> {
     await _flutterBlue.startScan(timeout: Duration(seconds: 4));
     print('Stop Scanning...');
     _flutterBlue.stopScan();
-    sub.cancel();
+    _sub.cancel();
+    _sub = null;
     return;
   }
 
@@ -246,6 +247,11 @@ class _FindDevicesState extends State<FindDevices> {
           ),
         ),
     );
+  }
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 }
 
