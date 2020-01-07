@@ -18,9 +18,39 @@ class _PairedDevicesState extends State<PairedDevices> {
     widget.setIndex(1);
   }
 
-  void _connectToDevice(BluetoothDevice device, AppState appState) {
+  void _connectToDevice(BluetoothDevice device, AppState appState) async {
     print('Connecting to ${device.name}...');
     appState.connectedDevice = device;
+    try {
+      appState.isConnecting = true;
+      await device.connect(autoConnect: false);
+      appState.isConnecting = false;
+      print('Connected to ${device.name}');
+    } catch (err) {
+      print('Failed to connect to ${device.name}');
+      print(err.toString());
+      _disconnectFromDevice(device, appState);
+    }
+  }
+
+  void _disconnectFromDevice(BluetoothDevice device, AppState appState) {
+    device.disconnect();
+    appState.connectedDevice = null;
+  }
+
+  void _handleTap(BluetoothDevice device, AppState appState) {
+    if (appState.connectedDevice == device) {
+      _disconnectFromDevice(device, appState);
+    } else {
+      _connectToDevice(device, appState);
+    }
+  }
+
+  String _getConnectionState(dev, connectedDevice, isConnecting) {
+    if (connectedDevice == dev) {
+      return isConnecting ? 'Connecting...' : 'Connected: TRUE';
+    }
+    return 'Connected: FALSE';
   }
 
   List<Widget> _buildDevices(AppState appState) {
@@ -29,7 +59,7 @@ class _PairedDevicesState extends State<PairedDevices> {
       devWidgets.add(Padding(
         padding: EdgeInsets.only(bottom: 10),
         child: GestureDetector(
-          onTap: () => _connectToDevice(dev, appState),
+          onTap: () => _handleTap(dev, appState),
           child: Card(
             child: SizedBox(
               width: MediaQuery.of(context).size.width - 100,
@@ -39,7 +69,7 @@ class _PairedDevicesState extends State<PairedDevices> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(dev.name),
-                    Text('Connected: ${appState.connectedDevice == dev ? 'TRUE' : 'FALSE'}',
+                    Text(_getConnectionState(dev, appState.connectedDevice, appState.isConnecting),
                       style: TextStyle(
                         color: Colors.black38,
                       ),

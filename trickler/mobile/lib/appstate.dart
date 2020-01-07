@@ -18,4 +18,12 @@ class AppState with ChangeNotifier {
     notifyListeners();
   }
 
+  // Is Connecting
+  bool _isConnecting = false;
+  get isConnecting => _isConnecting;
+  set isConnecting(bool isConnecting) {
+    _isConnecting = isConnecting;
+    notifyListeners();
+  }
+
 }
