@@ -79,9 +79,9 @@ class _PairedDevicesState extends State<PairedDevices> {
 
   String _getConnectionState(dev, connectedDevice, isConnecting) {
     if (connectedDevice == dev) {
-      return isConnecting ? 'Connecting...' : 'Connected: TRUE';
+      return isConnecting ? 'Connecting...' : 'Connected';
     }
-    return 'Connected: FALSE';
+    return 'Disconnected';
   }
 
   List<Widget> _buildDevices(AppState appState) {
