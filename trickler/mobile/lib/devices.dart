@@ -200,8 +200,8 @@ class _FindDevicesState extends State<FindDevices> {
   void _addDevice(BluetoothDevice device, AppState appState, Function callback) {
     if (appState.devices.indexOf(device) == -1) {
       appState.devices.add(device);
-      callback();
     }
+    callback();
   }
 
   Widget _buildResults(BuildContext ctxt, int i, AppState appState, Function setIndex) {
