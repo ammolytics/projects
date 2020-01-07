@@ -18,17 +18,35 @@ class _PairedDevicesState extends State<PairedDevices> {
     widget.setIndex(1);
   }
 
-  List<Widget> _buildDevices(devices) {
+  void _connectToDevice(BluetoothDevice device, AppState appState) {
+    print('Connecting to ${device.name}...');
+    appState.connectedDevice = device;
+  }
+
+  List<Widget> _buildDevices(AppState appState) {
     List<Widget> devWidgets = [];
-    devices.forEach((dev) {
+    appState.devices.forEach((dev) {
       devWidgets.add(Padding(
         padding: EdgeInsets.only(bottom: 10),
-        child: Card(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width - 100,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-              child: Text(dev.name),
+        child: GestureDetector(
+          onTap: () => _connectToDevice(dev, appState),
+          child: Card(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width - 100,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(dev.name),
+                    Text('Connected: ${appState.connectedDevice == dev ? 'TRUE' : 'FALSE'}',
+                      style: TextStyle(
+                        color: Colors.black38,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -53,7 +71,7 @@ class _PairedDevicesState extends State<PairedDevices> {
                 )
               ),
             ),
-          ] + _buildDevices(appState.devices) + [
+          ] + _buildDevices(appState) + [
             RaisedButton(
               onPressed: _addADevice,
               padding: EdgeInsets.symmetric(horizontal: 80, vertical: 10),

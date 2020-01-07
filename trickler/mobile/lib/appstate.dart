@@ -10,4 +10,12 @@ class AppState with ChangeNotifier {
     notifyListeners();
   }
 
+  // Connected Device State
+  BluetoothDevice _connectedDevice = null;
+  get connectedDevice => _connectedDevice;
+  set connectedDevice(BluetoothDevice device) {
+    _connectedDevice = device;
+    notifyListeners();
+  }
+
 }
