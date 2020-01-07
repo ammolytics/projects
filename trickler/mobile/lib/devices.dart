@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:opentrickler/appstate.dart';
+import 'package:opentrickler/globals.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -20,27 +22,56 @@ class _PairedDevicesState extends State<PairedDevices> {
 
   void _connectToDevice(BluetoothDevice device, AppState appState) async {
     print('Connecting to ${device.name}...');
+    // Note: Devices fails to connect twice in a row.
+    // Possible solution is re-scan and add the same devices on disconnect.
     appState.connectedDevice = device;
+    bool errored = false;
     try {
       appState.isConnecting = true;
-      await device.connect(autoConnect: false);
+      await device.connect(autoConnect: false).timeout(Duration(seconds: 5));
       appState.isConnecting = false;
       print('Connected to ${device.name}');
+    } on TimeoutException {
+      print('Timed out while attempting to connect to ${device.name}');
+      _disconnectFromDevice(appState);
+      errored = true;
     } catch (err) {
       print('Failed to connect to ${device.name}');
       print(err.toString());
-      _disconnectFromDevice(device, appState);
+      _disconnectFromDevice(appState);
+      errored = true;
+    }
+    if (!errored) {
+      _discoverTricklerService(appState);
     }
   }
 
-  void _disconnectFromDevice(BluetoothDevice device, AppState appState) {
-    device.disconnect();
+  void _discoverTricklerService(AppState appState) async {
+    print('Discovering services on ${appState.connectedDevice.name}...');
+    try {
+      List<BluetoothService> services = await appState.connectedDevice.discoverServices();
+      BluetoothService tricklerService = services.singleWhere((s) => s.uuid.toString() == TRICKLER_SERVICE_UUID, orElse: () => null);
+      if (tricklerService != null) {
+        print('Found Trickler Service!');
+        appState.tricklerService = tricklerService;
+      } else {
+        print('Unable to find Trickler Service.');
+        _disconnectFromDevice(appState);
+      }
+    } catch (err) {
+      print(err.toString());
+    }
+  }
+
+  void _disconnectFromDevice(AppState appState) {
+    print('Disconnecting from ${appState.connectedDevice.name}...');
+    appState.connectedDevice.disconnect();
     appState.connectedDevice = null;
   }
 
   void _handleTap(BluetoothDevice device, AppState appState) {
     if (appState.connectedDevice == device) {
-      _disconnectFromDevice(device, appState);
+      _disconnectFromDevice(appState);
     } else {
       _connectToDevice(device, appState);
     }
@@ -128,6 +159,7 @@ class _FindDevicesState extends State<FindDevices> {
   RefreshController _refreshController = RefreshController(initialRefresh: true);
 
   Future _scanDevices() async {
+    // Cancel "sub" on dispose as well
     var sub = _flutterBlue.scanResults.listen((scanResults) {
         scanResults.forEach((sr) {
           if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) { // this check is causing a bug that allows for a device to show up multiple times if it has a different RSSI value the second time

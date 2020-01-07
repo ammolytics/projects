@@ -11,7 +11,7 @@ class AppState with ChangeNotifier {
   }
 
   // Connected Device State
-  BluetoothDevice _connectedDevice = null;
+  BluetoothDevice _connectedDevice;
   get connectedDevice => _connectedDevice;
   set connectedDevice(BluetoothDevice device) {
     _connectedDevice = device;
@@ -23,6 +23,14 @@ class AppState with ChangeNotifier {
   get isConnecting => _isConnecting;
   set isConnecting(bool isConnecting) {
     _isConnecting = isConnecting;
+    notifyListeners();
+  }
+
+  // Trickler Service
+  BluetoothService _tricklerService;
+  get tricklerService => _tricklerService;
+  set tricklerService(BluetoothService service) {
+    _tricklerService = service;
     notifyListeners();
   }
 
