@@ -162,11 +162,22 @@ class _FindDevicesState extends State<FindDevices> {
   Future _scanDevices() async {
     _sub = _flutterBlue.scanResults.listen((scanResults) {
         scanResults.forEach((sr) {
-          if (sr.device.name.length > 0 && _scanResults.indexOf(sr) == -1) { // this check is causing a bug that allows for a device to show up multiple times if it has a different RSSI value the second time
-            print('Found: ${sr.device.name}, rssi: ${sr.rssi}');
-            setState(() {
-              _scanResults.add(sr);
-            });
+          if (sr.device.name.length > 0) {
+            // Note: device.id is not unique to a physical device, but instead the local instance of that BluetoothDevice.
+            // The duplicate device issues is still present, the only solution I can think of at the moment is checking by
+            // device.name, but that would rule out the possibilty of listing two unique devices with the same name.
+            var repeatDevice = _scanResults.singleWhere((s) => s.device.id == sr.device.id, orElse: () => null);
+            if (repeatDevice == null) {
+              print('Found: ${sr.device.name}, rssi: ${sr.rssi}');
+              setState(() {
+                _scanResults.add(sr);
+              });
+            } else {
+              int i = _scanResults.indexOf(repeatDevice);
+              setState(() {
+                _scanResults[i] = sr;
+              });
+            }
           }
         });
     });
