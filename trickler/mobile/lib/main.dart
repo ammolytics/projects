@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:opentrickler/appstate.dart';
@@ -5,6 +6,7 @@ import 'package:opentrickler/devices.dart';
 import 'package:opentrickler/history.dart';
 import 'package:opentrickler/settings.dart';
 import 'package:opentrickler/trickle.dart';
+import 'package:opentrickler/globals.dart';
 
 void main() => runApp(MyApp());
 
@@ -29,7 +31,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _navIndex = 1;
+  int _navIndex = NAV_INDEX.indexOf(TABS.DEVICES);
 
   void _handleNav(int i) {
     setState(() {
@@ -39,9 +41,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // If this list is changed the NAV_INDEX values in lib/globals.dart should be updated to reflect the new list.
     final List<Widget> _tabs = [
       SettingsTab(),
-      DevicesTab(nav: (int i) => _handleNav(i)),
+      DevicesTab(nav: (TABS t) => _handleNav(NAV_INDEX.indexOf(t))),
       TrickleTab(),
       HistoryTab()
     ];

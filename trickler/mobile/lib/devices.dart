@@ -22,8 +22,7 @@ class _PairedDevicesState extends State<PairedDevices> {
   }
 
   void _goToTrickle() {
-    // TODO: add global consts for nav indexs
-    widget.nav(2);
+    widget.nav(TABS.TRICKLE);
   }
 
   @override
