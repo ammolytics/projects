@@ -8,8 +8,9 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class PairedDevices extends StatefulWidget {
   final Function setIndex;
+  final Function nav;
 
-  PairedDevices({Key key, this.setIndex});
+  PairedDevices({Key key, this.setIndex, this.nav}) : super(key: key);
 
   @override
   _PairedDevicesState createState() => _PairedDevicesState();
@@ -18,6 +19,11 @@ class PairedDevices extends StatefulWidget {
 class _PairedDevicesState extends State<PairedDevices> {
   void _addADevice() {
     widget.setIndex(1);
+  }
+
+  void _goToTrickle() {
+    // TODO: add global consts for nav indexs
+    widget.nav(2);
   }
 
   @override
@@ -109,6 +115,7 @@ class _PairedDevicesState extends State<PairedDevices> {
         print('WRITE: ${char.properties.write}\n\n');
       }
     }
+    _goToTrickle();
   }
 
   void _disconnectFromDevice(AppState appState) {
@@ -197,7 +204,7 @@ class _PairedDevicesState extends State<PairedDevices> {
 class FindDevices extends StatefulWidget {
   final Function setIndex;
 
-  FindDevices({Key key, this.setIndex});
+  FindDevices({Key key, this.setIndex}) : super(key: key);
 
   @override
   _FindDevicesState createState() => _FindDevicesState();
@@ -318,6 +325,10 @@ class _FindDevicesState extends State<FindDevices> {
 }
 
 class DevicesTab extends StatefulWidget {
+  final Function nav;
+
+  DevicesTab({Key key, this.nav}) : super(key: key);
+
   @override
   _DevicesTabState createState() => _DevicesTabState();
 }
@@ -341,9 +352,9 @@ class _DevicesTabState extends State<DevicesTab> {
     }
   }
 
-  Widget _getScreen(Function setIndex,) {
+  Widget _getScreen({Function setIndex, Function nav}) {
     final List<Widget> _screens = [
-      PairedDevices(setIndex: setIndex),
+      PairedDevices(setIndex: setIndex, nav: nav),
       FindDevices(setIndex: setIndex),
     ];
     return _screens[_screenIndex];
@@ -352,7 +363,10 @@ class _DevicesTabState extends State<DevicesTab> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: _getScreen((int i) => _setScreenIndex(i))
+      child: _getScreen(
+        setIndex: (int i) => _setScreenIndex(i),
+        nav: widget.nav
+      ),
     );
   }
 }

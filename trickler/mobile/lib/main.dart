@@ -22,9 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  final int startIndex;
-
-  MainScreen({Key key, this.startIndex}) : super(key: key);
+  MainScreen({Key key}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -32,12 +30,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _navIndex = 1;
-  final List<Widget> _tabs = [
-    SettingsTab(),
-    DevicesTab(),
-    TrickleTab(),
-    HistoryTab()
-  ];
 
   void _handleNav(int i) {
     setState(() {
@@ -47,6 +39,12 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _tabs = [
+      SettingsTab(),
+      DevicesTab(nav: (int i) => _handleNav(i)),
+      TrickleTab(),
+      HistoryTab()
+    ];
     return ChangeNotifierProvider(
       create: (_) => AppState(),
       child: Scaffold(
