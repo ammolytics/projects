@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:opentrickler/appstate.dart';
-import 'package:opentrickler/devices.dart';
+import 'package:opentrickler/devices/index.dart';
 import 'package:opentrickler/history.dart';
 import 'package:opentrickler/settings.dart';
 import 'package:opentrickler/trickle.dart';
