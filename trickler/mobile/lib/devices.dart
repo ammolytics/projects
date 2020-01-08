@@ -314,6 +314,16 @@ class _DevicesTabState extends State<DevicesTab> {
       });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    AppState appState = Provider.of<AppState>(context, listen: false);
+    if (appState.devices.length == 0) {
+      print('Running auto scan...');
+      _setScreenIndex(1);
+    }
+  }
+
   Widget _getScreen(Function setIndex,) {
     final List<Widget> _screens = [
       PairedDevices(setIndex: setIndex),
