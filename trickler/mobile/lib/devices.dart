@@ -48,6 +48,7 @@ class _PairedDevicesState extends State<PairedDevices> {
 
   void _discoverTricklerService(AppState appState) async {
     print('Discovering services on ${appState.connectedDevice.name}...');
+    bool errored = false;
     try {
       List<BluetoothService> services = await appState.connectedDevice.discoverServices();
       BluetoothService tricklerService = services.singleWhere((s) => s.uuid.toString() == TRICKLER_SERVICE_UUID, orElse: () => null);
@@ -57,13 +58,46 @@ class _PairedDevicesState extends State<PairedDevices> {
       } else {
         print('Unable to find Trickler Service.');
         _disconnectFromDevice(appState);
+        errored = true;
       }
     } catch (err) {
       print(err.toString());
+      errored = true;
+    }
+    if (!errored) {
+      _readCharacteristics(appState);
+    }
+  }
+
+  void _readCharacteristics(AppState appState) async {
+    print('Reading trickler characteristics...');
+    List<BluetoothCharacteristic> chars = appState.tricklerService.characteristics;
+    for (BluetoothCharacteristic char in chars) {
+      if (char.properties.read && DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
+        List<int> value = await char.read();
+        appState.tricklerChars[char.uuid] = value;
+        print('Read char: ${char.uuid}');
+        if (char.properties.notify) {
+          await char.setNotifyValue(true);
+          StreamSubscription sub = char.value.listen((data) {
+            appState.tricklerChars[char.uuid] = data;
+          });
+          print('Sub to char: ${char.uuid}');
+          appState.subs.add(sub);
+        }
+      } else if (DONT_READ_CHARS.indexOf(char.uuid.toString()) == -1) {
+        print('\n\n\nCAN\'T READ ${char.uuid.toString()}');
+        print('\n\n${char.uuid.toString()} PROPERTIES');
+        print('NOTIFY: ${char.properties.notify}');
+        print('READ: ${char.properties.read}');
+        print('WRITE: ${char.properties.write}\n\n');
+      }
     }
   }
 
   void _disconnectFromDevice(AppState appState) {
+    appState.subs.forEach((s) => s.cancel());
+    appState.subs = [];
     print('Disconnecting from ${appState.connectedDevice.name}...');
     appState.connectedDevice.disconnect();
     appState.connectedDevice = null;

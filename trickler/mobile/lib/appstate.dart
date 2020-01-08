@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
@@ -31,6 +33,22 @@ class AppState with ChangeNotifier {
   get tricklerService => _tricklerService;
   set tricklerService(BluetoothService service) {
     _tricklerService = service;
+    notifyListeners();
+  }
+
+  // Trickler Characteristics
+  Map<Guid, List<int>> _tricklerChars = {};
+  get tricklerChars => _tricklerChars;
+  set tricklerChars(Map<Guid, List<int>> tricklerChars) {
+    _tricklerChars = tricklerChars;
+    notifyListeners();
+  }
+
+  // Characteristic Subscriptions
+  List<StreamSubscription> _subs = [];
+  get subs  => _subs;
+  set subs(List<StreamSubscription> subs) {
+    _subs = subs;
     notifyListeners();
   }
 
