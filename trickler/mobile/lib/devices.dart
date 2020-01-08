@@ -20,6 +20,22 @@ class _PairedDevicesState extends State<PairedDevices> {
     widget.setIndex(1);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    AppState appState = Provider.of<AppState>(context, listen: false);
+    if (appState.autoConnectDevice != null) {
+      print('Running auto connect...');
+      // The following line is a work around to prevent a setState during build exception:
+      // Another exception was thrown: setState() or markNeedsBuild() called during build.
+      // https://stackoverflow.com/questions/45409565/flutter-setstate-or-markneedsbuild-called-when-widget-tree-was-locked
+      Future.delayed(Duration.zero, () { // Work around
+        _connectToDevice(appState.autoConnectDevice, appState);
+        appState.autoConnectDevice = null;
+      });
+    }
+  }
+
   void _connectToDevice(BluetoothDevice device, AppState appState) async {
     print('Connecting to ${device.name}...');
     // Note: Devices fails to connect twice in a row.
@@ -234,6 +250,7 @@ class _FindDevicesState extends State<FindDevices> {
   void _addDevice(BluetoothDevice device, AppState appState, Function callback) {
     if (appState.devices.indexOf(device) == -1) {
       appState.devices.add(device);
+      appState.autoConnectDevice = device;
     }
     callback();
   }

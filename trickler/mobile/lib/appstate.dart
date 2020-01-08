@@ -28,6 +28,14 @@ class AppState with ChangeNotifier {
     notifyListeners();
   }
 
+  // Auto Connect Device
+  BluetoothDevice _autoConnectDevice;
+  get autoConnectDevice => _autoConnectDevice;
+  set autoConnectDevice(BluetoothDevice autoConnectDevice) {
+    _autoConnectDevice = autoConnectDevice;
+    notifyListeners();
+  }
+
   // Trickler Service
   BluetoothService _tricklerService;
   get tricklerService => _tricklerService;
