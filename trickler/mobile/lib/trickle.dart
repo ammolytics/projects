@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:opentrickler/appstate.dart';
 import 'package:opentrickler/globals.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'dart:convert' show utf8;
 
 class TrickleTab extends StatelessWidget {
 
@@ -20,7 +21,9 @@ class TrickleTab extends StatelessWidget {
               Text('Trickle Tab...'),
               Text(STABILITY_LIST[getInt(getChar(appState, STABLE_CHAR_UUID), 1)]),
               Text(UNIT_LIST[getInt(getChar(appState, UNIT_CHAR_UUID), 0)]),
-              Text('Auto: ${getInt(getChar(appState, AUTO_MODE_CHAR_UUID), 0) != 0 ? 'On' : 'Off'}')
+              Text('Auto: ${getInt(getChar(appState, AUTO_MODE_CHAR_UUID), 0) != 0 ? 'On' : 'Off'}'),
+              Text('Weight: ${double.parse(utf8.decode(getChar(appState, WEIGHT_CHAR_UUID)))}'),
+              Text('Target: ${double.parse(utf8.decode(getChar(appState, TARGET_WEIGHT_CHAR_UUID)))}'),
             ],
           ),
         ),
