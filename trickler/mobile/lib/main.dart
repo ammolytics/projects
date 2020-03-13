@@ -5,7 +5,7 @@ import 'package:opentrickler/appstate.dart';
 import 'package:opentrickler/devices/index.dart';
 import 'package:opentrickler/history.dart';
 import 'package:opentrickler/settings.dart';
-import 'package:opentrickler/trickle.dart';
+import 'package:opentrickler/trickle/index.dart';
 import 'package:opentrickler/globals.dart';
 
 void main() => runApp(MyApp());
