@@ -9,6 +9,7 @@ class TrickleTab extends StatelessWidget {
   List<int> getChar(AppState appState, String uuid) => appState.tricklerChars[Guid(uuid)];
   
   String getStability(List<int> char) => char != null ? STABILITY_LIST[char[0]] : 'DISCONNECTED';
+  String getUnit(List<int> char) => char != null ? UNIT_LIST[char[0]] : GRAINS;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,7 @@ class TrickleTab extends StatelessWidget {
             children: <Widget>[
               Text('Trickle Tab...'),
               Text(getStability(getChar(appState, STABLE_CHAR_UUID))),
+              Text(getUnit(getChar(appState, UNIT_CHAR_UUID)))
             ],
           ),
         ),

@@ -42,3 +42,11 @@ const STABILITY_LIST = [
   ERROR,
   ACKNOWLEDGE,
 ];
+
+// Units
+const GRAINS = 'GRAINS';
+const GRAMS = 'GRAMS';
+const UNIT_LIST = [
+  GRAINS,
+  GRAMS
+];
