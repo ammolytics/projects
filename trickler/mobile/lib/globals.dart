@@ -35,17 +35,19 @@ const UNSTABLE = 'UNSTABLE';
 const OVERLOAD = 'OVERLOAD';
 const ERROR = 'ERROR';
 const ACKNOWLEDGE = 'ACKNOWLEDGE';
+const DISCONNECTED = 'DISCONNECTED';
 const STABILITY_LIST = [
   STABLE,
   UNSTABLE,
   OVERLOAD,
   ERROR,
   ACKNOWLEDGE,
+  DISCONNECTED
 ];
 
 // Units
-const GRAINS = 'GRAINS';
-const GRAMS = 'GRAMS';
+const GRAINS = 'gr';
+const GRAMS = 'g';
 const UNIT_LIST = [
   GRAINS,
   GRAMS
