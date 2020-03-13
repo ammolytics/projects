@@ -7,9 +7,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 class TrickleTab extends StatelessWidget {
 
   List<int> getChar(AppState appState, String uuid) => appState.tricklerChars[Guid(uuid)];
-  
-  String getStability(List<int> char) => char != null ? STABILITY_LIST[char[0]] : 'DISCONNECTED';
-  String getUnit(List<int> char) => char != null ? UNIT_LIST[char[0]] : GRAINS;
+  int getInt(List<int> char, int def) => char != null ? char[0] : def;
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +18,9 @@ class TrickleTab extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text('Trickle Tab...'),
-              Text(getStability(getChar(appState, STABLE_CHAR_UUID))),
-              Text(getUnit(getChar(appState, UNIT_CHAR_UUID)))
+              Text(STABILITY_LIST[getInt(getChar(appState, STABLE_CHAR_UUID), 1)]),
+              Text(UNIT_LIST[getInt(getChar(appState, UNIT_CHAR_UUID), 0)]),
+              Text('Auto: ${getInt(getChar(appState, AUTO_MODE_CHAR_UUID), 0) != 0 ? 'On' : 'Off'}')
             ],
           ),
         ),
