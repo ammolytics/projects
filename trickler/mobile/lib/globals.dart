@@ -28,3 +28,17 @@ const NAV_INDEX = [
   TABS.TRICKLE,
   TABS.HISTORY
 ];
+
+// Stability
+const STABLE = 'STABLE';
+const UNSTABLE = 'UNSTABLE';
+const OVERLOAD = 'OVERLOAD';
+const ERROR = 'ERROR';
+const ACKNOWLEDGE = 'ACKNOWLEDGE';
+const STABILITY_LIST = [
+  STABLE,
+  UNSTABLE,
+  OVERLOAD,
+  ERROR,
+  ACKNOWLEDGE,
+];
