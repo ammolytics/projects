@@ -5,6 +5,7 @@ import 'package:opentrickler/globals.dart';
 import 'package:opentrickler/helpers.dart';
 
 part 'status.dart';
+part 'weight_input.dart';
 
 class TrickleTab extends StatelessWidget {
   @override
@@ -15,7 +16,8 @@ class TrickleTab extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              getStatusRow(appState)
+              getStatusRow(appState),
+              WeightInput()
             ]
           )
         )
