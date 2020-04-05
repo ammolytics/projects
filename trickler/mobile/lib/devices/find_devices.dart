@@ -104,7 +104,7 @@ class _FindDevicesState extends State<FindDevices> {
   @override
   Widget build(BuildContext context) {
     return Consumer<AppState>(
-      builder: (context, appState, _) =>
+      builder: (context, appState, _) => appState.btState == BluetoothState.on ?
         SmartRefresher(
           enablePullDown: true,
           controller: _refreshController,
@@ -113,6 +113,30 @@ class _FindDevicesState extends State<FindDevices> {
             itemCount: _scanResults.length + 1,
             itemBuilder: (c, i) => _buildResults(c, i, appState, widget.setIndex),
           ),
+        ) :
+        AlertDialog(
+          title: Text('Enable Bluetooth'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Please enable Bluetooth in your System Settings to connect to an Open Trickler Device.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                print('Canceling...');
+              },
+            ),
+            FlatButton(
+              child: Text('Enable'),
+              onPressed: () {
+                print('Enabling...');
+              },
+            ),
+          ],
         ),
     );
   }

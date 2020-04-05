@@ -4,6 +4,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
 class AppState with ChangeNotifier {
+  // Bluetooth State
+  BluetoothState _btState = BluetoothState.unknown;
+  BluetoothState get btState => _btState;
+  set btState(BluetoothState state) {
+    _btState = state;
+    notifyListeners();
+  }
+
+  // Bluetooth State Subscription
+  StreamSubscription _btStateSub;
+  StreamSubscription get btStateSub => _btStateSub;
+  set btStateSub(StreamSubscription sub) {
+    _btStateSub = sub;
+    notifyListeners();
+  }
+
   // Devices State
   List<BluetoothDevice> _devices = [];
   List<BluetoothDevice> get devices => _devices;

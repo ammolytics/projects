@@ -22,11 +22,20 @@ class _DevicesTabState extends State<DevicesTab> {
   void initState() {
     super.initState();
     AppState appState = Provider.of<AppState>(context, listen: false);
+    subToBTState(appState);
     if (appState.devices.length == 0) {
       print('Running auto scan...');
       _setScreenIndex(1);
     }
   }
+
+  @override
+  void dispose() {
+    AppState appState = Provider.of<AppState>(context, listen: false);
+    unsubToBTState(appState);
+    super.dispose();
+  }
+
 
   Widget _getScreen({Function setIndex, Function nav}) {
     final List<Widget> _screens = [
