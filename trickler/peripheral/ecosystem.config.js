@@ -16,6 +16,8 @@ module.exports = {
       'SCALE_BAUD_RATE': 19200,
       'SCALE_DEVICE_PATH': '/dev/ttyUSB0',
       'DEVICE_NAME': 'Trickler',
+      'BLENO_DEVICE_NAME': 'Trickler',
+      'BLENO_ADVERTISING_INTERVAL': 50,
     },
     env_production : {
        'NODE_ENV': 'production',
