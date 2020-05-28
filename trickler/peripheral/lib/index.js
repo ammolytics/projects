@@ -4,6 +4,7 @@
  */
 const bleno = require('bleno')
 
+const bluetooth = require('./bluetooth')
 const motors = require('./motor')
 const scales = require('./and-fxfz')
 const trickler = require('./trickler')
@@ -13,6 +14,7 @@ var BT_READY = false
 var TRICKLER_READY = false
 
 console.log('===== STARTING UP =====')
+console.log('process.env:', process.env)
 
 const MOTOR = new motors.MotorControl({
   pin: process.env.MOTOR_PIN,
@@ -64,6 +66,7 @@ var readyInterval = setInterval(() => {
   console.log(`Checking if ready... TRICKLER: ${TRICKLER_READY} SCALE: ${TRICKLER.scale.ready} BT: ${BT_READY}`)
   if ((TRICKLER_READY === true || TRICKLER.scale.ready === true) && BT_READY === true) {
     clearInterval(readyInterval)
+    bluetooth.makeAdData(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID])
     bleno.startAdvertising(process.env.DEVICE_NAME, [TricklerService.TRICKLER_SERVICE_UUID], errHandler)
   }
 }, 250)

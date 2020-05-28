@@ -4,19 +4,21 @@
   "description": "Automatic, Bluetooth-controlled powder trickler controller",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "./node_modules/.bin/eslint *.js lib/*.js"
   },
   "repository": "git@github.com:ammolytics/projects.git",
   "author": "Eric Higgins <eric@ammolytics.com>",
   "license": "MIT",
   "dependencies": {
+    "@abandonware/bleno": "github:abandonware/bleno",
     "bleno": "github:abandonware/bleno",
     "lodash": "^4.17.15",
-    "mathjs": "^6.6.4",
+    "mathjs": "^6.6.5",
     "rpio": "^2.1.1",
-    "serialport": "^8.0.7"
+    "serialport": "^8.0.8"
   },
   "devDependencies": {
-    "eslint": "^6.8.0"
+    "eslint": "^7.1.0"
   }
 }

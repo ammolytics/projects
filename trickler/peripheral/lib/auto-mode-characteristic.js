@@ -38,7 +38,7 @@ class AutoModeCharacteristic extends bleno.Characteristic {
     if (offset) {
       callback(this.RESULT_ATTR_NOT_LONG, null)
     } else {
-      var data = new Buffer(1);
+      var data = Buffer.alloc(1)
       data.writeUInt8(this.trickler.autoMode, 0);
       callback(this.RESULT_SUCCESS, data)
     }
