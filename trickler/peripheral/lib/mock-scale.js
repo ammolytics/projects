@@ -6,9 +6,11 @@ const MockBinding = require('@serialport/binding-mock')
 const trickler = require('./trickler')
 
 
+/**
 function randomInt() {
   return Math.floor(Math.random() * Math.floor(10))
 }
+*/
 
 function formatGrams(numVal) {
   return numVal.toFixed(3).padStart(7, 0)
@@ -22,6 +24,7 @@ function formatGrains(numVal) {
   return numVal.toFixed(2).padStart(6, 0)
 }
 
+/**
 function addPan() {
   `
   019-04-19T22:57:11.559Z]  [ST,+00000.00 GN
@@ -97,6 +100,7 @@ function removePan() {
 2019-04-19T22:57:04.435Z]  [ST,-00717.60 GN
 2019-04-19T22:57:04.482Z]  [ST,-00717.60 GN`
 }
+*/
 
 
 /**
@@ -117,16 +121,15 @@ function removePan() {
 }
 */
 
+/**
+  * Wait until scale is stable and 0.
+  * If automode is on, start to trickle up, increase weight.
+  * Jump in weight (80% or target - 2 gr) to simulate a dump.
+  * Once target weight is reached, let the app take over.
+  * Wait a second or two, then drop down to a negative weight (pan removed)
+  * Wait another second, then go back up to zero.
+  * Start pretend trickling again.
 function fakeUser() {
-  /**
-   * Wait until scale is stable and 0.
-   * If automode is on, start to trickle up, increase weight.
-   * Jump in weight (80% or target - 2 gr) to simulate a dump.
-   * Once target weight is reached, let the app take over.
-   * Wait a second or two, then drop down to a negative weight (pan removed)
-   * Wait another second, then go back up to zero.
-   * Start pretend trickling again.
-   */
     this.emitData(`US,+000.000  g\r\n`)
     this.emitData(`ST,+000.000  g\r\n`)
     this.emitData(`US,+000.00  GN\r\n`)
@@ -151,6 +154,7 @@ function fakeUser() {
       }
     })
 }
+*/
 
 
 class MockScale extends MockBinding {
@@ -209,15 +213,17 @@ class MockScale extends MockBinding {
 
   _printWeight() {
     var sign = Math.sign(this.getCurrentWeight())
+    var unit = null
+    var weight = null
 
     switch(this._unit) {
       case trickler.TricklerUnits.GRAINS:
-        var unit = 'GN'
-        var weight = formatGrains(sign * this.getCurrentWeight())
+        unit = 'GN'
+        weight = formatGrains(sign * this.getCurrentWeight())
         break
       case trickler.TricklerUnits.GRAMS:
-        var unit = ' g'
-        var weight = formatGrams(sign * this.getCurrentWeight())
+        unit = ' g'
+        weight = formatGrams(sign * this.getCurrentWeight())
         break
     }
 

@@ -81,7 +81,7 @@ class UnitCharacteristic extends bleno.Characteristic {
             console.log('Unit already set')
             callback(this.RESULT_SUCCESS)
           } else {
-            this.scale.once('unit', result => {
+            this.scale.once('unit', () => {
               callback(this.RESULT_SUCCESS)
             })
             this.scale.pressMode()
