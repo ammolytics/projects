@@ -8,6 +8,7 @@ tar --create --transform "$sed_expr" --file $out \
   LICENSE \
   VERSION \
   README.md \
+  .eslintrc.js \
   ecosystem.config.js \
   index.js \
   package.json \
