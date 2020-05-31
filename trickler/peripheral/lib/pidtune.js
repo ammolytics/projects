@@ -7,7 +7,7 @@ function start (PWM, SCALE, timerFn, fn, target) {
   console.log('timestamp, input (motor %), output (%)')
   PWM.duty = .40
   timerFn = timer.bind(null, Date.now())
-  console.log(`${timerFn()}, ${(PWM.duty * 100).toFixed(2)}, ${((SCALE.weight / target) * 100).toFixed(2)}`)
+  console.log(`${timerFn()}, ${PWM.duty.toFixed(2)}, ${(SCALE.weight / target).toFixed(2)}`)
 }
 
 function finish (PWM, SCALE) {
@@ -30,7 +30,7 @@ function run (target) {
   var timerFn = timer.bind(null, Date.now())
 
   function update (weight) {
-    console.log(`${timerFn()}, ${(PWM.duty * 100).toFixed(2)}, ${((weight / target) * 100).toFixed(2)}`)
+    console.log(`${timerFn()}, ${PWM.duty.toFixed(2)}, ${(weight / target).toFixed(2)}`)
     var doneness = parseInt(weight / target * 100)
     switch (doneness) {
       case 100:
