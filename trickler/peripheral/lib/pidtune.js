@@ -4,6 +4,7 @@ const pwm = require('./pwm')
 
 function start (PWM, SCALE, timerFn, fn, target) {
   SCALE.on('weight', fn)
+  console.log(`${(new Date()).toISOString()}`)
   console.log('timestamp, input (motor %), output (%)')
   PWM.duty = .40
   timerFn = timer.bind(null, Date.now())
@@ -17,6 +18,7 @@ function finish (PWM, SCALE) {
     SCALE.removeAllListeners('weight')
     SCALE.close()
     PWM.close()
+    console.log('Target weight reached. Done!')
   }, 2000)
 }
 
@@ -55,7 +57,29 @@ function run (target) {
   SCALE.open(() => PWM.open(() => {setTimeout(start.bind(null, PWM, SCALE, timerFn, update, target), 1000)}))
 }
 
+// Run motor fast until the scale detects a change.
+function prime () {
+  const PWM = new pwm.PwmControl({pwmWidth: 0, clockDiv: 256})
+  const SCALE = new scales.Scale({baud:19200, device: '/dev/ttyUSB0'})
+
+  function quit () {
+    PWM.off()
+    SCALE.removeAllListeners('weight')
+    SCALE.close()
+    PWM.close()
+    console.log('Priming complete!')
+  }
+
+  function primeTube () {
+    console.log('Priming trickler...')
+    SCALE.on('weight', quit)
+    PWM.duty = .90
+  }
+  SCALE.open(() => PWM.open(() => {setTimeout(primeTube, 1000)}))
+}
+
 module.exports.run = run
+module.exports.prime = prime
 
 
 /**
