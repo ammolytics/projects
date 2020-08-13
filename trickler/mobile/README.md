@@ -7,7 +7,11 @@ This mobile app is designed to connect to and operate the Open Trickler. The app
 
 _Google Play and the Google Play logo are trademarks of Google LLC._
 
-## Instructions
+**Have an iPhone or iPad?**
+
+Get the [iOS Beta App through TestFlight](https://testflight.apple.com/join/1XSoUPL3)
+
+## Developer Instructions
 
 Please follow the Flutter [Getting Started guide](https://flutter.dev/docs/get-started/install) to get your development environment up and running.
 
