@@ -53,6 +53,8 @@ Please see the following:
 - [Can you add support for my scale?](#can-you-add-support-for-my-scale)
 - [Can you make it work with an Arduino or ESP?](#can-you-make-it-work-with-an-arduino-or-esp)
 - [Can you add support for a powder drop?](#can-you-add-support-for-a-powder-drop)
+- [Why does it take so long?](#why-does-it-take-so-long)
+- [Why does it overthrow?](#why-does-it-overthrow)
 
 
 ### Why isn't Bluetooth working?
@@ -68,6 +70,8 @@ Assuming you do have a supported scale connected, here are a few other debug tip
 - Are you using the [null modem adapter](https://www.amazon.com/gp/product/B075XHWVSJ/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B075XHWVSJ&linkId=7c662ec9d4021bf3c1374f86ff1b9b0d)?  
   Even though you can _physically_ connect the USB-to-Serial adapter directly to your scale, it **will not function properly** without the null modem adapter.
 - Check the make/model of USB-to-Serial adapter. The first adapter I used (and linked to) ended up being unreliable for many folks, so I now [recommend a different adapter](https://www.amazon.com/gp/product/B0769FY7R7/ref=as_li_qf_asin_il_tl?ie=UTF8&tag=ammolytics0f-20&creative=9325&linkCode=as2&creativeASIN=B0769FY7R7&linkId=35f392bd7bfdae3ec7dfa542c8da93ae) (which also happens to be less expensive)
+- Some scale manufacturers provide debug software that you can install and connect your scale to your computer. This may be worthwhile to ensure that the scale and cables are working properly before using on the Open Trickler.  
+  - [A&D software](https://weighing.andonline.com/support/software-downloads)
 
 
 ### Why can't I see the `CODE` partition from my computer?
@@ -108,3 +112,18 @@ That said, you're welcome to reference and adapt the Open Trickler software if y
 Personally, I don't care for the powder drop design of the AutoTrickler and I'm not inclined to utilize it myself. That said, I can understand why some folks want this and that's great!
 
 [See this ticket](https://github.com/ammolytics/projects/issues/21) if you're interested in working on this and adding it to the Open Trickler.
+
+
+### Why does it take so long?
+
+Like any other trickler, the Open Trickler is sensitive to the angle at which the trickler tube is positioned in relation with the ground.
+
+A positive angle (tip towards the sky) will despense slow.  
+A negative angle (tip towards the ground) will dispense fast.  
+
+Even if you find the perfect angle for a given powder, you may need to adjust for different powders.  
+For example, I have found that Varget and H4350 (both stick powders from the same manufacturer) will trickle very differently.
+
+### Why does it overthrow?
+
+Same as above. The trickler is sensitive to the angle at which it's positioned.
