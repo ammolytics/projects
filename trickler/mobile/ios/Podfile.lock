@@ -5,24 +5,18 @@ PODS:
     - flutter_blue/Protos (= 0.0.1)
   - flutter_blue/Protos (0.0.1):
     - Flutter
-    - Protobuf
-  - Protobuf (3.6.1)
+    - Protobuf (~> 3.11.4)
+  - Protobuf (3.11.4)
   - url_launcher (0.0.1):
-    - Flutter
-  - url_launcher_macos (0.0.1):
-    - Flutter
-  - url_launcher_web (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_blue (from `.symlinks/plugins/flutter_blue/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
-  - url_launcher_macos (from `.symlinks/plugins/url_launcher_macos/ios`)
-  - url_launcher_web (from `.symlinks/plugins/url_launcher_web/ios`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - Protobuf
 
 EXTERNAL SOURCES:
@@ -32,19 +26,13 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_blue/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
-  url_launcher_macos:
-    :path: ".symlinks/plugins/url_launcher_macos/ios"
-  url_launcher_web:
-    :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_blue: be3f2be2f5fda254d174896c0738b2fcb6b1073e
-  Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
+  flutter_blue: eeb381dc4727a0954dede73515f683865494b370
+  Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
-  url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
-  url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
 
-PODFILE CHECKSUM: 3dbe063e9c90a5d7c9e4e76e70a821b9e2c1d271
+PODFILE CHECKSUM: 8e679eca47255a8ca8067c4c67aab20e64cb974d
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
