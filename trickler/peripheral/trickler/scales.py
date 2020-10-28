@@ -20,7 +20,12 @@ class ScaleStatus(enum.Enum):
     ACKNOWLEDGE = 6
 
 
-class Scale(object):
+SCALES = {
+  'and-fx120': ANDFx120,
+}
+
+
+class ANDFx120(object):
     weight = None
     unit = None
     status = None
