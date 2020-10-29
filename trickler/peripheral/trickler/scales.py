@@ -1,6 +1,7 @@
 import decimal
 import enum
 import logging
+import time
 
 import serial
 
@@ -32,6 +33,14 @@ class ANDFx120(object):
 
     def __init__(self, port='/dev/ttyUSB0', baudrate=19200, timeout=0.05, **kwargs):
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=timeout, **kwargs)
+
+    def change_unit(self, to_unit):
+        # TODO(eric): prevent infinite loops.
+        while self.unit != to_unit:
+            # Send Mode button command.
+            self.serial.write('U\r\n')
+            time.sleep(0.1)
+            self.update()
 
     def update(self):
         handlers = {
