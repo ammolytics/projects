@@ -2,14 +2,14 @@
 
 import decimal
 import logging
-import serial
 
 import gpiozero
 import pymemcache.client.base
 import pymemcache.serde
 
-import scales
 import PID
+import motors
+import scales
 
 
 memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
@@ -28,7 +28,7 @@ memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.ser
 # 0: unknown/not ready
 
 
-def trickler_loop(pid, pwm_motor, scale, args):
+def trickler_loop(pid, trickler_motor, scale, args):
     running = True
     memcache.set('running', running)
 
@@ -49,27 +49,25 @@ def trickler_loop(pid, pwm_motor, scale, args):
         memcache.set('scale_weight', scale.weight)
         memcache.set('scale_unit', scale.unit)
         memcache.set('scale_status', scale.status)
-        memcache.set('pwm_motor_value', pwm_motor.value)
+        memcache.set('trickler_motor_speed', trickler_motor.speed)
         remainder_weight = target_weight - scale.weight
         logging.debug('remainder_weight: %r', remainder_weight)
 
         # Powder pan in place.
         if scale.weight >= 0 and auto_mode:
             pid.update(float(scale.weight))
-            target_pwm = pid.output
-            target_pwm = max(min(int(target_pwm), args.max_pwm), args.min_pwm)
-            pwm_motor.value = target_pwm / 100
-            logging.debug('pwm_motor_value: %r, target_pwm: %r', pwm_motor.value, target_pwm)
+            trickler_motor.update(pid.output)
+            logging.debug('trickler_motor.speed: %r, pid.output: %r', trickler_motor.speed, pid.output)
         else:
             # Pan removed.
             # Turn off trickler motor.
-            pwm_motor.value = 0
+            trickler_motor.off()
             logging.debug('Pan removed, motor turned off.')
 
         # Trickling complete.
         if remainder_weight <= 0:
             # Turn off trickler motor.
-            pwm_motor.value = 0
+            trickler_motor.off()
             # Clear PID values.
             pid.clear()
             logging.debug('Trickling complete, motor turned off and PID reset.')
@@ -79,7 +77,7 @@ def trickler_loop(pid, pwm_motor, scale, args):
 
 def main(args):
     pid = PID.PID(args.pid_P, args.pid_I, args.pid_D)
-    pwm_motor = gpiozero.PWMOutputDevice(args.trickler_motor_pin)
+    trickler_motor = motors.TricklerMotor(args.trickler_motor_pin, min_pwm=args.min_pwm, max_pwm=args.max_pwm)
     #servo_motor = gpiozero.AngularServo(args.servo_motor_pin)
 
     scale = scales.SCALES[args.scale](
@@ -87,7 +85,7 @@ def main(args):
         baudrate=args.scale_baudrate,
         timeout=args.scale_timeout)
 
-    trickler_loop(pid, pwm_motor, scale, args)
+    trickler_loop(pid, trickler_motor, scale, args)
 
 
 if __name__ == '__main__':
