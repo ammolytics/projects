@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
+import decimal
 import logging
 import serial
 
 import gpiozero
 import pymemcache.client.base
+import pymemcache.serde
 
 import scales
 import PID
 
 
-memcache = pymemcache.client.base.Client('localhost')
+memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
 
 # Components:
@@ -34,10 +36,11 @@ def trickler_loop(pid, pwm_motor, scale, args):
         # Read scale values (weight/unit/stable)
         scale.update()
         # Read settings (on/off/target/etc)
-        auto_mode = memcache.get('auto_mode', False)
-        target_weight = memcache.get('target_weight', 0.0)
-        target_unit = memcache.get('target_unit', scale.unit)
-        pid.SetPoint = target_weight
+        auto_mode = memcache.get('auto_mode', args.auto_mode)
+        target_weight = decimal.Decimal(memcache.get('target_weight', args.target_weight).decode('utf-8'))
+        target_unit = memcache.get('target_unit', args.target_unit)
+        pid.SetPoint = float(target_weight)
+        logging.debug('auto_mode: %r, target_weight: %r, target_unit: %r', auto_mode, target_weight, target_unit)
 
         # Set scale to match target unit.
         if target_unit != scale.unit:
@@ -48,32 +51,33 @@ def trickler_loop(pid, pwm_motor, scale, args):
         memcache.set('scale_status', scale.status)
         memcache.set('pwm_motor_value', pwm_motor.value)
         remainder_weight = target_weight - scale.weight
+        logging.debug('remainder_weight: %r', remainder_weight)
 
         # Powder pan in place.
         if scale.weight >= 0 and auto_mode:
-            pid.update(scale.weight)
+            pid.update(float(scale.weight))
             target_pwm = pid.output
             target_pwm = max(min(int(target_pwm), args.max_pwm), args.min_pwm)
             pwm_motor.value = target_pwm / 100
+            logging.debug('pwm_motor_value: %r, target_pwm: %r', pwm_motor.value, target_pwm)
         else:
             # Pan removed.
             # Turn off trickler motor.
-            pmw.value = 0
+            pwm_motor.value = 0
+            logging.debug('Pan removed, motor turned off.')
 
         # Trickling complete.
         if remainder_weight <= 0:
             # Turn off trickler motor.
-            pmw.value = 0
+            pwm_motor.value = 0
             # Clear PID values.
             pid.clear()
+            logging.debug('Trickling complete, motor turned off and PID reset.')
 
         running = memcache.get('running', running)
 
 
 def main(args):
-    Proportional = 10
-    Integral = 1
-    Derivative = 1
     pid = PID.PID(args.pid_P, args.pid_I, args.pid_D)
     pwm_motor = gpiozero.PWMOutputDevice(args.trickler_motor_pin)
     #servo_motor = gpiozero.AngularServo(args.servo_motor_pin)
@@ -86,21 +90,29 @@ def main(args):
     trickler_loop(pid, pwm_motor, scale, args)
 
 
-if __name_ == '__main__':
+if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description='Run OpenTrickler.')
-    parser.add_argument('scale', choices=scales.SCALES.keys())
-    parser.add_argument('scale_port')
-    parser.add_argument('scale_baudrate', type=int)
-    parser.add_argument('scale_timeout', type=int, default=0)
-    parser.add_argument('trickler_motor_pin', type=int)
-    parser.add_argument('servo_motor_pin', type=int)
-    parser.add_argument('max_pwm', type=float)
-    parser.add_argument('min_pwm', type=float)
-    parser.add_argument('pid_P', type=float)
-    parser.add_argument('pid_I', type=float)
-    parser.add_argument('pid_D', type=float)
+    parser.add_argument('--scale', choices=scales.SCALES.keys(), default='and-fx120')
+    parser.add_argument('--scale_port', default='/dev/ttyUSB0')
+    parser.add_argument('--scale_baudrate', type=int, default=19200)
+    parser.add_argument('--scale_timeout', type=float, default=0.05)
+    parser.add_argument('--trickler_motor_pin', type=int, default=18)
+    #parser.add_argument('--servo_motor_pin', type=int)
+    parser.add_argument('--max_pwm', type=float, default=100)
+    parser.add_argument('--min_pwm', type=float, default=15)
+    parser.add_argument('--pid_P', type=float, default=10)
+    parser.add_argument('--pid_I', type=float, default=1)
+    parser.add_argument('--pid_D', type=float, default=1)
+    parser.add_argument('--auto_mode', type=bool, default=False)
+    parser.add_argument('--target_weight', type=decimal.Decimal, default=0)
+    parser.add_argument('--target_unit', type=int, default=scales.Units.GRAINS)
     args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
+        datefmt='%Y-%m-%dT%H:%M:%S')
 
     main(args)

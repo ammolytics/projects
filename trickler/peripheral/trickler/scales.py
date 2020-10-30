@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import decimal
 import enum
 import logging
@@ -21,21 +23,14 @@ class ScaleStatus(enum.Enum):
     ACKNOWLEDGE = 6
 
 
-SCALES = {
-  'and-fx120': ANDFx120,
-}
-
-
 class ANDFx120(object):
-    weight = None
-    unit = None
-    status = None
 
     def __init__(self, port='/dev/ttyUSB0', baudrate=19200, timeout=0.05, **kwargs):
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=timeout, **kwargs)
 
     def change_unit(self, to_unit):
         # TODO(eric): prevent infinite loops.
+        logging.debug('changing weight unit on scale from: %r to: %r', self.unit, to_unit)
         while self.unit != to_unit:
             # Send Mode button command.
             self.serial.write('U\r\n')
@@ -55,27 +50,28 @@ class ANDFx120(object):
         }
 
         raw = self.serial.readline()
+        self.raw = raw
         logging.debug(raw)
-        line = raw.strip()
-        status = line[0, 2]
+        line = raw.strip().decode('utf-8')
+        status = line[0:2]
         handler = handlers.get(status, self._noop)
         handler(line)
 
     def _stable_unstable(self, line):
-        weight = line[3, 12].strip()
+        weight = line[3:12].strip()
         self.weight = decimal.Decimal(weight)
 
         units = {
             'GN': Units.GRAINS,
             'g': Units.GRAMS,
         }
-        unit = line[12, 15].strip()
+        unit = line[12:15].strip()
         self.unit = units[unit]
 
-        resolution = {
-            Units.GRAINS: decimal.Decimal(0.02)
-            Units.GRAMS: decimal.Decimal(0.001)
-        }
+        resolution = {}
+        resolution[Units.GRAINS] = decimal.Decimal(0.02)
+        resolution[Units.GRAMS] = decimal.Decimal(0.001)
+       
         self.resolution = resolution[self.unit]
 
     def _stable(self, line):
@@ -106,3 +102,31 @@ class ANDFx120(object):
     def _noop(self, line):
         pass
 
+
+SCALES = {
+  'and-fx120': ANDFx120,
+}
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Test scale.')
+    parser.add_argument('--scale', choices=SCALES.keys(), default='and-fx120')
+    parser.add_argument('--scale_port', default='/dev/ttyUSB0')
+    parser.add_argument('--scale_baudrate', type=int, default='19200')
+    parser.add_argument('--scale_timeout', type=float, default='0.05')
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
+        datefmt='%Y-%m-%dT%H:%M:%S')
+
+    scale = SCALES[args.scale](
+        port=args.scale_port,
+        baudrate=args.scale_baudrate,
+        timeout=args.scale_timeout)
+
+    while 1:
+        scale.update()
