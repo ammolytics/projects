@@ -3,6 +3,11 @@
 import logging
 
 import gpiozero
+import pymemcache.client.base
+import pymemcache.serde
+
+
+memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
 
 class TricklerMotor(object):
@@ -23,6 +28,7 @@ class TricklerMotor(object):
         # TODO(eric): must be 0 - 1.
         logging.debug('Setting speed from %r to %r', self.speed, speed)
         self.pwm.value = speed
+        memcache.set('trickler_motor_speed', self.speed)
 
     def off(self):
         self.set_speed(0)

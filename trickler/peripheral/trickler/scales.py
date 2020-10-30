@@ -5,7 +5,12 @@ import enum
 import logging
 import time
 
+import pymemcache.client.base
+import pymemcache.serde
 import serial
+
+
+memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
 
 class Units(enum.Enum):
@@ -73,6 +78,11 @@ class ANDFx120(object):
         resolution[Units.GRAMS] = decimal.Decimal(0.001)
        
         self.resolution = resolution[self.unit]
+        # Update memcache values.
+        memcache.set('scale_status', self.status)
+        memcache.set('scale_weight', self.weight)
+        memcache.set('scale_unit', self.unit)
+        memcache.set('scale_resolution', self.resolution)
 
     def _stable(self, line):
         self.status = ScaleStatus.STABLE
@@ -84,12 +94,15 @@ class ANDFx120(object):
 
     def _overload(self, line):
         self.status = ScaleStatus.OVERLOAD
+        memcache.set('scale_status', self.status)
 
     def _error(self, line):
         self.status = ScaleStatus.ERROR
+        memcache.set('scale_status', self.status)
 
     def _acknowledge(self, line):
         self.status = ScaleStatus.ACKNOWLEDGE
+        memcache.set('scale_status', self.status)
 
     def _model_number(self, line):
         self.status = ScaleStatus.MODEL_NUMBER
