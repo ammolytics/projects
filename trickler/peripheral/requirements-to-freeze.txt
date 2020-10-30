@@ -1,5 +1,5 @@
 pybleno
 pyserial
 gpiozero
-pigpio
 pymemcache
+RPi.GPIO
