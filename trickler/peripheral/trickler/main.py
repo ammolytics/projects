@@ -37,7 +37,7 @@ def trickler_loop(pid, trickler_motor, scale, args):
         scale.update()
         # Read settings (on/off/target/etc)
         auto_mode = memcache.get('auto_mode', args.auto_mode)
-        target_weight = decimal.Decimal(memcache.get('target_weight', args.target_weight).decode('utf-8'))
+        target_weight = memcache.get('target_weight', args.target_weight)
         target_unit = memcache.get('target_unit', args.target_unit)
         pid.SetPoint = float(target_weight)
         logging.debug('auto_mode: %r, target_weight: %r, target_unit: %r', auto_mode, target_weight, target_unit)
@@ -84,6 +84,10 @@ def main(args):
         port=args.scale_port,
         baudrate=args.scale_baudrate,
         timeout=args.scale_timeout)
+
+    memcache.set('auto_mode', args.auto_mode)
+    memcache.set('target_weight', args.target_weight)
+    memcache.set('target_unit', args.target_unit)
 
     trickler_loop(pid, trickler_motor, scale, args)
 
