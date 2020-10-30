@@ -46,10 +46,6 @@ def trickler_loop(pid, trickler_motor, scale, args):
         if target_unit != scale.unit:
             scale.change_unit(target_unit)
 
-        memcache.set('scale_weight', scale.weight)
-        memcache.set('scale_unit', scale.unit)
-        memcache.set('scale_status', scale.status)
-        memcache.set('trickler_motor_speed', trickler_motor.speed)
         remainder_weight = target_weight - scale.weight
         logging.debug('remainder_weight: %r', remainder_weight)
 
