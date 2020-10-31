@@ -57,8 +57,11 @@ if __name__ == '__main__':
     motor = TricklerMotor(args.trickler_motor_pin, min_pwm=args.min_pwm, max_pwm=args.max_pwm)
     print('Spinning up trickler motor in 3 seconds...')
     time.sleep(3)
-    for x in range(1, 11):
-        motor.set_speed(x / 10)
-        time.sleep(2)
+    for x in range(1, 101):
+        motor.set_speed(x / 100)
+        time.sleep(.05)
+    for x in range(100, 0, -1):
+        motor.set_speed(x / 100)
+        time.sleep(.05)
     motor.off()
     print('Done.')
