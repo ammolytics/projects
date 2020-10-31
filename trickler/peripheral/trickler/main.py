@@ -83,7 +83,7 @@ def main(args):
 
     memcache.set('auto_mode', args.auto_mode)
     memcache.set('target_weight', args.target_weight)
-    memcache.set('target_unit', args.target_unit)
+    memcache.set('target_unit', scales.UNIT_MAP[args.target_unit])
 
     trickler_loop(pid, trickler_motor, scale, args)
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--pid_D', type=float, default=1)
     parser.add_argument('--auto_mode', type=bool, default=False)
     parser.add_argument('--target_weight', type=decimal.Decimal, default=0)
-    parser.add_argument('--target_unit', type=int, default=scales.Units.GRAINS)
+    parser.add_argument('--target_unit', choices=scales.UNIT_MAP.keys(), default='GN')
     args = parser.parse_args()
 
     logging.basicConfig(
