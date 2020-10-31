@@ -28,17 +28,27 @@ class ScaleStatus(enum.Enum):
     ACKNOWLEDGE = 6
 
 
+UNIT_MAP = {
+    'GN': Units.GRAINS,
+    'g': Units.GRAMS,
+}
+
+
 class ANDFx120(object):
 
     def __init__(self, port='/dev/ttyUSB0', baudrate=19200, timeout=0.05, **kwargs):
         self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=timeout, **kwargs)
+        # Set default values, which should be overwritten quickly.
+        self.unit = Units.GRAINS
+        self.weight = decimal.Decimal('0.00')
+        self.status = ScaleStatus.STABLE
 
     def change_unit(self, to_unit):
         # TODO(eric): prevent infinite loops.
         logging.debug('changing weight unit on scale from: %r to: %r', self.unit, to_unit)
         while self.unit != to_unit:
             # Send Mode button command.
-            self.serial.write('U\r\n')
+            self.serial.write(b'U\r\n')
             time.sleep(0.1)
             self.update()
 
@@ -66,12 +76,8 @@ class ANDFx120(object):
         weight = line[3:12].strip()
         self.weight = decimal.Decimal(weight)
 
-        units = {
-            'GN': Units.GRAINS,
-            'g': Units.GRAMS,
-        }
         unit = line[12:15].strip()
-        self.unit = units[unit]
+        self.unit = UNIT_MAP[unit]
 
         resolution = {}
         resolution[Units.GRAINS] = decimal.Decimal(0.02)
