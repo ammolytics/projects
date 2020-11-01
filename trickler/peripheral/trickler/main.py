@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import datetime
 import decimal
 import logging
 
@@ -48,6 +49,9 @@ def trickler_loop(pid, trickler_motor, scale, args):
 
         remainder_weight = target_weight - scale.weight
         logging.debug('remainder_weight: %r', remainder_weight)
+
+        if args.pid_tune:
+            print(f'{datetime.datetime.now().timestamp()}, {trickler_motor.speed}, {scale.weight / target_weight}')
 
         # Powder pan in place.
         if scale.weight >= 0 and auto_mode:
@@ -99,18 +103,41 @@ if __name__ == '__main__':
     parser.add_argument('--trickler_motor_pin', type=int, default=18)
     #parser.add_argument('--servo_motor_pin', type=int)
     parser.add_argument('--max_pwm', type=float, default=100)
-    parser.add_argument('--min_pwm', type=float, default=15)
+    parser.add_argument('--min_pwm', type=float, default=35)
+    # Higher Kp values will:
+    # - decrease rise time
+    # - increase overshoot
+    # - slightly increase settling time
+    # - decrease steady-state error
+    # - degrade stability
     parser.add_argument('--pid_P', type=float, default=10)
+    # Higher Ki values will:
+    # - slightly decrease rise time
+    # - increase overshoot
+    # - increase settling time
+    # - largely decrease steady-state error
+    # - degrade stability
     parser.add_argument('--pid_I', type=float, default=1)
+    # Higher Kd values will:
+    # - slightly decrease rise time
+    # - decrease overshoot
+    # - decrease settling time
+    # - minorly affect steady-state error
+    # - improve stability
     parser.add_argument('--pid_D', type=float, default=1)
     parser.add_argument('--auto_mode', type=bool, default=False)
     parser.add_argument('--target_weight', type=decimal.Decimal, default=0)
     parser.add_argument('--target_unit', choices=scales.UNIT_MAP.keys(), default='GN')
+    parser.add_argument('--pid_tune', type=bool, default=False)
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S')
+    if args.pid_tune:
+        logging.basicConfig(level=logging.INFO)
+        print('timestamp, input (motor %), output (weight %)')
+    else:
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
+            datefmt='%Y-%m-%dT%H:%M:%S')
 
     main(args)
