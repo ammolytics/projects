@@ -103,7 +103,7 @@ if __name__ == '__main__':
     parser.add_argument('--trickler_motor_pin', type=int, default=18)
     #parser.add_argument('--servo_motor_pin', type=int)
     parser.add_argument('--max_pwm', type=float, default=100)
-    parser.add_argument('--min_pwm', type=float, default=35)
+    parser.add_argument('--min_pwm', type=float, default=32)
     # Higher Kp values will:
     # - decrease rise time
     # - increase overshoot
@@ -117,14 +117,14 @@ if __name__ == '__main__':
     # - increase settling time
     # - largely decrease steady-state error
     # - degrade stability
-    parser.add_argument('--pid_I', type=float, default=1)
+    parser.add_argument('--pid_I', type=float, default=2.3)
     # Higher Kd values will:
     # - slightly decrease rise time
     # - decrease overshoot
     # - decrease settling time
     # - minorly affect steady-state error
     # - improve stability
-    parser.add_argument('--pid_D', type=float, default=1)
+    parser.add_argument('--pid_D', type=float, default=3.75)
     parser.add_argument('--auto_mode', type=bool, default=False)
     parser.add_argument('--target_weight', type=decimal.Decimal, default=0)
     parser.add_argument('--target_unit', choices=scales.UNIT_MAP.keys(), default='GN')
