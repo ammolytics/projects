@@ -3,17 +3,11 @@
 import datetime
 import decimal
 import logging
-
-import gpiozero
-import pymemcache.client.base
-import pymemcache.serde
+import time
 
 import PID
 import motors
 import scales
-
-
-memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
 
 # Components:
@@ -28,10 +22,20 @@ memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.ser
 # Conditions:
 # 0: unknown/not ready
 
+# TODO
+# - TESTING correctly disable trickling when pan is removed
+# - TESTING use stable/unstable value from scale for trickling
+# - TESTING fix scale unit switching. gets stuck in a loop
+# - TESTING add delay before trickling when empty pan is placed
+# - add comments to code for clarity
+# - add support for config input (configparse)
+# - document specific python version
 
-def trickler_loop(pid, trickler_motor, scale, args):
+
+def trickler_loop(memcache, pid, trickler_motor, scale, args):
     running = True
     memcache.set('running', running)
+    done = False
 
     while running:
         # Read scale values (weight/unit/stable)
@@ -44,8 +48,8 @@ def trickler_loop(pid, trickler_motor, scale, args):
         logging.debug('auto_mode: %r, target_weight: %r, target_unit: %r', auto_mode, target_weight, target_unit)
 
         # Set scale to match target unit.
-        if target_unit != scale.unit:
-            scale.change_unit(target_unit)
+        #if target_unit != scale.unit:
+        #    scale.change_unit(target_unit)
 
         remainder_weight = target_weight - scale.weight
         logging.debug('remainder_weight: %r', remainder_weight)
@@ -54,7 +58,12 @@ def trickler_loop(pid, trickler_motor, scale, args):
             print(f'{datetime.datetime.now().timestamp()}, {trickler_motor.speed}, {scale.weight / target_weight}')
 
         # Powder pan in place.
-        if scale.weight >= 0 and auto_mode:
+        if scale.weight >= 0 and scale.status == scales.ScaleStatus.STABLE and auto_mode and not done:
+            # Wait a second to start trickling.
+            time.sleep(1)
+            done = False
+
+        if scale.weight >= 0 and auto_mode and not done:
             pid.update(float(scale.weight))
             trickler_motor.update(pid.output)
             logging.debug('trickler_motor.speed: %r, pid.output: %r', trickler_motor.speed, pid.output)
@@ -63,6 +72,7 @@ def trickler_loop(pid, trickler_motor, scale, args):
             # Turn off trickler motor.
             trickler_motor.off()
             logging.debug('Pan removed, motor turned off.')
+            done = True
 
         # Trickling complete.
         if remainder_weight <= 0:
@@ -75,31 +85,43 @@ def trickler_loop(pid, trickler_motor, scale, args):
         running = memcache.get('running', running)
 
 
-def main(args):
+def main(args, memcache):
     pid = PID.PID(args.pid_P, args.pid_I, args.pid_D)
-    trickler_motor = motors.TricklerMotor(args.trickler_motor_pin, min_pwm=args.min_pwm, max_pwm=args.max_pwm)
+    logging.debug('pid: %r', pid)
+
+    trickler_motor = motors.TricklerMotor(
+        memcache=memcache,
+        motor_pin=args.trickler_motor_pin,
+        min_pwm=args.min_pwm,
+        max_pwm=args.max_pwm)
+    logging.debug('trickler_motor: %r', trickler_motor)
     #servo_motor = gpiozero.AngularServo(args.servo_motor_pin)
 
     scale = scales.SCALES[args.scale](
+        memcache=memcache,
         port=args.scale_port,
         baudrate=args.scale_baudrate,
         timeout=args.scale_timeout)
+    logging.debug('scale: %r', scale)
 
     memcache.set('auto_mode', args.auto_mode)
     memcache.set('target_weight', args.target_weight)
     memcache.set('target_unit', scales.UNIT_MAP[args.target_unit])
 
-    trickler_loop(pid, trickler_motor, scale, args)
+    trickler_loop(memcache, pid, trickler_motor, scale, args)
 
 
 if __name__ == '__main__':
     import argparse
 
+    import pymemcache.client.base
+    import pymemcache.serde
+
     parser = argparse.ArgumentParser(description='Run OpenTrickler.')
     parser.add_argument('--scale', choices=scales.SCALES.keys(), default='and-fx120')
     parser.add_argument('--scale_port', default='/dev/ttyUSB0')
     parser.add_argument('--scale_baudrate', type=int, default=19200)
-    parser.add_argument('--scale_timeout', type=float, default=0.05)
+    parser.add_argument('--scale_timeout', type=float, default=0.1)
     parser.add_argument('--trickler_motor_pin', type=int, default=18)
     #parser.add_argument('--servo_motor_pin', type=int)
     parser.add_argument('--max_pwm', type=float, default=100)
@@ -140,4 +162,5 @@ if __name__ == '__main__':
             format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
             datefmt='%Y-%m-%dT%H:%M:%S')
 
-    main(args)
+    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    main(args, memcache)
