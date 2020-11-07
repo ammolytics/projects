@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 
+import atexit
 import logging
 
 import gpiozero
-import pymemcache.client.base
-import pymemcache.serde
-
-
-memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
 
 class TricklerMotor(object):
 
-    def __init__(self, motor_pin=18, min_pwm=15, max_pwm=100):
+    def __init__(self, memcache, motor_pin=18, min_pwm=15, max_pwm=100):
+        self._memcache = memcache
         self.pwm = gpiozero.PWMOutputDevice(motor_pin)
         self.min_pwm = min_pwm
         self.max_pwm = max_pwm
         logging.debug('Created pwm motor on PIN %r with min %r and max %r: %r', motor_pin, self.min_pwm, self.max_pwm, self.pwm)
+        atexit.register(self._graceful_exit)
+
+    def _graceful_exit(self):
+        logging.debug('Closing trickler motor...')
+        self.pwm.off()
+        self.pwm.close()
 
     def update(self, target_pwm):
         logging.debug('Updating target_pwm to %r', target_pwm)
@@ -28,7 +31,7 @@ class TricklerMotor(object):
         # TODO(eric): must be 0 - 1.
         logging.debug('Setting speed from %r to %r', self.speed, speed)
         self.pwm.value = speed
-        memcache.set('trickler_motor_speed', self.speed)
+        self._memcache.set('trickler_motor_speed', self.speed)
 
     def off(self):
         self.set_speed(0)
@@ -42,6 +45,9 @@ if __name__ == '__main__':
     import argparse
     import time
 
+    import pymemcache.client.base
+    import pymemcache.serde
+
     parser = argparse.ArgumentParser(description='Test motors.')
     parser.add_argument('--trickler_motor_pin', type=int, default=18)
     #parser.add_argument('--servo_motor_pin', type=int)
@@ -49,12 +55,18 @@ if __name__ == '__main__':
     parser.add_argument('--min_pwm', type=float, default=15)
     args = parser.parse_args()
 
+    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
         datefmt='%Y-%m-%dT%H:%M:%S')
 
-    motor = TricklerMotor(args.trickler_motor_pin, min_pwm=args.min_pwm, max_pwm=args.max_pwm)
+    motor = TricklerMotor(
+        memcache=memcache,
+        motor_pin=args.trickler_motor_pin,
+        min_pwm=args.min_pwm,
+        max_pwm=args.max_pwm)
     print('Spinning up trickler motor in 3 seconds...')
     time.sleep(3)
     for x in range(1, 101):

@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 
+import atexit
 import decimal
 import enum
 import logging
 import time
 
-import pymemcache.client.base
-import pymemcache.serde
 import serial
-
-
-memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
 
 class Units(enum.Enum):
@@ -36,20 +32,26 @@ UNIT_MAP = {
 
 class ANDFx120(object):
 
-    def __init__(self, port='/dev/ttyUSB0', baudrate=19200, timeout=0.05, **kwargs):
-        self.serial = serial.Serial(port=port, baudrate=baudrate, timeout=timeout, **kwargs)
+    def __init__(self, memcache, port='/dev/ttyUSB0', baudrate=19200, timeout=0.1, **kwargs):
+        self._memcache = memcache
+        self._serial = serial.Serial(port=port, baudrate=baudrate, timeout=timeout, **kwargs)
         # Set default values, which should be overwritten quickly.
         self.unit = Units.GRAINS
         self.weight = decimal.Decimal('0.00')
         self.status = ScaleStatus.STABLE
+        atexit.register(self._graceful_exit)
+
+    def _graceful_exit(self):
+        logging.debug('Closing serial port...')
+        self._serial.close()
 
     def change_unit(self, to_unit):
         # TODO(eric): prevent infinite loops.
         logging.debug('changing weight unit on scale from: %r to: %r', self.unit, to_unit)
         while self.unit != to_unit:
             # Send Mode button command.
-            self.serial.write(b'U\r\n')
-            time.sleep(0.1)
+            self._serial.write(b'U\r\n')
+            time.sleep(1)
             self.update()
 
     def update(self):
@@ -64,13 +66,18 @@ class ANDFx120(object):
             None: self._noop,
         }
 
-        raw = self.serial.readline()
+        raw = self._serial.readline()
         self.raw = raw
         logging.debug(raw)
-        line = raw.strip().decode('utf-8')
-        status = line[0:2]
-        handler = handlers.get(status, self._noop)
-        handler(line)
+        try:
+            line = raw.strip().decode('utf-8')
+        except UnicodeDecodeError:
+            logging.debug('Could not decode bytes to unicode.')
+        else:
+            status = line[0:2]
+            handler = handlers.get(status, self._noop)
+            logging.debug('handler: %r', handler)
+            handler(line)
 
     def _stable_unstable(self, line):
         weight = line[3:12].strip()
@@ -85,10 +92,10 @@ class ANDFx120(object):
        
         self.resolution = resolution[self.unit]
         # Update memcache values.
-        memcache.set('scale_status', self.status)
-        memcache.set('scale_weight', self.weight)
-        memcache.set('scale_unit', self.unit)
-        memcache.set('scale_resolution', self.resolution)
+        self._memcache.set('scale_status', self.status)
+        self._memcache.set('scale_weight', self.weight)
+        self._memcache.set('scale_unit', self.unit)
+        self._memcache.set('scale_resolution', self.resolution)
 
     def _stable(self, line):
         self.status = ScaleStatus.STABLE
@@ -100,42 +107,47 @@ class ANDFx120(object):
 
     def _overload(self, line):
         self.status = ScaleStatus.OVERLOAD
-        memcache.set('scale_status', self.status)
+        self._memcache.set('scale_status', self.status)
 
     def _error(self, line):
         self.status = ScaleStatus.ERROR
-        memcache.set('scale_status', self.status)
+        self._memcache.set('scale_status', self.status)
 
     def _acknowledge(self, line):
         self.status = ScaleStatus.ACKNOWLEDGE
-        memcache.set('scale_status', self.status)
+        self._memcache.set('scale_status', self.status)
 
     def _model_number(self, line):
         self.status = ScaleStatus.MODEL_NUMBER
-        self.model = line[3:]
+        self.model_number = line[3:]
 
     def _serial_number(self, line):
         self.status = ScaleStatus.SERIAL_NUMBER
-        self.serial = line[3:]
+        self.serial_number = line[3:]
 
     def _noop(self, line):
         pass
 
 
 SCALES = {
-  'and-fx120': ANDFx120,
+    'and-fx120': ANDFx120,
 }
 
 
 if __name__ == '__main__':
     import argparse
 
+    import pymemcache.client.base
+    import pymemcache.serde
+
     parser = argparse.ArgumentParser(description='Test scale.')
     parser.add_argument('--scale', choices=SCALES.keys(), default='and-fx120')
     parser.add_argument('--scale_port', default='/dev/ttyUSB0')
     parser.add_argument('--scale_baudrate', type=int, default='19200')
-    parser.add_argument('--scale_timeout', type=float, default='0.05')
+    parser.add_argument('--scale_timeout', type=float, default='0.1')
     args = parser.parse_args()
+
+    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
     logging.basicConfig(
         level=logging.DEBUG,
@@ -145,7 +157,8 @@ if __name__ == '__main__':
     scale = SCALES[args.scale](
         port=args.scale_port,
         baudrate=args.scale_baudrate,
-        timeout=args.scale_timeout)
+        timeout=args.scale_timeout,
+        memcache=memcache)
 
     while 1:
         scale.update()
