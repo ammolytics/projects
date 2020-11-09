@@ -30,15 +30,19 @@ UNIT_MAP = {
 }
 
 
-class ANDFx120(object):
+class ANDFx120:
 
     def __init__(self, memcache, port='/dev/ttyUSB0', baudrate=19200, timeout=0.1, **kwargs):
         self._memcache = memcache
         self._serial = serial.Serial(port=port, baudrate=baudrate, timeout=timeout, **kwargs)
         # Set default values, which should be overwritten quickly.
+        self.raw = b''
         self.unit = Units.GRAINS
+        self.resolution = decimal.Decimal(0.02)
         self.weight = decimal.Decimal('0.00')
         self.status = ScaleStatus.STABLE
+        self.model_number = None
+        self.serial_number = None
         atexit.register(self._graceful_exit)
 
     def _graceful_exit(self):
@@ -89,7 +93,7 @@ class ANDFx120(object):
         resolution = {}
         resolution[Units.GRAINS] = decimal.Decimal(0.02)
         resolution[Units.GRAMS] = decimal.Decimal(0.001)
-       
+
         self.resolution = resolution[self.unit]
         # Update memcache values.
         self._memcache.set('scale_status', self.status)
@@ -147,7 +151,7 @@ if __name__ == '__main__':
     parser.add_argument('--scale_timeout', type=float, default='0.1')
     args = parser.parse_args()
 
-    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    memcache_client = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
     logging.basicConfig(
         level=logging.DEBUG,
@@ -158,7 +162,7 @@ if __name__ == '__main__':
         port=args.scale_port,
         baudrate=args.scale_baudrate,
         timeout=args.scale_timeout,
-        memcache=memcache)
+        memcache=memcache_client)
 
     while 1:
         scale.update()

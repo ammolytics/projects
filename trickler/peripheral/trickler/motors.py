@@ -6,7 +6,7 @@ import logging
 import gpiozero
 
 
-class TricklerMotor(object):
+class TricklerMotor:
 
     def __init__(self, memcache, motor_pin=18, min_pwm=15, max_pwm=100):
         self._memcache = memcache
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('--min_pwm', type=float, default=15)
     args = parser.parse_args()
 
-    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    memcache_client = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
 
     logging.basicConfig(
         level=logging.DEBUG,
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         datefmt='%Y-%m-%dT%H:%M:%S')
 
     motor = TricklerMotor(
-        memcache=memcache,
+        memcache=memcache_client,
         motor_pin=args.trickler_motor_pin,
         min_pwm=args.min_pwm,
         max_pwm=args.max_pwm)

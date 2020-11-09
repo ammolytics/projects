@@ -32,24 +32,24 @@ import scales
 # - document specific python version
 
 
-def trickler_loop(memcache, pid, trickler_motor, scale, args):
-    running = True
-    memcache.set('running', running)
-    done = False
+def trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_unit, args):
+    while 1:
+        # Stop running if auto mode is disabled.
+        if not memcache.get('auto_mode'):
+            logging.debug('auto mode disabled.')
+            break
 
-    while running:
         # Read scale values (weight/unit/stable)
         scale.update()
-        # Read settings (on/off/target/etc)
-        auto_mode = memcache.get('auto_mode', args.auto_mode)
-        target_weight = memcache.get('target_weight', args.target_weight)
-        target_unit = memcache.get('target_unit', args.target_unit)
-        pid.SetPoint = float(target_weight)
-        logging.debug('auto_mode: %r, target_weight: %r, target_unit: %r', auto_mode, target_weight, target_unit)
 
-        # Set scale to match target unit.
-        #if target_unit != scale.unit:
-        #    scale.change_unit(target_unit)
+        if scale.unit != target_unit:
+            logging.debug('Target unit does not match scale unit.')
+            break
+
+        # Stop running if pan removed.
+        if scale.weight < 0:
+            logging.debug('Pan removed.')
+            break
 
         remainder_weight = target_weight - scale.weight
         logging.debug('remainder_weight: %r', remainder_weight)
@@ -57,32 +57,19 @@ def trickler_loop(memcache, pid, trickler_motor, scale, args):
         if args.pid_tune:
             print(f'{datetime.datetime.now().timestamp()}, {trickler_motor.speed}, {scale.weight / target_weight}')
 
-        # Powder pan in place.
-        if scale.weight >= 0 and scale.status == scales.ScaleStatus.STABLE and auto_mode and not done:
-            # Wait a second to start trickling.
-            time.sleep(1)
-            done = False
-
-        if scale.weight >= 0 and auto_mode and not done:
-            pid.update(float(scale.weight))
-            trickler_motor.update(pid.output)
-            logging.debug('trickler_motor.speed: %r, pid.output: %r', trickler_motor.speed, pid.output)
-        else:
-            # Pan removed.
-            # Turn off trickler motor.
-            trickler_motor.off()
-            logging.debug('Pan removed, motor turned off.')
-            done = True
-
         # Trickling complete.
         if remainder_weight <= 0:
-            # Turn off trickler motor.
-            trickler_motor.off()
-            # Clear PID values.
-            pid.clear()
             logging.debug('Trickling complete, motor turned off and PID reset.')
+            break
 
-        running = memcache.get('running', running)
+        pid.update(float(scale.weight))
+        trickler_motor.update(pid.output)
+        logging.debug('trickler_motor.speed: %r, pid.output: %r', trickler_motor.speed, pid.output)
+
+    # Clean up tasks.
+    trickler_motor.off()
+    # Clear PID values.
+    pid.clear()
 
 
 def main(args, memcache):
@@ -108,7 +95,23 @@ def main(args, memcache):
     memcache.set('target_weight', args.target_weight)
     memcache.set('target_unit', scales.UNIT_MAP[args.target_unit])
 
-    trickler_loop(memcache, pid, trickler_motor, scale, args)
+    while 1:
+        # Update settings.
+        auto_mode = memcache.get('auto_mode', args.auto_mode)
+        target_weight = memcache.get('target_weight', args.target_weight)
+        target_unit = memcache.get('target_unit', args.target_unit)
+        pid.SetPoint = float(target_weight)
+        scale.update()
+        # Set scale to match target unit.
+        #if target_unit != scale.unit:
+        #    scale.change_unit(target_unit)
+
+        # Powder pan in place.
+        if scale.weight >= 0 and scale.status == scales.ScaleStatus.STABLE and auto_mode:
+            # Wait a second to start trickling.
+            time.sleep(1)
+            # Run trickler loop.
+            trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_unit, args)
 
 
 if __name__ == '__main__':
@@ -162,5 +165,5 @@ if __name__ == '__main__':
             format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
             datefmt='%Y-%m-%dT%H:%M:%S')
 
-    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
-    main(args, memcache)
+    memcache_client = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    main(args, memcache_client)
