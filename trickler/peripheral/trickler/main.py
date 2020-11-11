@@ -27,7 +27,6 @@ import scales
 # 7: Powder pan/cup?
 
 # TODO
-# - TESTING fix scale unit switching. gets stuck in a loop
 # - add support for config input (configparse)
 # - document specific python version
 # - handle case where scale is booted with pan on -- shows error instead of negative value
