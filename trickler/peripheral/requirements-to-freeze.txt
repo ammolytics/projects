@@ -3,3 +3,4 @@ pyserial
 gpiozero
 pymemcache
 RPi.GPIO
+grpcio
