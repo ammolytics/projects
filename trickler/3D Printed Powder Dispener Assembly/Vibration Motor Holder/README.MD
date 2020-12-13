@@ -9,6 +9,6 @@ One end has a taper on the two holes.  This end is marked by two small dimples. 
 Print this part without supports, in the orientation shown below.  I had best results with 0.1mm layer height.
 
 
-![knob orientation](motor_holder_orientation.png)
+![motor holder orientation](motor_holder.png)
 
 
