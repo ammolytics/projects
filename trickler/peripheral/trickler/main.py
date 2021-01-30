@@ -173,7 +173,7 @@ if __name__ == '__main__':
     pid_handler.setFormatter(logging.Formatter('%(message)s'))
 
     pidtune_logger.setLevel(logging.ERROR)
-    if args.pid_tune:
+    if args.pid_tune or config['PID'].getboolean('pid_tuner_mode'):
         pidtune_logger.setLevel(logging.INFO)
 
     main(config, args, pidtune_logger)
