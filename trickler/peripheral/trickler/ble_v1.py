@@ -7,15 +7,16 @@ OpenTrickler
 https://github.com/ammolytics/projects/tree/develop/trickler
 """
 
+import array
 import atexit
 import functools
 import logging
 
 import pybleno
 
+import helpers
 
-# TODO: Get from env.
-DEVICE_NAME = 'Trickler'
+
 TRICKLER_UUID = '10000000-be5f-4b43-a49f-76f2d65c6e28'
 
 
@@ -38,8 +39,8 @@ class AutoMode(BasicCharacteristic):
             'properties': ['read', 'write'],
             'descriptors': [
                 pybleno.Descriptor(
-                    uuid = '2901',
-                    value = 'Start/stop automatic trickle mode'
+                    uuid='2901',
+                    value='Start/stop automatic trickle mode'
                 )],
             'value': False,
         })
@@ -77,8 +78,8 @@ class ScaleStatus(BasicCharacteristic):
             'properties': ['read', 'notify'],
             'descriptors': [
                 pybleno.Descriptor(
-                    uuid = '2901',
-                    value = 'Reads the current stability status of the scale'
+                    uuid='2901',
+                    value='Reads the current stability status of the scale'
                 )],
         })
         self._memcache = memcache
@@ -101,8 +102,8 @@ class TargetWeight(BasicCharacteristic):
             'properties': ['read', 'write'],
             'descriptors': [
                 pybleno.Descriptor(
-                    uuid = '2901',
-                    value = 'Target powder weight'
+                    uuid='2901',
+                    value='Target powder weight'
                 )],
         })
         self._memcache = memcache
@@ -141,8 +142,8 @@ class ScaleUnit(BasicCharacteristic):
             'properties': ['read', 'write', 'notify'],
             'descriptors': [
                 pybleno.Descriptor(
-                    uuid = '2901',
-                    value = 'Reads the current weight unit of the scale'
+                    uuid='2901',
+                    value='Reads the current weight unit of the scale'
                 )],
         })
         self._memcache = memcache
@@ -180,8 +181,8 @@ class ScaleWeight(BasicCharacteristic):
             'properties': ['read', 'notify'],
             'descriptors': [
                 pybleno.Descriptor(
-                    uuid = '2901',
-                    value = 'Reads the current weight value of the scale'
+                    uuid='2901',
+                    value='Reads the current weight value of the scale'
                 )],
         })
         self._memcache = memcache
@@ -218,9 +219,9 @@ def error_handler(error):
         logging.error(error)
 
 
-def on_state_change(bleno, trickler_service, state):
+def on_state_change(device_name, bleno, trickler_service, state):
     if state == 'poweredOn':
-        bleno.startAdvertising(DEVICE_NAME, [TRICKLER_UUID], error_handler)
+        bleno.startAdvertising(device_name, [TRICKLER_UUID], error_handler)
     else:
         bleno.stopAdvertising()
 
@@ -237,29 +238,29 @@ def graceful_exit(bleno):
     bleno.disconnect()
 
 
-def run(memcache):
+def run(config, args):
+    memcache = helpers.get_mc_client()
+
     trickler_service = TricklerService(memcache)
     bleno = pybleno.Bleno()
+    device_name = config['bluetooth']['name']
     atexit.register(functools.partial(graceful_exit, bleno))
-    bleno.on('stateChange', functools.partial(on_state_change, bleno, trickler_service))
+    bleno.on('stateChange', functools.partial(on_state_change, device_name, bleno, trickler_service))
     bleno.on('advertisingStart', functools.partial(on_advertising_start, bleno, trickler_service))
     bleno.start()
 
 
 if __name__ == '__main__':
     import argparse
-
-    import pymemcache.client.base
-    import pymemcache.serde
+    import configparser
 
     parser = argparse.ArgumentParser(description='Test bluetooth')
+    parser.add_argument('config_file')
     args = parser.parse_args()
 
-    memcache_client = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    config = configparser.ConfigParser()
+    config.read_file(args.config_file)
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S')
+    helpers.setup_logging()
 
-    run(memcache_client)
+    run(config, args)

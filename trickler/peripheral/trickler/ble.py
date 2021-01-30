@@ -9,27 +9,27 @@ https://github.com/ammolytics/projects/tree/develop/trickler
 
 import logging
 
-import pybleno
+import bluezero
+
+import helpers
 
 
-def main(args):
+def main(config, args):
+    memcache = helpers.get_mc_client()
     pass
 
 
 if __name__ == '__main__':
     import argparse
-
-    import pymemcache.client.base
-    import pymemcache.serde
+    import configparser
 
     parser = argparse.ArgumentParser(description='Test bluetooth')
+    parser.add_argument('config_file')
     args = parser.parse_args()
 
-    memcache = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    config = configparser.ConfigParser()
+    config.read_file(args.config_file)
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S')
+    helpers.setup_logging()
 
-    main(args)
+    main(config, args)

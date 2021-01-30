@@ -1,3 +1,4 @@
+bluezero
 pybleno
 pyserial
 gpiozero

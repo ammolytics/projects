@@ -64,8 +64,7 @@ if __name__ == '__main__':
     import argparse
     import time
 
-    import pymemcache.client.base
-    import pymemcache.serde
+    import helpers
 
     parser = argparse.ArgumentParser(description='Test motors.')
     parser.add_argument('--trickler_motor_pin', type=int, default=18)
@@ -74,12 +73,9 @@ if __name__ == '__main__':
     parser.add_argument('--min_pwm', type=float, default=15)
     args = parser.parse_args()
 
-    memcache_client = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+    memcache_client = helpers.get_mc_client()
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S')
+    helpers.setup_logging()
 
     motor = TricklerMotor(
         memcache=memcache_client,

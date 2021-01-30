@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd /code/opentrickler
-exec ./server.js ecosystem.config.js >> "$1" 2>&1
+exec ./trickler/main.py --config_file=config.ini >> "$1" 2>&1

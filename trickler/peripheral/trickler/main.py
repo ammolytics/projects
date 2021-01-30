@@ -12,6 +12,7 @@ import decimal
 import logging
 import time
 
+import helpers
 import PID
 import motors
 import scales
@@ -27,18 +28,10 @@ import scales
 # 7: Powder pan/cup?
 
 # TODO
-# - add support for config input (configparse)
 # - document specific python version
 # - handle case where scale is booted with pan on -- shows error instead of negative value
 # - detect scale that's turned off (blank values)
 # - validate inputs (target weight)
-
-
-def is_even(dec):
-    """Returns True if a decimal.Decimal is even, False if odd."""
-    exp = dec.as_tuple().exponent
-    factor = 10 ** (exp * -1)
-    return (dec * factor) % 2 == 0
 
 
 def trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_unit, pidtune_logger):
@@ -97,23 +90,28 @@ def trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_un
     logging.info('Trickling process stopped.')
 
 
-def main(args, memcache, pidtune_logger):
-    pid = PID.PID(args.pid_P, args.pid_I, args.pid_D)
+def main(config, args, pidtune_logger):
+    memcache = helpers.get_mc_client()
+
+    pid = PID.PID(
+        float(config['PID']['Kp']),
+        float(config['PID']['Ki']),
+        float(config['PID']['Kd']))
     logging.debug('pid: %r', pid)
 
     trickler_motor = motors.TricklerMotor(
         memcache=memcache,
-        motor_pin=args.trickler_motor_pin,
-        min_pwm=args.min_pwm,
-        max_pwm=args.max_pwm)
+        motor_pin=int(config['motors']['trickler_pin']),
+        min_pwm=int(config['motors']['trickler_min_pwm']),
+        max_pwm=int(config['motors']['trickler_max_pwm']))
     logging.debug('trickler_motor: %r', trickler_motor)
-    #servo_motor = gpiozero.AngularServo(args.servo_motor_pin)
+    #servo_motor = gpiozero.AngularServo(int(config['motors']['servo_pin']))
 
-    scale = scales.SCALES[args.scale](
+    scale = scales.SCALES[config['scale']['model']](
         memcache=memcache,
-        port=args.scale_port,
-        baudrate=args.scale_baudrate,
-        timeout=args.scale_timeout)
+        port=config['scale']['port'],
+        baudrate=int(config['scale']['baudrate']),
+        timeout=float(config['scale']['timeout']))
     logging.debug('scale: %r', scale)
 
     memcache.set('auto_mode', args.auto_mode)
@@ -151,55 +149,24 @@ def main(args, memcache, pidtune_logger):
 
 if __name__ == '__main__':
     import argparse
-    import distutils.util
-
-    import pymemcache.client.base
-    import pymemcache.serde
+    import configparser
 
     parser = argparse.ArgumentParser(description='Run OpenTrickler.')
-    parser.add_argument('--scale', choices=scales.SCALES.keys(), default='and-fx120')
-    parser.add_argument('--scale_port', default='/dev/ttyUSB0')
-    parser.add_argument('--scale_baudrate', type=int, default=19200)
-    parser.add_argument('--scale_timeout', type=float, default=0.1)
-    parser.add_argument('--trickler_motor_pin', type=int, default=18)
-    #parser.add_argument('--servo_motor_pin', type=int)
-    parser.add_argument('--max_pwm', type=float, default=100)
-    parser.add_argument('--min_pwm', type=float, default=32)
-    # Higher Kp values will:
-    # - decrease rise time
-    # - increase overshoot
-    # - slightly increase settling time
-    # - decrease steady-state error
-    # - degrade stability
-    parser.add_argument('--pid_P', type=float, default=10)
-    # Higher Ki values will:
-    # - slightly decrease rise time
-    # - increase overshoot
-    # - increase settling time
-    # - largely decrease steady-state error
-    # - degrade stability
-    parser.add_argument('--pid_I', type=float, default=2.3)
-    # Higher Kd values will:
-    # - slightly decrease rise time
-    # - decrease overshoot
-    # - decrease settling time
-    # - minorly affect steady-state error
-    # - improve stability
-    parser.add_argument('--pid_D', type=float, default=3.75)
-    parser.add_argument('--auto_mode', type=distutils.util.strtobool, default=False)
+    parser.add_argument('config_file')
+    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--auto_mode', action='store_true')
+    parser.add_argument('--pid_tune', action='store_true')
     parser.add_argument('--target_weight', type=decimal.Decimal, default=0)
     parser.add_argument('--target_unit', choices=scales.UNIT_MAP.keys(), default='GN')
-    parser.add_argument('--pid_tune', type=distutils.util.strtobool, default=False)
-    parser.add_argument('--verbose', type=distutils.util.strtobool, default=False)
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
-        datefmt='%Y-%m-%dT%H:%M:%S')
+    config = configparser.ConfigParser()
+    config.read_file(args.config_file)
 
-    if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+    helpers.setup_logging()
+
+    if not args.verbose:
+        logging.basicConfig(level=logging.INFO)
 
     pidtune_logger = logging.getLogger('pid_tune')
     pid_handler = logging.StreamHandler()
@@ -209,5 +176,4 @@ if __name__ == '__main__':
     if args.pid_tune:
         pidtune_logger.setLevel(logging.INFO)
 
-    memcache_client = pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
-    main(args, memcache_client, pidtune_logger)
+    main(config, args, pidtune_logger)
