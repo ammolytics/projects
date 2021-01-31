@@ -71,7 +71,7 @@ def trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_un
             logging.debug('Trickling complete, motor turned off and PID reset.')
             break
 
-
+        # PID controller requires float value instead of decimal.Decimal
         pid.update(float(scale.weight))
         trickler_motor.update(pid.output)
         logging.debug('trickler_motor.speed: %r, pid.output: %r', trickler_motor.speed, pid.output)
