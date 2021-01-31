@@ -134,6 +134,7 @@ class ANDFx120:
         self._memcache.set('scale_weight', self.weight)
         self._memcache.set('scale_unit', self.unit)
         self._memcache.set('scale_resolution', self.resolution)
+        self._memcache.set('scale_is_stable', self.is_stable)
 
     def _stable(self, line):
         """Scale is stable."""
