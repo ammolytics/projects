@@ -8,12 +8,10 @@ tar --create --transform "$sed_expr" --file $out \
   LICENSE \
   VERSION \
   README.md \
-  .eslintrc.js \
-  ecosystem.config.js \
-  index.js \
-  package.json \
-  server.js \
+  .pylintrc \
+  config.ini \
+  opentrickler_api.yaml \
   server.sh \
-  lib/
+  trickler/
 
 xz -c $out > $out.xz

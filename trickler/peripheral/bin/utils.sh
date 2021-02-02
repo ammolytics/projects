@@ -7,7 +7,6 @@ upload_files() {
     --progress \
     --exclude=".git/" \
     --exclude=".venv/" \
-    --exclude="node_modules/" \
     --delete \
     . -e ssh $USER@$HOST:projects/trickler/peripheral
   echo "Done."
