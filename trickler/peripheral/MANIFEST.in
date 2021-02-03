@@ -1,0 +1,7 @@
+include config.ini
+include opentrickler_api.yaml
+include server.sh
+include requirements-to-freeze.txt
+include setup.py
+include LICENSE
+include *.md
