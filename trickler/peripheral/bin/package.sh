@@ -8,7 +8,10 @@ tar --create --transform "$sed_expr" --file $out \
   LICENSE \
   VERSION \
   README.md \
+  MANIFEST.in \
   .pylintrc \
+  setup.cfg \
+  setup.py \
   config.ini \
   opentrickler_api.yaml \
   server.sh \
