@@ -236,18 +236,29 @@ def on_advertising_start(bleno, trickler_service, error):
 def graceful_exit(bleno):
     bleno.stopAdvertising()
     bleno.disconnect()
+    logging.info('Stopping OpenTrickler Bluetooth...')
 
 
 def run(config, args):
     memcache = helpers.get_mc_client()
 
+    logging.info('Setting up Bluetooth...')
     trickler_service = TricklerService(memcache)
     bleno = pybleno.Bleno()
     device_name = config['bluetooth']['name']
     atexit.register(functools.partial(graceful_exit, bleno))
+
     bleno.on('stateChange', functools.partial(on_state_change, device_name, bleno, trickler_service))
     bleno.on('advertisingStart', functools.partial(on_advertising_start, bleno, trickler_service))
+
+    logging.info('Advertising OpenTrickler over Bluetooth...')
     bleno.start()
+
+    logging.info('Starting OpenTrickler Bluetooth daemon...')
+    while 1:
+        pass
+
+    logging.info('OpenTrickler Bluetooth daemon has stopped.')
 
 
 if __name__ == '__main__':
