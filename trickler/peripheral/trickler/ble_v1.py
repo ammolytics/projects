@@ -259,7 +259,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config = configparser.ConfigParser()
-    config.read_file(args.config_file)
+    config.read_file(open(args.config_file))
 
     helpers.setup_logging()
 
