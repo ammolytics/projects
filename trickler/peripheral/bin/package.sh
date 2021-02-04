@@ -14,6 +14,7 @@ tar --create --transform "$sed_expr" --file $out \
   setup.py \
   config.ini \
   opentrickler_api.yaml \
+  bluetooth.sh \
   server.sh \
   trickler/
 
