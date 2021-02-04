@@ -38,10 +38,10 @@ class AutoMode(BasicCharacteristic):
             'uuid': '10000005-be5f-4b43-a49f-76f2d65c6e28',
             'properties': ['read', 'write'],
             'descriptors': [
-                pybleno.Descriptor(
+                pybleno.Descriptor(dict(
                     uuid='2901',
                     value='Start/stop automatic trickle mode'
-                )],
+                ))],
             'value': False,
         })
         self._memcache = memcache
@@ -77,10 +77,10 @@ class ScaleStatus(BasicCharacteristic):
             'uuid': '10000002-be5f-4b43-a49f-76f2d65c6e28',
             'properties': ['read', 'notify'],
             'descriptors': [
-                pybleno.Descriptor(
+                pybleno.Descriptor(dict(
                     uuid='2901',
                     value='Reads the current stability status of the scale'
-                )],
+                ))],
         })
         self._memcache = memcache
         self._updateValueCallback = None
@@ -101,10 +101,10 @@ class TargetWeight(BasicCharacteristic):
             'uuid': '10000004-be5f-4b43-a49f-76f2d65c6e28',
             'properties': ['read', 'write'],
             'descriptors': [
-                pybleno.Descriptor(
+                pybleno.Descriptor(dict(
                     uuid='2901',
                     value='Target powder weight'
-                )],
+                ))],
         })
         self._memcache = memcache
         self._updateValueCallback = None
@@ -141,10 +141,10 @@ class ScaleUnit(BasicCharacteristic):
             'uuid': '10000003-be5f-4b43-a49f-76f2d65c6e28',
             'properties': ['read', 'write', 'notify'],
             'descriptors': [
-                pybleno.Descriptor(
+                pybleno.Descriptor(dict(
                     uuid='2901',
                     value='Reads the current weight unit of the scale'
-                )],
+                ))],
         })
         self._memcache = memcache
         self._updateValueCallback = None
@@ -180,10 +180,10 @@ class ScaleWeight(BasicCharacteristic):
             'uuid': '10000001-be5f-4b43-a49f-76f2d65c6e28',
             'properties': ['read', 'notify'],
             'descriptors': [
-                pybleno.Descriptor(
+                pybleno.Descriptor(dict(
                     uuid='2901',
                     value='Reads the current weight value of the scale'
-                )],
+                ))],
         })
         self._memcache = memcache
         self._updateValueCallback = None
