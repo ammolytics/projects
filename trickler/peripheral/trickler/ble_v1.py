@@ -90,7 +90,7 @@ class ScaleStatus(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
             data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get('scale_status'), 0)
+            pybleno.writeUInt8(data, self._memcache.get('scale_status').value, 0)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
 
@@ -113,10 +113,10 @@ class TargetWeight(BasicCharacteristic):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            target_weight = self._memcache.get('target_weight')
+            target_weight = str(self._memcache.get('target_weight'))
             # TODO: Convert to number?
             data = array.array('B', [0] * len(target_weight))
-            data.fromunicode(target_weight)
+            data.fromstring(target_weight)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -154,7 +154,7 @@ class ScaleUnit(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
             data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get('scale_unit'), 0)
+            pybleno.writeUInt8(data, self._memcache.get('scale_unit').value, 0)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -192,10 +192,10 @@ class ScaleWeight(BasicCharacteristic):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            scale_weight = self._memcache.get('scale_weight')
+            scale_weight = str(self._memcache.get('scale_weight'))
             # TODO: Convert to number?
             data = array.array('B', [0] * len(scale_weight))
-            data.fromunicode(scale_weight)
+            data.fromstring(scale_weight)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
 
