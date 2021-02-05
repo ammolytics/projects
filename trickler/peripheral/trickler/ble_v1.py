@@ -9,12 +9,14 @@ https://github.com/ammolytics/projects/tree/develop/trickler
 
 import array
 import atexit
+import decimal
 import functools
 import logging
 
 import pybleno
 
 import helpers
+import scales
 
 
 TRICKLER_UUID = '10000000-be5f-4b43-a49f-76f2d65c6e28'
@@ -63,6 +65,7 @@ class AutoMode(BasicCharacteristic):
         else:
             value = pybleno.readUInt16BE(data, 0)
             # TODO: Validate value.
+            value = bool(value)
             self._memcache.set('auto_mode', value)
             # Notify subscribers.
             if self._updateValueCallback:
@@ -127,6 +130,7 @@ class TargetWeight(BasicCharacteristic):
         else:
             value = data.decode('utf-8')
             # TODO: Validate value.
+            value = decimal.Decimal(value)
             self._memcache.set('target_weight', value)
             # Notify subscribers.
             if self._updateValueCallback:
@@ -165,6 +169,7 @@ class ScaleUnit(BasicCharacteristic):
         else:
             value = pybleno.readUInt8(data, 0)
             # TODO: Validate value.
+            value = scales.UNIT_MAP[value]
             # NOTE: Cannot set the scale unit directly, but can change the target unit.
             self._memcache.set('target_unit', value)
             # Notify subscribers.
