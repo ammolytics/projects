@@ -15,6 +15,7 @@ tar --create --transform "$sed_expr" --file $out \
   config.ini \
   opentrickler_api.yaml \
   bluetooth.sh \
+  leds.sh \
   server.sh \
   trickler/
 
