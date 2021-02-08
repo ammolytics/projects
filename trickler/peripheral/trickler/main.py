@@ -12,6 +12,7 @@ import decimal
 import logging
 import time
 
+import constants
 import helpers
 import PID
 import motors
@@ -40,7 +41,7 @@ def trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_un
 
     while 1:
         # Stop running if auto mode is disabled.
-        if not memcache.get('auto_mode'):
+        if not memcache.get(constants.AUTO_MODE):
             logging.debug('auto mode disabled.')
             break
 
@@ -114,15 +115,15 @@ def main(config, args, pidtune_logger):
         timeout=float(config['scale']['timeout']))
     logging.debug('scale: %r', scale)
 
-    memcache.set('auto_mode', args.auto_mode)
-    memcache.set('target_weight', args.target_weight)
-    memcache.set('target_unit', scales.UNIT_MAP[args.target_unit])
+    memcache.set(constants.AUTO_MODE, args.auto_mode)
+    memcache.set(constants.TARGET_WEIGHT, args.target_weight)
+    memcache.set(constants.TARGET_UNIT, scales.UNIT_MAP[args.target_unit])
 
     while 1:
         # Update settings.
-        auto_mode = memcache.get('auto_mode', args.auto_mode)
-        target_weight = memcache.get('target_weight', args.target_weight)
-        target_unit = memcache.get('target_unit', args.target_unit)
+        auto_mode = memcache.get(constants.AUTO_MODE, args.auto_mode)
+        target_weight = memcache.get(constants.TARGET_WEIGHT, args.target_weight)
+        target_unit = memcache.get(constants.TARGET_UNIT, args.target_unit)
         pid.SetPoint = float(target_weight)
         scale.update()
 

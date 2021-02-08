@@ -15,6 +15,7 @@ import logging
 
 import pybleno
 
+import constants
 import helpers
 import scales
 
@@ -54,7 +55,7 @@ class AutoMode(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
             data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get('auto_mode'), 0)
+            pybleno.writeUInt8(data, self._memcache.get(constants.AUTO_MODE), 0)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -66,7 +67,7 @@ class AutoMode(BasicCharacteristic):
             value = pybleno.readUInt16BE(data, 0)
             # TODO: Validate value.
             value = bool(value)
-            self._memcache.set('auto_mode', value)
+            self._memcache.set(constants.AUTO_MODE, value)
             # Notify subscribers.
             if self._updateValueCallback:
                 self._updateValueCallback(value)
@@ -93,7 +94,7 @@ class ScaleStatus(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
             data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get('scale_status').value, 0)
+            pybleno.writeUInt8(data, self._memcache.get(constants.SCALE_STATUS).value, 0)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
 
@@ -116,7 +117,7 @@ class TargetWeight(BasicCharacteristic):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            target_weight = str(self._memcache.get('target_weight'))
+            target_weight = str(self._memcache.get(constants.TARGET_WEIGHT))
             # TODO: Convert to number?
             data = array.array('B', [0] * len(target_weight))
             data.fromstring(target_weight)
@@ -131,7 +132,7 @@ class TargetWeight(BasicCharacteristic):
             value = data.decode('utf-8')
             # TODO: Validate value.
             value = decimal.Decimal(value)
-            self._memcache.set('target_weight', value)
+            self._memcache.set(constants.TARGET_WEIGHT, value)
             # Notify subscribers.
             if self._updateValueCallback:
                 self._updateValueCallback(value)
@@ -158,7 +159,7 @@ class ScaleUnit(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
             data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get('scale_unit').value, 0)
+            pybleno.writeUInt8(data, self._memcache.get(constants.SCALE_UNIT).value, 0)
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -171,7 +172,7 @@ class ScaleUnit(BasicCharacteristic):
             # TODO: Validate value.
             value = scales.UNIT_MAP[value]
             # NOTE: Cannot set the scale unit directly, but can change the target unit.
-            self._memcache.set('target_unit', value)
+            self._memcache.set(constants.TARGET_UNIT, value)
             # Notify subscribers.
             if self._updateValueCallback:
                 self._updateValueCallback(value)
@@ -197,7 +198,7 @@ class ScaleWeight(BasicCharacteristic):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            scale_weight = str(self._memcache.get('scale_weight'))
+            scale_weight = str(self._memcache.get(constants.SCALE_WEIGHT))
             # TODO: Convert to number?
             data = array.array('B', [0] * len(scale_weight))
             data.fromstring(scale_weight)
