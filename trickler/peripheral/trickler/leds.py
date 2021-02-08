@@ -12,6 +12,8 @@ import enum
 import logging
 
 import gpiozero
+
+import constants
 import helpers
 
 
@@ -64,8 +66,8 @@ def run(config, args):
     status_led = gpiozero.PWMLED(status_led_pin)
 
     while 1:
-        motor_on = memcache.get('trickler_motor_speed') > 0
-        auto_mode = memcache.get('auto_mode')
+        motor_on = memcache.get(constants.TRICKLER_MOTOR_SPEED) > 0
+        auto_mode = memcache.get(constants.AUTO_MODE)
         status = TricklerStatus((auto_mode, motor_on))
 
         led_fn = LED_MODES.get(config['leds'][STATUS_MAP[status]])

@@ -15,6 +15,8 @@ import time
 
 import serial
 
+import constants
+
 
 class Units(enum.Enum):
     GRAINS = 0
@@ -130,11 +132,11 @@ class ANDFx120:
 
         self.resolution = resolution[self.unit]
         # Update memcache values.
-        self._memcache.set('scale_status', self.status)
-        self._memcache.set('scale_weight', self.weight)
-        self._memcache.set('scale_unit', self.unit)
-        self._memcache.set('scale_resolution', self.resolution)
-        self._memcache.set('scale_is_stable', self.is_stable)
+        self._memcache.set(constants.SCALE_STATUS, self.status)
+        self._memcache.set(constants.SCALE_WEIGHT, self.weight)
+        self._memcache.set(constants.SCALE_UNIT, self.unit)
+        self._memcache.set(constants.SCALE_RESOLUTION, self.resolution)
+        self._memcache.set(constants.SCALE_IS_STABLE, self.is_stable)
 
     def _stable(self, line):
         """Scale is stable."""
@@ -149,17 +151,17 @@ class ANDFx120:
     def _overload(self, line):
         """Scale is overloaded."""
         self.status = self.StatusMap.OVERLOAD
-        self._memcache.set('scale_status', self.status)
+        self._memcache.set(constants.SCALE_STATUS, self.status)
 
     def _error(self, line):
         """Scale has an error."""
         self.status = self.StatusMap.ERROR
-        self._memcache.set('scale_status', self.status)
+        self._memcache.set(constants.SCALE_STATUS, self.status)
 
     def _acknowledge(self, line):
         """Scale has acknowledged a command."""
         self.status = self.StatusMap.ACKNOWLEDGE
-        self._memcache.set('scale_status', self.status)
+        self._memcache.set(constants.SCALE_STATUS, self.status)
 
     def _model_number(self, line):
         """Gets & sets the scale's model number."""

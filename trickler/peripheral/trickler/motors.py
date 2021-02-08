@@ -12,6 +12,8 @@ import logging
 
 import gpiozero
 
+import constants
+
 
 class TricklerMotor:
     """Controls a small vibration DC motor with the PWM controller on the Pi."""
@@ -48,7 +50,7 @@ class TricklerMotor:
         # TODO(eric): must be 0 - 1.
         logging.debug('Setting speed from %r to %r', self.speed, speed)
         self.pwm.value = speed
-        self._memcache.set('trickler_motor_speed', self.speed)
+        self._memcache.set(constants.TRICKLER_MOTOR_SPEED, self.speed)
 
     def off(self):
         """Turns motor off."""
