@@ -29,6 +29,12 @@ UNIT_MAP = {
 }
 
 
+UNIT_REVERSE_MAP = {
+    Units.GRAINS: 'GN',
+    Units.GRAMS: 'g',
+}
+
+
 def noop(*args, **kwargs):
     """No-op function for scales to use on throwaway status updates."""
     return
