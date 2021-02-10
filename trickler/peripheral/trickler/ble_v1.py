@@ -170,7 +170,7 @@ class ScaleUnit(BasicCharacteristic):
         else:
             value = pybleno.readUInt8(data, 0)
             # TODO: Validate value.
-            value = scales.UNIT_REVERSE_MAP[scales.Units(value)]
+            value = scales.Units(value)
             # NOTE: Cannot set the scale unit directly, but can change the target unit.
             self._memcache.set(constants.TARGET_UNIT, value)
             # Notify subscribers.
