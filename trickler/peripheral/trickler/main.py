@@ -141,8 +141,11 @@ def main(config, args, pidtune_logger):
             auto_mode)
 
         # Powder pan in place, scale stable, ready to trickle.
-        if (scale.weight >= 0 and scale.weight < target_weight and scale.unit == target_unit
-                and scale.is_stable and auto_mode):
+        if (scale.weight >= 0 and
+            scale.weight < target_weight and
+            scale.unit == target_unit and
+            scale.is_stable and
+            auto_mode):
             # Wait a second to start trickling.
             time.sleep(1)
             # Run trickler loop.
