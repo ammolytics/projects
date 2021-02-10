@@ -129,6 +129,7 @@ def main(config, args, pidtune_logger):
 
         # Set scale to match target unit.
         if target_unit != scale.unit:
+            logging.info('scale.unit: %r, target_unit: %r', scale.unit, target_unit)
             scale.change_unit()
 
         logging.info(
