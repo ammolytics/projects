@@ -64,7 +64,7 @@ class AutoMode(BasicCharacteristic):
         elif len(data) != 1:
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
-            value = pybleno.readUInt16BE(data, 0)
+            value = pybleno.readUInt8(data, 0)
             # TODO: Validate value.
             value = bool(value)
             self._memcache.set(constants.AUTO_MODE, value)
