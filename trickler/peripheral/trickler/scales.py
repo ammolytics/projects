@@ -92,6 +92,9 @@ class ANDFx120:
         logging.debug('changing weight unit on scale from: %r', self.unit)
         # Send Mode button command.
         self._serial.write(b'U\r\n')
+        # Sleep 1s and wait for change to take effect.
+        time.sleep(1)
+        # Run update fn to set latest values.
         self.update()
 
     @property
