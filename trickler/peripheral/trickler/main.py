@@ -115,15 +115,15 @@ def main(config, args, pidtune_logger):
         timeout=float(config['scale']['timeout']))
     logging.debug('scale: %r', scale)
 
-    memcache.set(constants.AUTO_MODE, args.auto_mode)
-    memcache.set(constants.TARGET_WEIGHT, args.target_weight)
-    memcache.set(constants.TARGET_UNIT, scales.UNIT_MAP[args.target_unit])
+    memcache.set(constants.AUTO_MODE, args.auto_mode or False)
+    memcache.set(constants.TARGET_WEIGHT, args.target_weight or decimal.Decimal('0.0'))
+    memcache.set(constants.TARGET_UNIT, scales.UNIT_MAP.get(args.target_unit, 'GN'))
 
     while 1:
         # Update settings.
-        auto_mode = memcache.get(constants.AUTO_MODE, args.auto_mode)
-        target_weight = memcache.get(constants.TARGET_WEIGHT, args.target_weight)
-        target_unit = memcache.get(constants.TARGET_UNIT, args.target_unit)
+        auto_mode = memcache.get(constants.AUTO_MODE)
+        target_weight = memcache.get(constants.TARGET_WEIGHT)
+        target_unit = memcache.get(constants.TARGET_UNIT)
         pid.SetPoint = float(target_weight)
         scale.update()
 
