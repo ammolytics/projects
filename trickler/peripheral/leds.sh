@@ -8,4 +8,4 @@ cd /code/opentrickler
 exec ./trickler/leds.py config.ini >> "$1" 2>&1
 
 # Revert activity LED to original trigger.
-echo mmc0 | sudo tee /sys/class/leds/led0/trigger
+#echo mmc0 | sudo tee /sys/class/leds/led0/trigger
