@@ -18,15 +18,15 @@ import helpers
 
 
 class TricklerStatus(enum.Enum):
-    READY = (True, False)
+    READY = (False, False)
     RUNNING = (True, True)
-    STOPPED = (False, False)
+    DONE = (True, False)
 
 
 STATUS_MAP = {
     TricklerStatus.READY: 'ready_status_led_mode',
     TricklerStatus.RUNNING: 'running_status_led_mode',
-    TricklerStatus.STOPPED: 'stopped_status_led_mode',
+    TricklerStatus.DONE: 'done_status_led_mode',
 }
 
 
@@ -63,7 +63,8 @@ def run(config, args):
     memcache = helpers.get_mc_client()
 
     status_led_pin = int(config['leds']['status_led_pin'])
-    status_led = gpiozero.PWMLED(status_led_pin)
+    status_led = gpiozero.PWMLED(status_led_pin, active_high=config['leds'].getboolean('active_high', True))
+    last_led_fn = None
 
     while 1:
         motor_on = float(memcache.get(constants.TRICKLER_MOTOR_SPEED, 0.0)) > 0
@@ -71,7 +72,9 @@ def run(config, args):
         status = TricklerStatus((auto_mode, motor_on))
 
         led_fn = LED_MODES.get(config['leds'][STATUS_MAP[status]])
-        led_fn(status_led)
+        if led_fn != last_led_fn:
+            led_fn(status_led)
+            last_led_fn = led_fn
 
 
 if __name__ == '__main__':
