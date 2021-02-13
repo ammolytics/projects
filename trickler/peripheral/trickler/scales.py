@@ -115,6 +115,8 @@ class ANDFx120:
             None: noop,
         }
 
+        # Note: The input buffer can fill up, causing latency. Clear it before reading.
+        self._serial.reset_input_buffer()
         raw = self._serial.readline()
         self.raw = raw
         logging.debug(raw)
