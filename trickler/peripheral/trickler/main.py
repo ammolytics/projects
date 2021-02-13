@@ -73,7 +73,7 @@ def trickler_loop(memcache, pid, trickler_motor, scale, target_weight, target_un
             break
 
         # PID controller requires float value instead of decimal.Decimal
-        pid.update(float(scale.weight))
+        pid.update(float(scale.weight / target_weight) * 100)
         trickler_motor.update(pid.output)
         logging.debug('trickler_motor.speed: %r, pid.output: %r', trickler_motor.speed, pid.output)
         logging.info(
@@ -124,7 +124,8 @@ def main(config, args, pidtune_logger):
         auto_mode = memcache.get(constants.AUTO_MODE)
         target_weight = memcache.get(constants.TARGET_WEIGHT)
         target_unit = memcache.get(constants.TARGET_UNIT)
-        pid.SetPoint = float(target_weight)
+        # Use percentages for PID control to avoid complexity w/ different units of weight.
+        pid.SetPoint = 100.0
         scale.update()
 
         # Set scale to match target unit.
