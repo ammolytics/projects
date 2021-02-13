@@ -3,5 +3,5 @@ pybleno
 pyserial
 gpiozero
 pymemcache
-RPi.GPIO
+RPi.GPIO; platform_machine == 'armv6l'
 grpcio
