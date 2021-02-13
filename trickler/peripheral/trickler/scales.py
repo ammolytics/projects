@@ -75,7 +75,7 @@ class ANDFx120:
 
         self.StatusMap = self.ScaleStatusV1
         if _version == 2:
-          self.StatusMap = self.ScaleStatusV2
+            self.StatusMap = self.ScaleStatusV2
 
         self.status = self.StatusMap.STABLE
         self.model_number = None
