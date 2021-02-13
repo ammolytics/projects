@@ -1,6 +1,5 @@
 #!/bin/bash
 
-NODE_VER='8.16.0'
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # OSX
