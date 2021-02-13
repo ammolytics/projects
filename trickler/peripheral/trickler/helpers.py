@@ -12,13 +12,13 @@ import pymemcache.client.base
 import pymemcache.serde
 
 
-def get_mc_client():
-    return pymemcache.client.base.Client('127.0.0.1:11211', serde=pymemcache.serde.PickleSerde())
+def get_mc_client(server='127.0.0.1:11211'):
+    return pymemcache.client.base.Client(server, serde=pymemcache.serde.PickleSerde())
 
 
-def setup_logging():
+def setup_logging(level=logging.DEBUG):
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=level,
         format='%(asctime)s.%(msecs)06dZ %(levelname)-4s %(message)s',
         datefmt='%Y-%m-%dT%H:%M:%S')
 

@@ -169,10 +169,11 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read_file(open(args.config_file))
 
-    helpers.setup_logging()
+    log_level = logging.INFO
+    if args.verbose:
+        log_level = logging.DEBUG
 
-    if not args.verbose:
-        logging.basicConfig(level=logging.INFO)
+    helpers.setup_logging(log_level)
 
     pidtune_logger = logging.getLogger('pid_tune')
     pid_handler = logging.StreamHandler()
