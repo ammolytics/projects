@@ -18,6 +18,7 @@ import helpers
 
 
 class TricklerStatus(enum.Enum):
+    """The tuple values correspond to auto_mode, motor_on."""
     READY = (False, False)
     RUNNING = (True, True)
     DONE = (True, False)
@@ -68,8 +69,12 @@ def run(config, args):
 
     while 1:
         motor_on = float(memcache.get(constants.TRICKLER_MOTOR_SPEED, 0.0)) > 0
-        auto_mode = memcache.get(constants.AUTO_MODE, False)
-        status = TricklerStatus((auto_mode, motor_on))
+        auto_mode = memcache.get(constants.AUTO_MODE)
+        try:
+            status = TricklerStatus((auto_mode, motor_on))
+        except ValueError:
+            logging.info('Bad state. auto_mode:%r and motor_on:%r', auto_mode, motor_on)
+            break
 
         led_fn = LED_MODES.get(config['leds'][STATUS_MAP[status]])
         if led_fn != last_led_fn:
