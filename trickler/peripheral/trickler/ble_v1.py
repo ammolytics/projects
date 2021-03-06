@@ -12,6 +12,7 @@ import atexit
 import decimal
 import functools
 import logging
+import time
 
 import pybleno
 
@@ -21,6 +22,48 @@ import scales
 
 
 TRICKLER_UUID = '10000000-be5f-4b43-a49f-76f2d65c6e28'
+
+
+def bool_to_bytes(value):
+    data_bytes = array.array('B', [0] * 1)
+    pybleno.writeUInt8(data_bytes, value, 0)
+    return data_bytes
+
+
+def bytes_to_bool(data_bytes):
+    value = pybleno.readUInt8(data_bytes, 0)
+    return bool(value)
+
+
+def str_to_bytes(value):
+    data_bytes = array.array('B', [])
+    data_bytes.frombytes(value.encode('utf-8'))
+    return data_bytes
+
+
+def bytes_to_str(data_bytes):
+    return data_bytes.decode('utf-8')
+
+
+def decimal_to_bytes(value):
+    value = str(value)
+    return str_to_bytes(value)
+
+
+def bytes_to_decimal(data_bytes):
+    value = bytes_to_str(data_bytes)
+    return decimal.Decimal(value)
+
+
+def enum_to_bytes(value_enum):
+    data_bytes = array.array('B', [0] * 1)
+    pybleno.writeUInt8(data_bytes, value_enum.value, 0)
+    return data_bytes
+
+
+def bytes_to_enum(data_bytes, enum_cls):
+    value = pybleno.readUInt8(data_bytes, 0)
+    return enum_cls(value)
 
 
 class BasicCharacteristic(pybleno.Characteristic):
@@ -49,13 +92,25 @@ class AutoMode(BasicCharacteristic):
         })
         self._memcache = memcache
         self._updateValueCallback = None
+        self.__value = self._memcache.get(constants.AUTO_MODE)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if value == self.__value:
+            return
+        self.__value = value
+        if self._updateValueCallback:
+            self._updateValueCallback(bool_to_bytes(self.__value))
 
     def onReadRequest(self, offset, callback):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get(constants.AUTO_MODE), 0)
+            data = bool_to_bytes(self._memcache.get(constants.AUTO_MODE))
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -64,9 +119,7 @@ class AutoMode(BasicCharacteristic):
         elif len(data) != 1:
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
-            value = pybleno.readUInt8(data, 0)
-            # TODO: Validate value.
-            value = bool(value)
+            value = bytes_to_bool(data)
             self._memcache.set(constants.AUTO_MODE, value)
             # Notify subscribers.
             if self._updateValueCallback:
@@ -88,13 +141,25 @@ class ScaleStatus(BasicCharacteristic):
         })
         self._memcache = memcache
         self._updateValueCallback = None
+        self.__value = self._memcache.get(constants.SCALE_STATUS)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if value == self.__value:
+            return
+        self.__value = value
+        if self._updateValueCallback:
+            self._updateValueCallback(enum_to_bytes(self.__value))
 
     def onReadRequest(self, offset, callback):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get(constants.SCALE_STATUS).value, 0)
+            data = enum_to_bytes(self._memcache.get(constants.SCALE_STATUS))
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
 
@@ -112,15 +177,25 @@ class TargetWeight(BasicCharacteristic):
         })
         self._memcache = memcache
         self._updateValueCallback = None
+        self.__value = self._memcache.get(constants.TARGET_WEIGHT)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if value == self.__value:
+            return
+        self.__value = value
+        if self._updateValueCallback:
+            self._updateValueCallback(decimal_to_bytes(self.__value))
 
     def onReadRequest(self, offset, callback):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            target_weight = str(self._memcache.get(constants.TARGET_WEIGHT))
-            # TODO: Convert to number?
-            data = array.array('B', [0] * len(target_weight))
-            data.fromstring(target_weight)
+            data = decimal_to_bytes(self._memcache.get(constants.TARGET_WEIGHT))
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -129,9 +204,7 @@ class TargetWeight(BasicCharacteristic):
         elif len(data) == 0:
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
-            value = data.decode('utf-8')
-            # TODO: Validate value.
-            value = decimal.Decimal(value)
+            value = bytes_to_decimal(data)
             self._memcache.set(constants.TARGET_WEIGHT, value)
             # Notify subscribers.
             if self._updateValueCallback:
@@ -153,13 +226,25 @@ class ScaleUnit(BasicCharacteristic):
         })
         self._memcache = memcache
         self._updateValueCallback = None
+        self.__value = self._memcache.get(constants.SCALE_UNIT)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if value == self.__value:
+            return
+        self.__value = value
+        if self._updateValueCallback:
+            self._updateValueCallback(enum_to_bytes(self.__value))
 
     def onReadRequest(self, offset, callback):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            data = array.array('B', [0] * 1)
-            pybleno.writeUInt8(data, self._memcache.get(constants.SCALE_UNIT).value, 0)
+            data = enum_to_bytes(self._memcache.get(constants.SCALE_UNIT))
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
@@ -168,9 +253,7 @@ class ScaleUnit(BasicCharacteristic):
         elif len(data) != 1:
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
-            value = pybleno.readUInt8(data, 0)
-            # TODO: Validate value.
-            value = scales.Units(value)
+            value = bytes_to_enum(data, scales.Units)
             # NOTE: Cannot set the scale unit directly, but can change the target unit.
             self._memcache.set(constants.TARGET_UNIT, value)
             # Notify subscribers.
@@ -193,30 +276,43 @@ class ScaleWeight(BasicCharacteristic):
         })
         self._memcache = memcache
         self._updateValueCallback = None
+        self.__value = self._memcache.get(constants.SCALE_WEIGHT)
+
+    @property
+    def value(self):
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        if value == self.__value:
+            return
+        self.__value = value
+        if self._updateValueCallback:
+            self._updateValueCallback(decimal_to_bytes(self.__value))
 
     def onReadRequest(self, offset, callback):
         if offset:
             callback(pybleno.Characteristic.RESULT_ATTR_NOT_LONG, None)
         else:
-            scale_weight = str(self._memcache.get(constants.SCALE_WEIGHT))
-            # TODO: Convert to number?
-            data = array.array('B', [0] * len(scale_weight))
-            data.fromstring(scale_weight)
+            data = decimal_to_bytes(self._memcache.get(constants.SCALE_WEIGHT))
             callback(pybleno.Characteristic.RESULT_SUCCESS, data)
 
 
 class TricklerService(pybleno.BlenoPrimaryService):
 
     def __init__(self, memcache):
+        self.char_map = {
+            constants.AUTO_MODE: AutoMode(memcache),
+            constants.SCALE_STATUS: ScaleStatus(memcache),
+            constants.SCALE_UNIT: ScaleUnit(memcache),
+            constants.SCALE_WEIGHT: ScaleWeight(memcache),
+            constants.TARGET_WEIGHT: TargetWeight(memcache),
+        }
+        logging.info('char_map: %r', self.char_map)
+
         pybleno.BlenoPrimaryService.__init__(self, {
             'uuid': TRICKLER_UUID,
-            'characteristics': [
-                AutoMode(memcache),
-                ScaleStatus(memcache),
-                TargetWeight(memcache),
-                ScaleUnit(memcache),
-                ScaleWeight(memcache),
-            ],
+            'characteristics': [self.char_map[k] for k in  self.char_map],
         })
 
 
@@ -261,6 +357,7 @@ def graceful_exit(bleno):
 def run(config, args):
     memcache = helpers.get_mc_client()
 
+    # TODO(eric): Push the following into a separate function with a try/catch so it can restart because pybleno is flaky.
     logging.info('Setting up Bluetooth...')
     trickler_service = TricklerService(memcache)
     bleno = pybleno.Bleno()
@@ -274,12 +371,32 @@ def run(config, args):
     bleno.on('accept', on_accept)
     bleno.on('disconnect', on_disconnect)
 
+    logging.info('Checking if ready to advertise...')
+    while 1:
+        variables = (
+            memcache.get(constants.AUTO_MODE, None) != None,
+            memcache.get(constants.SCALE_STATUS, None) != None,
+            memcache.get(constants.SCALE_WEIGHT, None) != None,
+            memcache.get(constants.SCALE_UNIT, None) != None,
+            memcache.get(constants.TARGET_WEIGHT, None) != None,
+        )
+        logging.info('Variables: %r', variables)
+        if all(variables):
+            break
+
     logging.info('Advertising OpenTrickler over Bluetooth...')
     bleno.start()
 
     logging.info('Starting OpenTrickler Bluetooth daemon...')
+
     while 1:
-        pass
+        trickler_service.char_map.get(constants.SCALE_STATUS).value = memcache.get(constants.SCALE_STATUS)
+        trickler_service.char_map.get(constants.SCALE_WEIGHT).value = memcache.get(constants.SCALE_WEIGHT)
+        trickler_service.char_map.get(constants.SCALE_UNIT).value = memcache.get(constants.SCALE_UNIT)
+        # TODO(eric): Disabled because these properties aren't configured to notify.
+        #trickler_service.char_map.get(constants.AUTO_MODE).value = memcache.get(constants.AUTO_MODE)
+        #trickler_service.char_map.get(constants.TARGET_WEIGHT).value = memcache.get(constants.TARGET_WEIGHT)
+        time.sleep(0.1)
 
     logging.info('OpenTrickler Bluetooth daemon has stopped.')
 
