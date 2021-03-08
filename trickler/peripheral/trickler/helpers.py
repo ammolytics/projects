@@ -13,7 +13,11 @@ import pymemcache.serde
 
 
 def get_mc_client(server='127.0.0.1:11211'):
-    return pymemcache.client.base.Client(server, serde=pymemcache.serde.PickleSerde())
+    return pymemcache.client.base.Client(
+        server,
+        serde=pymemcache.serde.PickleSerde(),
+        connect_timeout=10,
+        timeout=2)
 
 
 def setup_logging(level=logging.DEBUG):
