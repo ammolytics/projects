@@ -10,8 +10,9 @@ https://github.com/ammolytics/projects/tree/develop/trickler
 import atexit
 import enum
 import logging
+import time
 
-import gpiozero
+import gpiozero # pylint: disable=import-error;
 
 import constants
 import helpers
@@ -80,6 +81,7 @@ def run(config, args):
         if led_fn != last_led_fn:
             led_fn(status_led)
             last_led_fn = led_fn
+        time.sleep(1)
 
 
 if __name__ == '__main__':
