@@ -11,8 +11,8 @@ import decimal
 import logging
 import struct
 
-import pymemcache.client.base
-import pymemcache.serde
+import pymemcache.client.base # pylint: disable=import-error;
+import pymemcache.serde # pylint: disable=import-error;
 
 
 def get_mc_client(server='127.0.0.1:11211'):

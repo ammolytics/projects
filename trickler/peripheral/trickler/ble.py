@@ -9,7 +9,7 @@ https://github.com/ammolytics/projects/tree/develop/trickler
 
 import logging
 
-import bluezero
+import bluezero # pylint: disable=import-error;
 
 import helpers
 
