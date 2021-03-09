@@ -12,7 +12,7 @@ import functools
 import logging
 import time
 
-import pybleno
+import pybleno # pylint: disable=import-error;
 
 import constants
 import helpers

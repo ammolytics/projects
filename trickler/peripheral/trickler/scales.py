@@ -13,7 +13,7 @@ import enum
 import logging
 import time
 
-import serial
+import serial # pylint: disable=import-error;
 
 import constants
 

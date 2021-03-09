@@ -10,7 +10,7 @@ https://github.com/ammolytics/projects/tree/develop/trickler
 import atexit
 import logging
 
-import gpiozero
+import gpiozero # pylint: disable=import-error;
 
 import constants
 
