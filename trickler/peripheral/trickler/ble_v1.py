@@ -56,6 +56,7 @@ class BasicCharacteristic(pybleno.Characteristic):
     def mc_value(self, value):
         if value == self.__value:
             return
+        logging.info('Updating %s: from %r to %r', self._mc_key, self.__value, value)
         self.__value = value
         if self._updateValueCallback:
             self._updateValueCallback(self._send_fn(self.__value))
@@ -71,7 +72,6 @@ class BasicCharacteristic(pybleno.Characteristic):
 
     def mc_update(self):
         value = self.mc_get()
-        logging.info('Updating from memcache. %s: from %r to %r', self._mc_key, self.mc_value, value)
         self.mc_value = value
 
 
