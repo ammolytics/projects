@@ -61,6 +61,15 @@ LED_MODES = {
 }
 
 
+def all_variables_set(memcache):
+    variables = (
+        memcache.get(constants.AUTO_MODE, None) != None,
+        memcache.get(constants.TRICKLER_MOTOR_SPEED, None) != None,
+    )
+    logging.info('Variables: %r', variables)
+    return all(variables)
+
+
 def run(config, args):
     memcache = helpers.get_mc_client()
 
@@ -68,9 +77,21 @@ def run(config, args):
     status_led = gpiozero.PWMLED(status_led_pin, active_high=config['leds'].getboolean('active_high', True))
     last_led_fn = None
 
+    logging.info('Checking if ready to begin...')
     while 1:
-        motor_on = float(memcache.get(constants.TRICKLER_MOTOR_SPEED, 0.0)) > 0
-        auto_mode = memcache.get(constants.AUTO_MODE)
+        if all_variables_set(memcache):
+            logging.info('Ready!')
+            break
+        time.sleep(0.1)
+
+    while 1:
+        try:
+            motor_on = float(memcache.get(constants.TRICKLER_MOTOR_SPEED, 0.0)) > 0
+            auto_mode = memcache.get(constants.AUTO_MODE)
+        except (KeyError, ValueError):
+            logging.exception('Possible cache miss, trying again.')
+            break
+
         try:
             status = TricklerStatus((auto_mode, motor_on))
         except ValueError:
