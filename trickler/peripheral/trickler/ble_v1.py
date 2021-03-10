@@ -71,6 +71,7 @@ class BasicCharacteristic(pybleno.Characteristic):
 
     def mc_update(self):
         value = self.mc_get()
+        logging.info('Updating from memcache. %s: from %r to %r', self._mc_key, self.mc_value, value)
         self.mc_value = value
 
 
@@ -101,7 +102,8 @@ class AutoMode(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
             value = self._recv_fn(data)
-            self._memcache.set(constants.AUTO_MODE, value)
+            logging.info('Changing %s to %r', self._mc_key, value)
+            self._memcache.set(self._mc_key, value)
             # This will notify subscribers.
             self.mc_value = value
             callback(pybleno.Characteristic.RESULT_SUCCESS)
@@ -153,6 +155,7 @@ class TargetWeight(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
             value = self._recv_fn(data)
+            logging.info('Changing %s to %r', self._mc_key, value)
             self._memcache.set(self._mc_key, value)
             # This will notify subscribers.
             self.mc_value = value
@@ -185,6 +188,7 @@ class ScaleUnit(BasicCharacteristic):
             callback(pybleno.Characteristic.RESULT_INVALID_ATTRIBUTE_LENGTH)
         else:
             value = self._recv_fn(data)
+            logging.info('Changing %s to %r', constants.TARGET_UNIT, value)
             # NOTE: Cannot set the scale unit directly, but can change the target unit.
             self._memcache.set(constants.TARGET_UNIT, value)
             # Notify subscribers.
@@ -227,7 +231,7 @@ class TricklerService(pybleno.BlenoPrimaryService):
             ],
         })
 
-    def update(self):
+    def all_mc_update(self):
         for characteristic in self['characteristics']:
             characteristic.mc_update()
 
@@ -277,6 +281,7 @@ def all_variables_set(memcache):
         memcache.get(constants.SCALE_WEIGHT, None) != None,
         memcache.get(constants.SCALE_UNIT, None) != None,
         memcache.get(constants.TARGET_WEIGHT, None) != None,
+        memcache.get(constants.TARGET_UNIT, None) != None,
     )
     logging.info('Variables: %r', variables)
     return all(variables)
@@ -314,7 +319,7 @@ def run(config, args):
     # Loop and keep TricklerService property values up to date from memcache.
     while 1:
         try:
-            trickler_service.update()
+            trickler_service.all_mc_update()
         except (AttributeError, OSError):
             logging.exception('Caught possible bluetooth exception.')
         time.sleep(0.1)
