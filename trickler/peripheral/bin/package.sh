@@ -12,7 +12,7 @@ tar --create --transform "$sed_expr" --file $out \
   .pylintrc \
   setup.cfg \
   setup.py \
-  config.ini \
+  opentrickler_config.ini \
   opentrickler_api.yaml \
   bluetooth.sh \
   leds.sh \

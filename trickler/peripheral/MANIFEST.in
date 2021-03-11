@@ -1,4 +1,4 @@
-include config.ini
+include opentrickler_config.ini
 include opentrickler_api.yaml
 include bluetooth.sh
 include leds.sh
