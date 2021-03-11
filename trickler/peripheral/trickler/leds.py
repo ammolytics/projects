@@ -116,7 +116,11 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read_file(open(args.config_file))
 
-    helpers.setup_logging()
+    log_level = logging.INFO
+    if args.verbose or config['general'].getboolean('verbose'):
+        log_level = logging.DEBUG
+
+    helpers.setup_logging(log_level)
 
     if config['leds'].getboolean('enable_status_leds'):
         run(config, args)
