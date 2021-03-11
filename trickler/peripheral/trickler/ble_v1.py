@@ -338,6 +338,10 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read_file(open(args.config_file))
 
-    helpers.setup_logging()
+    log_level = logging.INFO
+    if config['general'].getboolean('verbose'):
+        log_level = logging.DEBUG
+
+    helpers.setup_logging(log_level)
 
     run(config, args)

@@ -170,7 +170,7 @@ if __name__ == '__main__':
     config.read_file(open(args.config_file))
 
     log_level = logging.INFO
-    if args.verbose:
+    if args.verbose or config['general'].getboolean('verbose'):
         log_level = logging.DEBUG
 
     helpers.setup_logging(log_level)
