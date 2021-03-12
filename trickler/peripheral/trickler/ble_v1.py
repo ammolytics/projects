@@ -10,6 +10,7 @@ https://github.com/ammolytics/projects/tree/develop/trickler
 import atexit
 import functools
 import logging
+import os
 import time
 
 import pybleno # pylint: disable=import-error;
@@ -293,6 +294,7 @@ def run(config, args):
     logging.info('Setting up Bluetooth...')
     trickler_service = TricklerService(memcache)
     device_name = config['bluetooth']['name']
+    os.environ['BLENO_DEVICE_NAME'] = device_name
     logging.info('Bluetooth device will be advertised as %s', device_name)
     bleno = pybleno.Bleno()
     atexit.register(functools.partial(graceful_exit, bleno))
