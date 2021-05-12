@@ -13,7 +13,7 @@
   "dependencies": {
     "@abandonware/bleno": "github:abandonware/bleno",
     "bleno": "github:abandonware/bleno",
-    "mathjs": "^6.6.5",
+    "mathjs": "^7.5.1",
     "rpio": "^2.1.1",
     "serialport": "^8.0.8"
   },
