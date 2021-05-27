@@ -5,4 +5,4 @@ if [[ "$OSTYPE" != "linux-gnu"* ]]; then
   source .venv/bin/activate;
 fi
 
-MOCK=1 node index.js /dev/ttyUSB0
+echo "Sorry, this no longer works."

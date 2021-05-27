@@ -1,4 +1,5 @@
 #!/bin/sh
 
+# Enter code directory and start the trickler daemon.
 cd /code/opentrickler
-exec ./server.js ecosystem.config.js >> "$1" 2>&1
+exec ./trickler/main.py opentrickler_config.ini >> "$1" 2>&1

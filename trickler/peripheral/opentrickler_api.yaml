@@ -1,0 +1,53 @@
+openapi: 3.0.0
+
+info:
+  version: 1.0.0
+  title: OpenTrickler API
+  license:
+    name: MIT
+
+servers:
+  - url: http://opentrickler.local/v1
+  - url: http://localhost/v1
+
+paths:
+  /settings:
+    get:
+      summary: Read Open Trickler settings
+      operationId: getSettings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Setting'
+    put:
+      summary: Update Open Trickler settings
+      operationId: updateSettings
+      requestBody:
+        description: New setting values
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Setting'
+      responses:
+        '204':
+          description: The settings were updated
+    
+components:
+  schemas:
+    Setting:
+      type: object
+      properties:
+        auto_mode:
+          type: boolean
+        target_weight:
+          type: string
+          pattern: '^\d{1,3}.\d{1,3}$'
+        target_unit:
+          type: string
+          enum:
+            - g
+            - gn

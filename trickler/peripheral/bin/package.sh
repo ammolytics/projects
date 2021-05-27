@@ -8,12 +8,15 @@ tar --create --transform "$sed_expr" --file $out \
   LICENSE \
   VERSION \
   README.md \
-  .eslintrc.js \
-  ecosystem.config.js \
-  index.js \
-  package.json \
-  server.js \
+  MANIFEST.in \
+  .pylintrc \
+  setup.cfg \
+  setup.py \
+  opentrickler_config.ini \
+  opentrickler_api.yaml \
+  bluetooth.sh \
+  leds.sh \
   server.sh \
-  lib/
+  trickler/
 
 xz -c $out > $out.xz
