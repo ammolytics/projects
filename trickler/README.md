@@ -4,7 +4,7 @@ The Open Trickler is described in greater detail [in this article](https://blog.
 
 ## Support
 
-Need help? [Join our Discord Server](https://discord.gg/WqTbyK2) to chat with other folks who are building the Open Trickler and helping each other out.
+Need help? [Check the FAQ](https://github.com/ammolytics/projects/tree/develop/trickler#frequently-asked-questions) or [join our Discord Server](https://discord.gg/WqTbyK2) to chat with other folks who are building the Open Trickler and helping each other out.
 
 This is a free, open-source project which does not come with any official support or warranty.
 
@@ -13,7 +13,7 @@ This is a free, open-source project which does not come with any official suppor
 
 The Mobile app for this project uses the [Flutter framework](https://flutter.dev/). The code can be found in the [`mobile/`](https://github.com/ammolytics/projects/blob/develop/trickler/mobile/) directory.
 
-The Controller is a [NodeJS (`v12.x`)](https://nodejs.org/docs/latest-v12.x/api/) application which reads from the scale's serial port and controls the trickler. It was designed to be run on a Raspberry Pi Zero W. The code can be found in the [`peripheral/`](https://github.com/ammolytics/projects/blob/develop/trickler/peripheral/) directory.
+The Controller is a [Python (`v3.7`)](https://docs.python.org/3.7/) application which reads from the scale's serial port and controls the trickler. It was designed to be run on a Raspberry Pi Zero W. The code can be found in the [`peripheral/`](https://github.com/ammolytics/projects/blob/develop/trickler/peripheral/) directory.
 
 ## Hardware
 
