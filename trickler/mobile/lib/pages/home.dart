@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _getScaffold() {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: Header(
