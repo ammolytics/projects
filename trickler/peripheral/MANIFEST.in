@@ -1,0 +1,9 @@
+include opentrickler_config.ini
+include opentrickler_api.yaml
+include bluetooth.sh
+include leds.sh
+include server.sh
+include requirements-to-freeze.txt
+include setup.py
+include LICENSE
+include *.md

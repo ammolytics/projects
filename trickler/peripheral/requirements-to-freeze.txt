@@ -1,0 +1,7 @@
+bluezero
+pybleno
+pyserial
+gpiozero
+pymemcache
+RPi.GPIO; platform_machine == 'armv6l'
+grpcio
