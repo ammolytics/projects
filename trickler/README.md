@@ -13,7 +13,7 @@ This is a free, open-source project which does not come with any official suppor
 
 The Mobile app for this project uses the [Flutter framework](https://flutter.dev/). The code can be found in the [`mobile/`](https://github.com/ammolytics/projects/blob/develop/trickler/mobile/) directory.
 
-The Controller is a [Python (`v3.7`)](https://docs.python.org/3.7/) application which reads from the scale's serial port and controls the trickler. It was designed to be run on a Raspberry Pi Zero W. The code can be found in the [`peripheral/`](https://github.com/ammolytics/projects/blob/develop/trickler/peripheral/) directory.
+The Controller is a [Python (`v3.9`)](https://docs.python.org/3.9/) application which reads from the scale's serial port and controls the trickler. It was designed to be run on a Raspberry Pi Zero W. The code can be found in the [`peripheral/`](https://github.com/ammolytics/projects/blob/develop/trickler/peripheral/) directory.
 
 ## Hardware
 

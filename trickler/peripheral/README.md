@@ -15,8 +15,8 @@ This is a free, open-source project which does not come with any official suppor
 
 ## Installing Latest Firmware
 
-1. Download the latest firmware image: [`opentrickler-python-20210409-BETA.img.xz`](https://drive.google.com/file/d/1V8894DeIHzzT5HGKF2Z1cRO5eUQMh79B/view?usp=sharing)
-  `SHA256 (opentrickler-python-20210409-BETA.img.xz) = 94a95b30f466834ebe85e12ef0d9d9ea53b34b0b21be1a4921ba125c1b8de2d1`
+1. Download the latest firmware image: [`opentrickler-python-20210814-PROD.img.xz`](https://drive.google.com/file/d/1Fe7pqHpg_yUvkC7nm8q0EPcZy5OtW1Yc/view?usp=sharing)
+  `SHA256 (opentrickler-python-20210814-PROD.img.xz) = 649b047b9b2ab5906686382008afecd590170a1f62cf16247d34621b7d583025`
 1. Flash your microSD card using [balenaEtcher](https://www.balena.io/etcher/)
   I **highly** recommend the free [balenaEtcher program](https://www.balena.io/etcher/) for this step as it's much smarter and less error/mistake prone.
 1. Open the `BOOT` partition (shows up like a USB-drive when plugged into your computer) on the microSD card. Edit the `wpa_supplicant.conf` file with your WiFi settings.
@@ -53,8 +53,8 @@ All firmware images are generated using [buildroot](https://buildroot.org/) and 
 1. Clone this repository.
   I highly recommend making changes on your computer then copying them to the microSD card.
 1. Download the latest **development** firmware image:
-  [`opentrickler-python-20210409-BETA.img.xz`](https://drive.google.com/file/d/1V8894DeIHzzT5HGKF2Z1cRO5eUQMh79B/view?usp=sharing)
-  `SHA256 (opentrickler-python-20210409-BETA.img.xz) = 94a95b30f466834ebe85e12ef0d9d9ea53b34b0b21be1a4921ba125c1b8de2d1`
+  [`opentrickler-python-20210814-DEV.img.xz`]()https://drive.google.com/file/d/1q7YvOHOx1h7B_rL1UD9nudy-sgMhuCzV/view?usp=sharing
+  `SHA256 (opentrickler-python-20210814-DEV.img.xz) = 1b8dbdbcfb76c9c6706ebfebfc981e6238a6107c24640619218087e01b0a277e`
 1. Follow the regular instructions above to flash the image.
 1. You can log into your running Open Trickler over SSH with the following info:  
   `ssh root@opentrickler.local` (p: `ammolytics`)
