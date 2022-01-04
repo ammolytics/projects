@@ -16,7 +16,7 @@ Inside the bottom hole are two grooves for o-rings to allow the trickler tube to
 
  
 
-### lid.stl
+### main_body.stl
 
 Print this part without supports, in the orientation shown below.  
 
