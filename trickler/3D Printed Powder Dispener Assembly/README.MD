@@ -1,6 +1,6 @@
 # 3D Printed Powder Dispenser Assembly
 
-Note:  This is a work in progress.  The parts here haven't been fully tested.
+Note:  This is a work in progress.  The parts here haven't been fully tested.  Every 3d printer has slight variations, the parts you print may need some slight adjustments to fit properly.
 
 Included in this directory are all of the parts required to 3d print your own powder dispenser assembly.  You'll find both .stl and .step file types. If you make any changes to the parts, you'll need to do the following:
 
