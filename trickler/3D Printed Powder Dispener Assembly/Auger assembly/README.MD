@@ -14,7 +14,9 @@ The tube used for the auger is this part from McMaster:  https://www.mcmaster.co
 
 It will need to be cut to length, and a hole will need to be drilled in it.
 
-TODO:  Add cut and drill dimensions
+Cut the auger tube to 7.35" long
+
+Drill a 1/2" diameter hole 3.1" from one end, through only one side of the tube.  When you install the tube, orient this hole so it's facing up.
 
 ### auger coupler.stl
 
