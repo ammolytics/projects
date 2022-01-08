@@ -4,6 +4,8 @@ The vibration motor is held onto the trickling tube using this part.
 
 One end has a taper on the two holes.  This end is marked by two small dimples. Insert the motor and tube into this end.  The motor will stop against a ridge in the hole, insert it until it comes to a stop.  If the motor needs to be removed, push it out from the end with the counterweight.  Do not pull the motor out by the wires.
 
+The vibration motor assmebly slips over the trickler tube.  Cut the tube to length, and use the tube cutting and crimping jigs to shape it to your desired shape.  The tube should be 5" long when you're done.
+
 ### vibration motor holder.stl
 
 Print this part without supports, in the orientation shown below.  I had best results with 0.1mm layer height.
