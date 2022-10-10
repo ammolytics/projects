@@ -32,7 +32,7 @@ Open Trickler is an open source project by Ammolytics.
   /// _getLink returns a Flat button that displays the
   /// given text, and opens the given url onPressed.
 
-  Widget _getLink(String text, String url) => FlatButton(
+  Widget _getLink(String text, String url) => TextButton(
     onPressed: () => _launchUrl(url),
     child: Text(
       text,

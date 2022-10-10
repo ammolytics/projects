@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+
 /// ToggleUnitButton is a custom InputDecoration. It creates a button that allows
 /// the user to call the given toggleUnit callback, and display the given unitAbbr.
 
@@ -23,7 +24,12 @@ class ToggleUnitButton extends InputDecoration {
     suffix: SizedBox(
       width: 57.0,
       height: 40.0,
-      child: OutlineButton(
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          ),
+        ),
         onPressed: toggleUnit,
         child: Text(
           unitAbbr,
@@ -33,10 +39,6 @@ class ToggleUnitButton extends InputDecoration {
             fontWeight: FontWeight.bold,
             color: Colors.blueAccent,
           ),
-        ),
-        splashColor: Colors.blueAccent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
         ),
       ),
     ),
