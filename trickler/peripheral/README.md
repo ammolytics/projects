@@ -1,6 +1,6 @@
 # This project has graduated!
 
-You find can the Open Trickler peripheral code at it's new home:
+You find can the Open Trickler peripheral code at its new home:
 
 ## [github.com/ammolytics/open-trickler-peripheral](https://github.com/ammolytics/open-trickler-peripheral)
 
