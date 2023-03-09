@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:scale_controller/widgets/weight_buttons.dart';
-import 'package:scale_controller/reducers/index.dart';
-import 'package:scale_controller/models/index.dart';
+import '../lib/widgets/weight_buttons.dart';
+import '../lib/reducers/index.dart';
+import '../lib/models/index.dart';
 
 /// This is a TestApp. It is set up similar to a real MaterialApp
 /// so that the widget we want to test, functions as expected.

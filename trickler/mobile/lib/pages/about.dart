@@ -22,8 +22,10 @@ Open Trickler is an open source project by Ammolytics.
   /// browser. If it is unable to open the url it will throw an error.
 
   void _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    Uri launchUri = Uri.parse(url);
+    
+    if (await canLaunchUrl(launchUri)) {
+      await launchUrl(launchUri);
     } else {
       throw 'Could not launch $url';
     }

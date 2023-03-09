@@ -2,8 +2,8 @@
 /// Released under the MIT license. See LICENSE file in the project root for details.
 
 import 'package:test/test.dart';
-import 'package:scale_controller/helpers.dart';
-import 'package:scale_controller/globals.dart';
+import '../lib/globals.dart';
+import '../lib/helpers.dart';
 
 void main() {
 
